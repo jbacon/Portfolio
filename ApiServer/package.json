@@ -5,7 +5,6 @@
   "description": "Node Express API Server for Josh Bacon's Public Portfolio Web App.",
   "main": "./bin/www",
   "scripts": {
-    "start": "node --inspect=localhost:9229 --inspect-brk ./bin/www",
     "startDev": "CONFIG_FILE=./configs-dev.json node --inspect=localhost:9229 --inspect-brk ./bin/www",
     "startProd": "CONFIG_FILE=./configs-prod.json node ./bin/www"
   },

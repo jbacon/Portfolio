@@ -1,28 +1,33 @@
-exports.CONFIG_FILE = process.env.CONFIG_FILE || './configs.json.template';
-var configFile = require('../'+exports.CONFIG_FILE);
+const DEFAULT_CONFIG_FILE='./configs.json.template'
 
-exports.ENVIRONMENTS = {
-	PROD: 'prod',
-	DEV: 'dev'
+const CONFIG_FILE = process.env.CONFIG_FILE || DEFAULT_CONFIG_FILE;
+
+exports.ENVRIONMENTS = {
+	DEV: 'development',
+	PROD: 'production'
 }
-exports.environment = process.env.ENVIRONMENT || configFile.environment || exports.OPTIONS.ENV.DEV
 
-exports.jwtSecret = process.env.JWT_SECRET || configFile.jwtSecret || 'This is my default super secret password!'
 
-exports.adminEmail = process.env.ADMIN_EMAIL || configFile.adminEmail || 'jbacon@zagmail.gonzaga.edu'
+const configs = require('../'+exports.CONFIG_FILE);
 
-exports.adminNameFirst = process.env.ADMIN_NAME_FIRST || configFile.adminNameFirst || 'Josh'
+exports.environment = process.env.NODE_ENV || configs.environment
 
-exports.adminNameLast = process.env.ADMIN_NAME_LAST || configFile.adminNameLast || 'Bacon'
+exports.jwtSecret = process.env.JWT_SECRET || configs.jwtSecret
 
-exports.adminPassword = process.env.ADMIN_PASSWORD || configFile.adminPassword || 'password'
+exports.adminEmail = process.env.ADMIN_EMAIL || configs.adminEmail
 
-exports.serverPort = process.env.SERVER_PORT || configFile.serverPort || '3000'
+exports.adminNameFirst = process.env.ADMIN_NAME_FIRST || configs.adminNameFirst
 
-exports.serverUrl = process.env.SERVER_URL || configFile.serverUrl || 'http://localhost'
+exports.adminNameLast = process.env.ADMIN_NAME_LAST || configs.adminNameLast
 
-exports.mongoDbUrl = process.env.MONGODB_URL || configFile.mongoDbUrl || 'mongodb://172.17.0.2:27017/portfolio'
+exports.adminPassword = process.env.ADMIN_PASSWORD || configs.adminPassword
 
-exports.facebookAppID = process.env.FACEBOOOK_APP_ID || configFile.facebookAppID || null
+exports.serverPort = process.env.SERVER_PORT || configs.serverPort
 
-exports.facebookAppSecret = process.env.FACEBOOK_APP_SECRET || configFile.facebookAppSecret || null
+exports.serverUrl = process.env.SERVER_URL || configs.serverUrl
+
+exports.mongoDbUrl = process.env.MONGODB_URL || configs.mongoDbUrl
+
+exports.facebookAppID = process.env.FACEBOOOK_APP_ID || configs.facebookAppID
+
+exports.facebookAppSecret = process.env.FACEBOOK_APP_SECRET || configs.facebookAppSecret

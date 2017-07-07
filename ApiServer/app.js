@@ -13,7 +13,7 @@ var commonLogging = require('./common/loggingUtil');
 var commonMongo = require('./common/mongoUtil'); 
 var commonMarkdown = require('./common/markdownUtil'); 
 var commonAuth = require('./common/authUtil'); 
-var commonConfigs = require('./common/configUtil');
+var commonConfig = require('./common/configUtil');
 /* 
 Generate Client Javascript Functions that generate reusable HTML components.
 Poor man's React.js? I want to avoid integrating a front-end framework at this point. 
@@ -21,7 +21,7 @@ This method makes SPA design simple and easy, since the API server will only be
 returning json data not partials or HTML elements.
 */
 /* Connect MongoDB */
-commonMongo.connectDB(commonConfigs.mongoDbUrl,
+commonMongo.connectDB(commonConfig.mongoDbUrl,
   (error) => {
     if(error) throw error
     commonMongo.configureDB(
@@ -55,7 +55,7 @@ app.use(function(req, res, next) {
 // ERROR LOGGING (AFTER routers BEFORE handlers)
 app.use(commonLogging.routerLoggingMiddleware);
 // ERROR HANDLERS
-if (commonConfigs.environment == commonConfigs.ENVIRONMENTS.DEV) {
+if (commonConfig.environment == commonConfig.ENVIRONMENTS.DEV) {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.send({

@@ -1,5 +1,5 @@
 {
-	"environment": "DEV",
+	"environment": "development",
 	"jwtSecret": "This is my secret JWT key!",
 	"sessionSecret": "This is my secret session key!",
 	"facebookAppID": "https://developers.facebook.com/",
