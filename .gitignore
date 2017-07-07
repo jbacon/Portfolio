@@ -1,4 +1,5 @@
 # Josh's Custom Ignores:
+.DS_Store
 ApiServer/data/ 
 ApiServer/node_modules/
 ApiServer/configs-dev.json
