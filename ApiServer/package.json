@@ -1,5 +1,5 @@
 {
-  "name": "PortfolioAPI",
+  "name": "ApiServer",
   "version": "1.0.0",
   "author": "Josh Bacon",
   "description": "Node Express API Server for Josh Bacon's Public Portfolio Web App.",

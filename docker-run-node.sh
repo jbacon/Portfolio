@@ -3,8 +3,8 @@ docker run \
 --interactive \
 --tty \
 --detach \
---volume ${PWD}/:/app/ \
---expose 3000:3000 \
+--volume ${PWD}/ApiServer/:/app/ \
+--expose 3000 \
 --env HTTP_PROXY=${HTTP_PROXY} \
 --env HTTPS_PROXY=${HTTPS_PROXY} \
 --env http_proxy=${http_proxy} \
@@ -19,5 +19,5 @@ apk add git;
 cd /app/;
 npm install;
 ./node_modules/.bin/jspm install
-npm start;
+npm start-prod;
 '

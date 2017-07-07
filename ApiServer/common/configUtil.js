@@ -21,7 +21,7 @@ exports.serverPort = process.env.SERVER_PORT || configFile.serverPort || '3000'
 
 exports.serverUrl = process.env.SERVER_URL || configFile.serverUrl || 'http://localhost'
 
-exports.mongoDbUrl = process.env.MONGODB_URL || configFile.mongoDbUrl || 'mongodb://172.17.0.2:27017/NodeJSWebApp'
+exports.mongoDbUrl = process.env.MONGODB_URL || configFile.mongoDbUrl || 'mongodb://172.17.0.2:27017/portfolio'
 
 exports.facebookAppID = process.env.FACEBOOOK_APP_ID || configFile.facebookAppID || null
 
