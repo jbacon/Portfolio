@@ -3,8 +3,8 @@ docker run \
 --interactive \
 --tty \
 --detach \
---volume ${PWD}/ngnix.conf:/etc/nginx.conf \
---volume /etc/letsencrypt/live/portfolioapi.joshbacon.name/:/etc/letsencrypt/live/portfolioapi.joshbacon.name/ \
+--volume ${PWD}/ngnix.conf:/etc/nginx/conf.d/default.conf \
+--volume /etc/letsencrypt/archive/portfolioapi.joshbacon.name/:/etc/letsencrypt/archive/portfolioapi.joshbacon.name/ \
 --publish 80:80 \
 --publish 443:443 \
 --env HTTP_PROXY=${HTTP_PROXY} \
