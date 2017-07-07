@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Josh Bacon</title>
+    <link rel="stylesheet" href="/stylesheets/layout.css">
+    <link rel="stylesheet" href="/stylesheets/login.css">
+    <link rel="stylesheet" href="/stylesheets/register.css">
+    <link rel="stylesheet" href="/stylesheets/modal-window.css">
+</head>
+<body class="hidden">
+    <header id="site-header">
+        <h1 id="site-title">Josh Bacon Profile</h1>
+        <nav id="site-nav-bar"><a class="clickable" id="logout">Logout</a><img id="profilepic"><a class="clickable" id="greeting">Hello</a><a class="clickable" id="register" href="#register-modal-box--open">Register</a><a class="clickable" id="login" href="#login-modal-box--open">Login</a></nav>
+    </header>
+    <main>
+        <nav id="main-menu">
+            <div>About Me</div>
+            <div>Articles</div>
+            <div>Photos</div>
+            <div>Contact</div>
+        </nav>
+        <section id="main-section">
+            <header id="main-header">
+                <article id="article-header" data-article-id="59344c18e987af001c119f93">Welcome!</article>
+            </header>
+            <div id="main-content">
+                <p id="article-content"> Hello! I'm Josh Bacon and you've entered my personal web app portfolio! Please explore my site, I'd love to share my passion for technology with you! You're invite to read through my articles, visit my social profiles, identify yourself via Facebook authentication, and/or provide any feedback you'd like in the below comment sections (no vulgarity please). Creating this app was great fun, and I hope you find it interesting. Behind-the-scenes is M.E..N technology stack.. MongoDB, ExpressJS, and the NodeJS runtime. I chose to ignore front-end frameworks for this project so I could focus on improving my understanding of native DOM manipulation and VanillaJS (Although I also would have enjoyed learning ReactJS for a more robust production application!). Hosting/Infrastructure for my site is backed entirely on my personal AWS account. From domain registration (R53), to DNS resolution (R53), certification management (ACM), and AWS EC2. Other technologies used include: Docker, PugJS templating engine, JSPM, NPM, CSS... Please Email me if you have any questions or interest in further discussions. Thanks for stopping by!</p>
+            </div>
+            <footer id="main-footer">
+                <section id="actions"><span class="clickable">Share</span><span class="clickable">Print</span><span class="clickable">Contact</span></section>
+            </footer>
+        </section>
+    </main>
+    <footer id="site-footer">
+        <article id="comments"></article>
+        <div class="modal-box" id="login-modal-box--open">
+            <a class="modal-box__overlay" href="#"></a>
+            <div class="modal-box__content"><a class="modal-box--close" id="login-modal-box--close" href="#">X</a>
+                <form id="local-login-form" action="">
+                    <label for="email">Email</label>
+                    <input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld">
+                    <label for="password">Password</label>
+                    <input class="password" id="password" type="password" name="password" placeholder="password..">
+                    <input class="submit" type="submit" href="#">
+                </form>
+                <form id="facebook-login-form" action="">
+                    <input class="submit" type="submit" name="Facebook">
+                </form>
+            </div>
+        </div>
+        <div class="modal-box" id="register-modal-box--open">
+            <a class="modal-box__overlay" href="#"></a>
+            <div class="modal-box__content"><a class="modal-box--close" id="register-modal-box--close" href="#">X</a>
+                <form id="register-form" action="">
+                    <div>
+                        <label for="email">Email</label>
+                        <input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld">
+                    </div>
+                    <div>
+                        <label for="name-first">First Name</label>
+                        <input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John">
+                    </div>
+                    <div>
+                        <label for="name-last">Last Name</label>
+                        <input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe">
+                    </div>
+                    <div>
+                        <label for="password">Password</label>
+                        <input class="password" id="password" type="password" name="password" placeholder="password..">
+                    </div>
+                    <div>
+                        <label for="passwordRetype">Retype Password</label>
+                        <input class="passwordRetype" id="passwordRetype" type="password" name="passwordRetype" placeholder="password..">
+                    </div>
+                    <div>
+                        <input class="submit" type="submit">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </footer>
+</body>
+<script src="javascript/myCommentComponent.js"></script>
+<script src="javascript/globalWebComponents.js"></script>
+</html>

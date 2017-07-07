@@ -1,0 +1,14 @@
+{
+	"environment": "DEV",
+	"jwtSecret": "This is my secret JWT key!",
+	"sessionSecret": "This is my secret session key!",
+	"facebookAppID": "https://developers.facebook.com/",
+	"facebookAppSecret": "https://developers.facebook.com/",
+	"adminEmail": "jbacon@zagmail.gonzaga.edu",
+	"adminNameFirst": "Josh",
+	"adminNameLast": "Bacon",
+	"adminPassword": "asdf",
+	"serverPort": "3000",
+	"serverUrl": "http://localhost",
+	"mongoDbUrl": "mongodb://172.17.0.2:27017/portfolio"
+}

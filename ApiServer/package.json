@@ -1,0 +1,36 @@
+{
+  "name": "PortfolioAPI",
+  "version": "1.0.0",
+  "author": "Josh Bacon",
+  "description": "Node Express API Server for Josh Bacon's Public Portfolio Web App.",
+  "main": "./bin/www",
+  "scripts": {
+    "start": "node --inspect=localhost:9229 --inspect-brk ./bin/www",
+    "start-dev": "CONFIG_FILE=./configs-dev.json node --inspect=localhost:9229 --inspect-brk ./bin/www",
+    "start-prod": "CONFIG_FILE=./configs-prod.json node ./bin/www"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "express": "latest",
+    "mongodb": "latest",
+    "winston": "latest",
+    "passport": "latest",
+    "body-parser": "latest",
+    "cookie-parser": "latest",
+    "debug": "latest",
+    "express-winston": "latest",
+    "serve-favicon": "latest",
+    "markdown": "latest",
+    "sanitize-html": "latest",
+    "passport-local": "latest",
+    "passport-jwt": "latest",
+    "passport-facebook-token": "latest",
+    "validator": "latest",
+    "bcryptjs": "latest",
+    "nodemailer": "latest"
+  },
+  "devDependencies": {
+    "jspm": "latest",
+    "eslint": "latest"
+  }
+}

@@ -1,0 +1,102 @@
+html {
+  max-width: 1000px;
+  min-width: 400px;
+  margin: auto;
+  background-color: rgba(0,0,0,1);
+}
+body {
+  margin: inherit;
+  background-image: url("/images/Background.jpg");
+  background-repeat: no-repeat;
+  background-size: 1000px;
+  color: white;
+  font: 15px Verdana, sans-serif;
+}
+#site-header {
+	height: 245px;
+}
+#site-title {
+	display: inline-block;
+	vertical-align: top;
+	width: 180px;
+	margin: 30px 0px 0px 30px;
+	color: white;
+	font: bold 25px Verdana, sans-serif;
+}
+#site-nav-bar {
+	display: inline-block;
+	vertical-align: top;
+	float: right;
+	color: white;
+	font: bold 20px Verdana, sans-serif;
+}
+#site-nav-bar > a {
+    text-decoration: none;
+	display: inline-block;
+	float: right;
+	padding: 5px 15px 5px 15px;
+	border-left: 3px solid;
+	--background-color: rgba(0,0,0,0.3);
+}
+#site-nav-bar > a:visited {
+    color: white;
+}
+#site-nav-bar > a:hover {
+    text-decoration: none;
+	color: black;
+	cursor: pointer;
+	font-size: 22px;
+}
+#site-nav-bar > a:active {
+    color: black;
+}
+#main-menu {
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 110px;
+	float: left;
+	width: 110px;
+	--background-color: rgba(0,0,0,0.8);
+}
+#main-menu > div {
+	font: bold 15px Verdana, sans-serif;
+}
+#main-menu > div:hover{
+	font-size: 18px;
+}
+#main-menu > div:hover{
+	font-size: 18px;
+	cursor: pointer;
+}
+#main-section {
+	display: inline-block;
+	vertical-align: top;
+	max-width: 780px;
+	background-color: rgba(0,0,0,0.8);
+}
+#main-header {
+	padding: 15px;
+	font: bold 20px Verdana, sans-serif;
+}
+#main-content {
+	padding: 0px 20px 20px 20px;
+	font: normal 15px Verdana, sans-serif;
+}
+#main-footer {
+	padding: 0px 20px 20px 20px;
+	font: normal 15px Verdana, sans-serif;
+}
+#site-footer {
+	background-color: rgba(0,0,0,0.8)
+}
+.hidden {
+	display: none !important;
+}
+.clickable {
+	font-weight: bold;
+}
+.clickable:hover {
+    text-decoration: underline;
+	cursor: pointer;
+	font-size: 120%;
+}

@@ -1,0 +1,11 @@
+#login-form {
+	margin: 0px 0px 0px 20px;
+}
+#login-form input {
+	font: bold 20px Verdana, sans-serif;
+}
+#login-form label {
+	font: bold 20px Verdana, sans-serif;
+	width: 150px;
+	display: inline-block;
+}
