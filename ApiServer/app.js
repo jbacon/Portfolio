@@ -1,6 +1,4 @@
 var express = require('express');
-var session = require('express-session');
-var MongoDBStore = require('connect-mongodb-session')(session);
 var path = require('path');
 var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
@@ -31,38 +29,14 @@ commonMongo.connectDB(commonConfigs.mongoDbUrl,
       if(error) throw error;
     })
   });
-/* Configure Session Store w/ MongoDB */
-/* Not using sessions for this site, JWT only
-var sessionStore = new MongoDBStore(
-{
-  uri: config.mongoDbUrl,
-  collection: 'sessions'
-});
-sessionStore.on('error', function(error) {
-  assert.ifError(error);
-  assert.ok(false);
-});
-var sessionMiddleware = session({
-  secret: config.sessionSecret,
-  cookie: {
-    maxAge: 1000 * 60 * 5 // 5 minutes
-  },
-  store: sessionStore,
-  resave: true,
-  saveUninitialized: true
-});
-*/
-
 var app = express();
 app.disable('x-powered-by');
 app.use(express.static('./public'));
-// app.use(sessionMiddleware);
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // Extended true always nested objects in req.body
 app.use(cookieParser());
 app.use(commonAuth.getPassport().initialize());
-//app.use(commonAuth.getPassport().session());
 // REQUEST LOGGING (BEFORE the routers)
 app.use(commonLogging.requestLoggingMiddleware);
 // MY MIDDLEWARE
