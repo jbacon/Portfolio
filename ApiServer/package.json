@@ -6,8 +6,8 @@
   "main": "./bin/www",
   "scripts": {
     "start": "node --inspect=localhost:9229 --inspect-brk ./bin/www",
-    "start-dev": "CONFIG_FILE=./configs-dev.json node --inspect=localhost:9229 --inspect-brk ./bin/www",
-    "start-prod": "CONFIG_FILE=./configs-prod.json node ./bin/www"
+    "start-dev": "--CONFIG_FILE=./configs-dev.json node --inspect=localhost:9229 --inspect-brk ./bin/www",
+    "start-prod": "--CONFIG_FILE=./configs-prod.json node ./bin/www"
   },
   "license": "ISC",
   "dependencies": {
