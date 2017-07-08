@@ -4,7 +4,7 @@ const CONFIG_FILE = process.env.CONFIG_FILE || DEFAULT_CONFIG_FILE;
 
 const configs = require('../'+CONFIG_FILE);
 
-exports.ENVRIONMENTS = {
+exports.ENVIRONMENTS = {
 	DEV: 'development',
 	PROD: 'production'
 }
