@@ -4,7 +4,6 @@ var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'); // Middware parses request.body before 
 var assert = require('assert');
-var routesIndex = require('./routes/index');
 var routesArticles = require('./routes/articles');
 var routesComments = require('./routes/comments');
 var routesAuth = require('./routes/auth');
@@ -42,7 +41,6 @@ app.use(commonLogging.requestLoggingMiddleware);
 // MY MIDDLEWARE
 // app.use(commonAuth.checkAuthenticated);
 // ROUTERS
-app.use('/', routesIndex);
 app.use('/comments', routesComments);
 app.use('/article', routesArticles);
 app.use('/auth', routesAuth);
