@@ -2,13 +2,12 @@ const DEFAULT_CONFIG_FILE='./configs.json.template'
 
 const CONFIG_FILE = process.env.CONFIG_FILE || DEFAULT_CONFIG_FILE;
 
+const configs = require('../'+CONFIG_FILE);
+
 exports.ENVRIONMENTS = {
 	DEV: 'development',
 	PROD: 'production'
 }
-
-
-const configs = require('../'+exports.CONFIG_FILE);
 
 exports.environment = process.env.NODE_ENV || configs.environment
 
