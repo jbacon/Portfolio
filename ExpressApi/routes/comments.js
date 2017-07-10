@@ -3,7 +3,6 @@ var Comment = require('../model/comments');
 var mongodb = require('mongodb'); 
 var commonAuth = require('../common/authUtil.js'); 
 var router = express.Router();
-var express = require('express');
 
 // Route Handler
 router.post('/create', commonAuth.ensureAuthenticated, function(req, res, next) {

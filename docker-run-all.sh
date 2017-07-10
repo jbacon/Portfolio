@@ -1,4 +1,6 @@
-. ${PWD}/docker-run-mongod.sh
-. ${PWD}/docker-run-mongo.sh
-. ${PWD}/docker-run-nginx.sh
-. ${PWD}/docker-run-node.sh
+#!/bin/bash -ex
+set -x 
+DIR="$(cd "$(dirname "$0")" && pwd)"
+bash ${DIR}/MongoDB/docker-run.sh
+bash ${DIR}/ExpressApi/docker-run.sh
+bash ${DIR}/Nginx/docker-run.sh

@@ -1,0 +1,3 @@
+mongo-setup.js
+data/
+mongod.conf

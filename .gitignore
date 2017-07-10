@@ -1,11 +1,4 @@
-# Josh's Custom Ignores:
 .DS_Store
-data/
-ApiServer/data/ 
-ApiServer/node_modules/
-ApiServer/configs-dev.json
-ApiServer/configs-prod.json
-
 
 # Generic Ignores Source
 https://github.com/github/gitignore/blob/master/Node.gitignore

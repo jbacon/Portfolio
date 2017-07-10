@@ -2,12 +2,12 @@ html {
   max-width: 1000px;
   min-width: 400px;
   margin: auto;
-  background-color: rgba(0,0,0,1);
 }
 body {
   margin: inherit;
   background-image: url("/images/Background.jpg");
   background-repeat: no-repeat;
+  background-color: rgba(0,0,0,1);
   background-size: 1000px;
   color: white;
   font: 15px Verdana, sans-serif;

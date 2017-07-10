@@ -49,4 +49,5 @@ router.get('/facebook/token',
 		const expiration = tokenDetails.expiration
 	    res.json({ token: token, expiration: expiration, user: req.user.toObject() })
 });
+
 module.exports = router;

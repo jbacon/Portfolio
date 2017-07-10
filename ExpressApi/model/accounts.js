@@ -1,11 +1,7 @@
-var mongoUtil = require('../common/mongoUtil');
-var authUtil = require('../common/authUtil');
 var Document = require('../model/document');
 var validator = require('validator');
-var bcrypt = require('bcryptjs');
-var mongodb = require('mongodb');
 
-module.exports = class Account extends Document{
+module.exports = class Account extends Document {
 	static get COLLECTION_NAME() {
 		return 'accounts'
 	}

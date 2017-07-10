@@ -39,7 +39,14 @@ app.use(commonAuth.getPassport().initialize());
 // REQUEST LOGGING (BEFORE the routers)
 app.use(commonLogging.requestLoggingMiddleware);
 // MY MIDDLEWARE
-// app.use(commonAuth.checkAuthenticated);
+// Allow CORS //https://enable-cors.org/server_expressjs.html
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  next();
+});
+
 // ROUTERS
 app.use('/comments', routesComments);
 app.use('/article', routesArticles);

@@ -1,6 +1,4 @@
-var mongoUtil = require('../common/mongoUtil');
 var Document = require('../model/document');
-var mongodb = require('mongodb');
 
 module.exports = class Article extends Document {
 	static get COLLECTION_NAME() {

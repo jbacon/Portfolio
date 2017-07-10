@@ -1,12 +1,12 @@
+var bcrypt = require('bcryptjs');
+var jwt = require('jsonwebtoken');
+var commonConfig = require('../common/configUtil');
+var Account = require('../model/accounts');
 var passport = require('passport'); // Authentication Framework
 var LocalStrategy = require('passport-local').Strategy; // Authentication Strategy
 var JwtStrategy = require('passport-jwt').Strategy;
 var ExtractJwt = require('passport-jwt').ExtractJwt;
 var FacebookTokenStrategy = require('passport-facebook-token');
-var Account = require('../model/accounts');
-var bcrypt = require('bcryptjs');
-var jwt = require('jsonwebtoken');
-var commonConfig = require('../common/configUtil');
 
 exports.getPassport = function() {
   return passport;
@@ -50,30 +50,6 @@ exports.ensureAdmin = function(req, res, next) {
       next(err)
   }
 }
-
-// exports.checkAuthenticated = function(req, res, next) {
-//     passport.authenticate(
-//     [ 'jwt' ],
-//     (err, user, info) => {
-//       if (err) { 
-//         next(); 
-//       }
-//       else if (!user) {
-//         next(); 
-//       }
-//       else {
-//         req.logIn(user, (err) => {
-//           if (err) { 
-//             next(); 
-//           }
-//           else {
-//             next();
-//           }
-//         });
-//       }
-//     })(req, res, next)
-// }
-
 exports.ensureAuthenticated = function(req, res, next) {
   passport.authenticate(
     [ 'jwt' ],
@@ -165,7 +141,6 @@ passport.use('local', new LocalStrategy(
       });
   })
 );
-
 
 // Authenticates client provided "Facebook token" validity
 // This middleware queries the facebook GraphAPI to return facebook account details,
