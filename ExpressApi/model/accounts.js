@@ -78,7 +78,8 @@ module.exports = class Account extends Document {
 		const result = await super.create({
 			doc: account
 		})
-		return result.ops[0];
+		const newAccountClass = new Account(result.ops[0])
+		return newAccountClass;
 	}
 	static async read({ query={}, pageSize=10, pageNum=1 } = {}) {
 		const docs = await super.read( {
@@ -97,13 +98,15 @@ module.exports = class Account extends Document {
 		const result = await super.update({
 			doc: account
 		});
-		return result
+		const newAccountClass = new Account(result.ops[0])
+		return newAccountClass
 	}
 	static async delete({ _id } = {}) {
 		const result = await super.delete( {
 			_id: _id,
 			collection: Account.COLLECTION_NAME
 		});
-		return result
+		const newAccountClass = new Account(result.ops[0])
+		return newAccountClass
 	}
 }

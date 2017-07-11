@@ -197,7 +197,7 @@ passport.use('facebook', new FacebookTokenStrategy({
                     account: account
                   })
                   .then((results) => {
-                    next(null, account.toObject())
+                    next(null, account)
                   })
                   .catch((err) => {
                     next(err)
@@ -221,7 +221,7 @@ passport.use('facebook', new FacebookTokenStrategy({
             })
             Account.create({ account: newAccount })
             .then((results) => {
-              next(null, results.ops[0])
+              next(null, account)
             })
             .catch((err) => {
               // Account create failed!

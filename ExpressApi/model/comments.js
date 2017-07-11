@@ -166,7 +166,8 @@ module.exports = class Comment extends Document {
 	async toObjectWithVirtuals() {
 		var obj = super.toObject()
 		obj.accountID = this.accountID;
-		obj.account = (await this.account).toObject();
+		const account = await this.account;
+		obj.account = (account) ? account.toObject() : null;
 		obj.text = this.text;
 		obj.articleID = this.articleID;
 		obj.parentCommentID = this.parentCommentID;
@@ -227,7 +228,7 @@ module.exports = class Comment extends Document {
 			else
 				throw new Error('Query parameter start invalid for value: '+start)
 			if(sortOrder === -1) //New -> Old
-				match._id = { $lt: startObject }
+				match._id = { $lte: startObject }
 			else if(sortOrder === 1) //Old -> New
 				match._id = { $gt: startObject };
 		}

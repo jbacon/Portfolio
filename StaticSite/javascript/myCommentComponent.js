@@ -198,7 +198,7 @@ class MyCommentComponent extends HTMLElement {
 		createForm.addEventListener('submit', function(event) {
 			event.preventDefault();
 			component._create.call(component, function(err) {
-					if(err) 
+					if(err)
 						handleServerErrorResponse(err)
 			});
 		});
@@ -335,7 +335,10 @@ class MyCommentComponent extends HTMLElement {
 				if(this.status === 200) {
 					// If initial comment, unhide 'Show Comments' and click 'Show Comments'
 					// Otherwise Programmatically click load latest comments...
-					loadNewButton.click();
+					if(component.children.length === 0)
+						loadOldButton.click();
+					else
+						loadNewButton.click();
 					replyToggle.click();
 					callback.call(component)
 				}
@@ -542,56 +545,36 @@ class MyCommentComponent extends HTMLElement {
 		upVoteButton.classList.add('disabled')
 		downVoteButton.classList.add('disabled')
 		const totalChildren = this.comment.childCommentIDs.length;
-		if(totalChildren === 0) {
-			this.classList.add('hidden');
-		}
-		else {
-			const canHide = function() {
-				var canHide = true
-				for(var i=0; i < this.children.length; i++) {
-					if(!this.children[i].classList.contains('hidden')) {
-						canHide = false
-						break;
-					}
+		var canHide = function() {
+			if(totalChildren === 0)
+				return true
+			for(var i=0; i < this.children.length; i++) {
+				if(!this.children[i].classList.contains('hidden')) {
+					return false
 				}
-				return canHide;
 			}
-
-			var checkPaginatedRepliesRecursively = function()
-			{
+			// Comments might be missing from current children, still can't be true...
+			if(totalChildren !== this.children.length)
+				return false
+			return true;
+		}
+		var recursivelyPaginateChildrenToDetermineVisbility = function()
+		{
+			if(canHide.call(this)) { // Try without querying database
+				this.classList.add('hidden');
+			}
+			else {
 				this._loadMoreReplies(function(err) {
 					if(err) {
 						handleServerErrorResponse(err)
 					}
 					else {
-						var canHide = true
-						for(var i=0; i < this.children.length; i++) {
-							if(!this.children[i].classList.contains('hidden')) {
-								canHide = false
-								break;
-							}
-						}
-						/* Get new current page */
-						if(canHide) { 
-							/* Might be able to hide.... 
-							if no more comments */
-							if(totalChildren === this.children.length) {
-								/* If lastPage same as currentPage, reached end of pagination!!!
-								Can hide*/
-								this.classList.add('hidden');
-							}
-							else {
-								/* Need to query more children.. */
-								checkPaginatedRepliesRecursively.call(this)
-							}
-						}
-						else {
-							// Can't hide... or done!
-						}
+						recursivelyPaginateChildrenToDetermineVisbility.call(this)
 					}
 				});
 			}
-			checkPaginatedRepliesRecursively.call(this)
+		}
+		recursivelyPaginateChildrenToDetermineVisbility.call(this)
 		}
 	};
 	_applyDisplayValueClass(element, value) {
