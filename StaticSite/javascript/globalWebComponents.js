@@ -1,4 +1,6 @@
-/* Dynamically switch API server address between dev/prod using a hidden button */
+/* 
+DYNAMICALLY SWITCH DEV/PROD
+*/
 var API_SERVER_ADDRESS = function() {
 	if(location.origin.includes('localhost')) {
 		// Address of dev service running on local docker container...
@@ -10,7 +12,8 @@ var API_SERVER_ADDRESS = function() {
 	}
 }
 
-/* PARSING URL FRAGMENT
+/* 
+PARSING URL FRAGMENT
 When this page is loaded of a redirect from an OAuth2 Server, the URL fragment will
 contain an access_token (Implicit Grant Authentication Flow).
 This access_token needs to be parsed out of the URL fragment and sent to my API server,
@@ -45,7 +48,7 @@ if(fragment) {
 				}
 				else {
 					deleteUserSession()
-					handleServerErrorResponse('Facebook Authentication Failed.', response)
+					handleServerErrorResponse('Facebook Login Failed.', response)
 				}
 				ready();
 			}
@@ -62,15 +65,16 @@ else {
 	ready();
 }
 
-/* ready function is called AFTER handling URL Fragment parsing/analysis */
+/*  */
 function ready() {
-	// Check if Logged in... via valid token
+	/*
+	AUTHENTICATED USER U.I. ALTERATIONS
+	*/
 	const currentTime = Math.floor(Date.now() / 1000)
 	if(window.localStorage.token
 		&& window.localStorage.tokenExpiration
 		&& window.localStorage.user
 		&& currentTime < Number(window.localStorage.tokenExpiration)) {
-		//Adjust U.I.
 		document.querySelector('#logout').classList.remove('hidden')
 		document.querySelector('#login').classList.add('hidden')
 		document.querySelector('#register').classList.add('hidden')
@@ -86,6 +90,9 @@ function ready() {
 		document.querySelector('#register').classList.remove('hidden')
 		deleteUserSession()
 	}
+	/*
+	INITIALIZE COMMENT SECTION -> With dummy comment
+	*/
 	window.customElements.define('my-comment', MyCommentComponent)
 	const dummyComment = {
 		_id: null,
@@ -100,17 +107,16 @@ function ready() {
 		childCommentIDs: [ 'dummy-placeholder' ]
 	}
 	const myCommentObject = new MyCommentComponent(dummyComment)
-	// myCommentObject.removed = 'false'
-	// myCommentObject.repliesDisplay = 'enabled'
-	// myCommentObject.replyDisplay = ''
 	myCommentObject.flagDisplay = 'hidden'
 	myCommentObject.voteDisplay = 'hidden'
 	myCommentObject.removeDisplay = 'hidden'
-	// Hide Shadow DOM elements for up/down vote counts...
 	myCommentObject.shadowRoot.getElementById('up-vote-count').style = 'display: none'
 	myCommentObject.shadowRoot.getElementById('down-vote-count').style = 'display: none'
 	const commentsElement = document.getElementById('comments')
 	commentsElement.insertAdjacentElement('beforeend', myCommentObject)
+	/*
+	LOGIN FORM 
+	*/
 	document.getElementById('local-login-form').addEventListener('submit', function(event) {
 		event.preventDefault();
 		const httpClient = new XMLHttpRequest();
@@ -122,7 +128,7 @@ function ready() {
 				const response = JSON.parse(this.response);
 				if(this.status === 200) {
 					// Store JWT token
-					// Refresh U.I. based on login
+					// Reload page... (to adjust U.I. accordingly for authenticated user)
 					window.localStorage.token = response.token;
 					window.localStorage.tokenExpiration = response.expiration;
 					window.localStorage.user = response.user;
@@ -135,13 +141,10 @@ function ready() {
 			}
 		}
 		httpClient.send()
-		// const jsonData = {}
-		// for(var i = 0; i < event.target.length - 1; i++) {
-		// 	jsonData[event.target.elements[i].name] = event.target.elements[i].value;
-		// }
-		// const dataString = JSON.stringify(jsonData)
-		// httpClient.send(dataString);
-	})
+	});
+	/*
+	LOGIN FORM 
+	*/
 	document.getElementById('facebook-login-form').addEventListener('submit', function(event) {
 		event.preventDefault();
 		var clientId = '144772189413167'
@@ -153,6 +156,9 @@ function ready() {
 			+'&scope=public_profile,email,user_friends'
 		window.location.href = facebookUrl
 	})
+	/*
+	REGISTRATION FORM 
+	*/
 	document.getElementById('register-form').addEventListener('submit', function(event) {
 		event.preventDefault();
 		const httpClient = new XMLHttpRequest();
@@ -180,14 +186,14 @@ function ready() {
 		deleteUserSession()
 		window.location.href = '/';
 	})
-	// PREVENTS PAGE FLICKER
-	// Some elements are styled programmatically via Javascript, this will prevent
-	// page from revealing elements which have not been styled yet by javascript.
+	/*
+	UNHIDE PAGE -> Prevent page flicker from dynamic changes...
+	*/
 	document.body.classList.remove('hidden')
 }
 
 function handleServerErrorResponse(message, response) {
-	alert(message+'.. '+response.status +' - '+response.statusText+' ('+response.message+')');
+	alert(message+'. Status: '+response.status +' - '+response.statusText+'. Message: '+response.message);
 }
 function deleteUserSession() {
 	delete window.localStorage.token;

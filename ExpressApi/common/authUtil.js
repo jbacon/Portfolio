@@ -111,17 +111,24 @@ passport.use('local', new LocalStrategy(
       {
         query: { email: email }
       })
-      .then((results) => {
-        switch(results.length) {
+      .then((accounts) => {
+        switch(accounts.length) {
           case 1: // FOUND
-            const account = new Account(results[0]);
-            if(!bcrypt.compareSync(password, account.passwordHashAndSalt)) {
-              var err = new Error('Incorrect Password!')
-              err.status = 401
-              next(null, false, err)
+            const account = new Account(accounts[0]);
+            if(account.passwordHashAndSalt) {
+              if(!bcrypt.compareSync(password, account.passwordHashAndSalt)) {
+                var err = new Error('Incorrect Password!')
+                err.status = 401
+                next(null, false, err)
+              }
+              else {
+                next(null, account)
+              }
             }
             else {
-              next(null, account)
+              var err = new Error('This account was registered via an external Social Media service, either login using another method or link your social account email with a local password via the registeration page.')
+              err.status = 500
+              next(null, false, err)
             }
             break;
           case 0: // NOT FOUND
@@ -162,11 +169,11 @@ passport.use('facebook', new FacebookTokenStrategy({
           { email: { $in: emailsList } } ]
       }
     })
-    .then((results) => {
+    .then((accounts) => {
       try {
-        switch(results.length) {
+        switch(accounts.length) {
           case 1: // Account match found!
-            const account = new Account(results[0]);
+            const account = new Account(accounts[0]);
             // Check if Email & ProfileID match between my local account data & facebooks profile data.
             if(account.email && emailsList.indexOf(account.email) !== -1 && account.email === emailsList[emailsList.indexOf(account.email)]
               && account.facebookProfileID && account.facebookProfileID === profile.id) {
@@ -181,7 +188,7 @@ passport.use('facebook', new FacebookTokenStrategy({
                 Account.update({
                   account: account
                 })
-                .then((results) => {
+                .then((account) => {
                   next(null, account)
                 })
                 .catch((err) => {
@@ -196,7 +203,7 @@ passport.use('facebook', new FacebookTokenStrategy({
                   Account.update({
                     account: account
                   })
-                  .then((results) => {
+                  .then((account) => {
                     next(null, account)
                   })
                   .catch((err) => {
@@ -220,7 +227,7 @@ passport.use('facebook', new FacebookTokenStrategy({
               email: profile.emails[0].value
             })
             Account.create({ account: newAccount })
-            .then((results) => {
+            .then((account) => {
               next(null, account)
             })
             .catch((err) => {

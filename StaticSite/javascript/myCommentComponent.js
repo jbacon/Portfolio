@@ -325,6 +325,7 @@ class MyCommentComponent extends HTMLElement {
 	}
 	_create(callback) {
 		const loadNewButton = this.shadowRoot.querySelector('#load-new-button')
+		const loadOldButton = this.shadowRoot.querySelector('#load-old-button')  
 		const replyToggle = this.shadowRoot.querySelector('#reply-toggle')
 		const createForm = this.shadowRoot.querySelector('#create-form')
 		const component = this;
@@ -519,12 +520,10 @@ class MyCommentComponent extends HTMLElement {
 		client.send();
 	}
 	_applyStyleRemoved() {
-		/*
-		1) Disable all features...
-		2) Check for replies (child comments)
-		3) If all replies are hidden (thus also disabled), 
-			then also hide this parent comment...
-		~ Only hide comments that are removed are also have no visible children...
+		/* Complicated logic....
+		DYNAMIC STYLING OPTIONS:
+			- Hide Entire Comment -> Only if no dependent children exist
+			- Hide Only Comment Content/User -> Only if dependent children exist 
 		*/
 		const content = this.shadowRoot.querySelector('#content')
 		const replyToggle = this.shadowRoot.querySelector('#reply-toggle')
@@ -575,8 +574,7 @@ class MyCommentComponent extends HTMLElement {
 			}
 		}
 		recursivelyPaginateChildrenToDetermineVisbility.call(this)
-		}
-	};
+	}
 	_applyDisplayValueClass(element, value) {
 		Object.keys(MyCommentComponent.displayValues).forEach((key) => {
 			element.classList.remove(MyCommentComponent.displayValues[key])

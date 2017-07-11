@@ -5,8 +5,8 @@ var bcrypt = require('bcryptjs');
 var router = express.Router();
 
 router.post('/local/register', (req, res, next) => {
-	// Generate Hash and Create Account
 	try {
+		/*  WORK TO BE DONE.. LINK SOCIAL ACCOUNT W/ LOCAL */
 		req.body.passwordHashAndSalt = bcrypt.hashSync(req.body.password, 10);
 		req.body.password = undefined
 		var account = new Account(req.body)
