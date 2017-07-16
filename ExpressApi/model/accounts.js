@@ -74,7 +74,7 @@ module.exports = class Account extends Document {
 	}
 	static async create({ account } = {}) {
 		if(!(account instanceof Account)) 
-			throw new Error('Failed to create account. Parameter not instance of Article')
+			throw new Error('Failed to create account. Parameter not instance of Account')
 		const result = await super.create({
 			doc: account
 		})
@@ -94,7 +94,7 @@ module.exports = class Account extends Document {
 	}
 	static async update({ account } = {}) {
 		if(!(account instanceof Account))
-			throw new Error('Failed to create account. Parameter not instance of Article')
+			throw new Error('Failed to create account. Parameter not instance of Account')
 		const result = await super.update({
 			doc: account
 		});

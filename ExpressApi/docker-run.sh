@@ -11,6 +11,8 @@ fi
 docker stop node
 docker rm node
 
+MONGOD_CONTAINER_IP=$(docker inspect mongod --format '{{ .NetworkSettings.IPAddress }}')
+
 docker run \
 --name node \
 --interactive \
@@ -23,6 +25,7 @@ $(if [ "${ENVIRONMENT}" = "production" ]; then
 else
 	echo '--publish 9229:9229 --env CONFIG_FILE=./configs-dev.json '
 fi) \
+--env MONGODB_URL='mongodb://'${MONGOD_CONTAINER_IP}':27017/portfolio' \
 --env HTTP_PROXY=${HTTP_PROXY} \
 --env HTTPS_PROXY=${HTTPS_PROXY} \
 --env http_proxy=${http_proxy} \

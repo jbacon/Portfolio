@@ -16,12 +16,12 @@ class MyCommentComponent extends HTMLElement {
 		const component = this;
 		this.shadowRoot.innerHTML = `
 			<div>
-				<span style='width:50px; height=50px;'>
+				<span>
 					${ (comment.account && comment.account.facebookProfileID) ? '<img display="inline-block" width="50px" height="50px" alt="" src="http://graph.facebook.com/'+comment.account.facebookProfileID+'/picture?type=large">' : ''}
 				</span>
 				<span style='width: 500px;'>
 					<div id='header'>${(comment.account) ? comment.account.nameFirst+' '+comment.account.nameLast+' @ '+comment.dateCreated : ''}</div>
-					<div id='content'><p>${comment.text}</p></div>
+					<div id='content'>${comment.text}</div>
 				</span>
 			</div>
 			<footer>
@@ -147,6 +147,12 @@ class MyCommentComponent extends HTMLElement {
 			if(component.replyDisplay !== MyCommentComponent.displayValues.disabled && component.replyDisplay !== MyCommentComponent.displayValues.hidden) {
 				replyToggle.classList.toggle('active')
 				createForm.classList.toggle('hidden')
+				var firstFormInput = createForm.querySelector('#text')
+				if(firstFormInput.isEqualNode(document.activeElementcreateForm)) {
+			        firstFormInput.blur();
+			    } else {
+			        firstFormInput.focus();
+			    }
 			}
 		});
 		removeButton.addEventListener('click', function(event) {
@@ -323,6 +329,19 @@ class MyCommentComponent extends HTMLElement {
 			delete this._comment
 		}
 	}
+	/* CUSTOM FUNCTIONS */
+	get on() {
+		return this._comment
+	}
+	set comment(val) {
+		if(val) {
+			this._comment = val
+		}
+		else {
+			delete this._comment
+		}
+	}
+	/* INTERNAL FUNCIONS */
 	_create(callback) {
 		const loadNewButton = this.shadowRoot.querySelector('#load-new-button')
 		const loadOldButton = this.shadowRoot.querySelector('#load-old-button')  
@@ -341,6 +360,7 @@ class MyCommentComponent extends HTMLElement {
 					else
 						loadNewButton.click();
 					replyToggle.click();
+					createForm.reset()
 					callback.call(component)
 				}
 				else {
@@ -417,7 +437,7 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', API_SERVER_ADDRESS()+'/comments/down-vote');
+		client.open('POST', API_SERVER_ADDRESS()+'/comments/up-vote');
 		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}

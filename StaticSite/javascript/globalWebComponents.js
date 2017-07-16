@@ -48,7 +48,7 @@ if(fragment) {
 				}
 				else {
 					deleteUserSession()
-					handleServerErrorResponse('Facebook Login Failed.', response)
+					handleServerErrorResponse(response)
 				}
 				ready();
 			}
@@ -106,7 +106,7 @@ function ready() {
 		flags: [ ],
 		childCommentIDs: [ 'dummy-placeholder' ]
 	}
-	const myCommentObject = new MyCommentComponent(dummyComment)
+	const myCommentObject = new MyCommentComponent(dummyComment);
 	myCommentObject.flagDisplay = 'hidden'
 	myCommentObject.voteDisplay = 'hidden'
 	myCommentObject.removeDisplay = 'hidden'
@@ -115,8 +115,12 @@ function ready() {
 	const commentsElement = document.getElementById('comments')
 	commentsElement.insertAdjacentElement('beforeend', myCommentObject)
 	/*
-	LOGIN FORM 
+	LOGIN 
 	*/
+	document.getElementById('login').addEventListener('mouseup', function(event) {
+		var emailInput = document.getElementById('email')
+	    emailInput.focus();
+	});
 	document.getElementById('local-login-form').addEventListener('submit', function(event) {
 		event.preventDefault();
 		const httpClient = new XMLHttpRequest();
@@ -136,15 +140,12 @@ function ready() {
 				}
 				else {
 					deleteUserSession()
-					handleServerErrorResponse('Login Failed.', response)
+					handleServerErrorResponse(response)
 				}
 			}
 		}
 		httpClient.send()
 	});
-	/*
-	LOGIN FORM 
-	*/
 	document.getElementById('facebook-login-form').addEventListener('submit', function(event) {
 		event.preventDefault();
 		var clientId = '144772189413167'
@@ -171,7 +172,7 @@ function ready() {
 					window.location.href = '/';
 				}
 				else {
-					handleServerErrorResponse('Registeration Failed.', response)
+					handleServerErrorResponse(response)
 				}
 			}
 		}
@@ -192,8 +193,8 @@ function ready() {
 	document.body.classList.remove('hidden')
 }
 
-function handleServerErrorResponse(message, response) {
-	alert(message+'. Status: '+response.status +' - '+response.statusText+'. Message: '+response.message);
+function handleServerErrorResponse(response) {
+	alert(response.status+' - '+response.message+'. '+((response.stack) ? response.stack : ''));
 }
 function deleteUserSession() {
 	delete window.localStorage.token;

@@ -126,7 +126,7 @@ passport.use('local', new LocalStrategy(
               }
             }
             else {
-              var err = new Error('This account was registered via an external Social Media service, either login using another method or link your social account email with a local password via the registeration page.')
+              var err = new Error('This account was registered via an external Social Media service, either login using with the appropriate method (then link your social account with a local password).')
               err.status = 500
               next(null, false, err)
             }

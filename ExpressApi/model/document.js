@@ -84,9 +84,10 @@ module.exports = class Document {
 	static async update({ doc } = {}) {
 		if(!(doc instanceof Document))
 			throw new Error('Invalid document')
+		var docJson = doc.toObject()
 		var results = await mongoUtil.getDB()
 			.collection(doc.constructor.COLLECTION_NAME)
-			.updateOne(doc.toObject())
+			.updateOne({ _id: doc._id }, docJson)
 		return results;
 	}
 	static async read({ query={}, collection, pageSize=10, pageNum=1 } = {}) {
