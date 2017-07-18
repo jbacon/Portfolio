@@ -1,21 +1,21 @@
 /* 
-DYNAMICALLY SWITCH DEV/PROD
+DYNAMICALLY DETERMINE DEV/PROD - by examining location origin
 */
 var API_SERVER_ADDRESS = function() {
 	if(location.origin.includes('localhost')) {
-		// Address of dev service running on local docker container...
+		// ASSUME DEV MODE
 		return 'http://localhost:8080'
 	}
 	else {
-		// Address of prod service running on S3/CloudFront...
+		// ASSUME PROD MODE
 		return 'https://portfolioapi.joshbacon.name'
 	}
 }
 
 /* 
 PARSING URL FRAGMENT
-When this page is loaded of a redirect from an OAuth2 Server, the URL fragment will
-contain an access_token (Implicit Grant Authentication Flow).
+When this page is loaded off a redirect from an OAuth2 Server, the URL fragment will
+contain an access_token (lookup Implicit Grant Authentication Flow).
 This access_token needs to be parsed out of the URL fragment and sent to my API server,
 so that it can verify the token, respond with the corresponding User account, and
 then return it's own signed JWT token...
@@ -23,7 +23,8 @@ Subsequent request to the API server authenticate using this new JWT token
 (NOT the original external OAuth2 access_token).
 This design decision intends to reduce authentication complexity, but using a single
 JWT middleware to verify API calls, instead of relying upon switching between many
-different auth flows for passportjs middlware (e.i. facebook, google, twitter, etc..).
+different auth flows which inherently occurs while using passportjs middlware usually
+ (e.i. via facebook, google, twitter, etc..).
 */
 var fragment = window.location.hash.slice(1)
 if(fragment) {
@@ -65,30 +66,43 @@ else {
 	ready();
 }
 
-/*  */
 function ready() {
 	/*
 	AUTHENTICATED USER U.I. ALTERATIONS
 	*/
+	var user;
 	const currentTime = Math.floor(Date.now() / 1000)
 	if(window.localStorage.token
 		&& window.localStorage.tokenExpiration
 		&& window.localStorage.user
 		&& currentTime < Number(window.localStorage.tokenExpiration)) {
+		user = JSON.parse(window.localStorage.user)
 		document.querySelector('#logout').classList.remove('hidden')
 		document.querySelector('#login').classList.add('hidden')
 		document.querySelector('#register').classList.add('hidden')
 		document.querySelector('#greeting').classList.remove('hidden')
-		const user = JSON.parse(window.localStorage.user)
 		document.querySelector('#greeting').innerHTML = 'Welcome, '+user.nameFirst+' '+user.nameLast
+		document.querySelector('#my-account').classList.remove('hidden')
 	}
 	else {
 		document.querySelector('#greeting').innerHTML = ''
 		document.querySelector('#greeting').classList.add('hidden')
+		document.querySelector('#my-account').classList.add('hidden')
 		document.querySelector('#logout').classList.add('hidden')
 		document.querySelector('#login').classList.remove('hidden')
 		document.querySelector('#register').classList.remove('hidden')
 		deleteUserSession()
+	}
+	/*
+	INITIALIZE MY-ACCOUNT SECTION
+	*/
+	if(user) {
+		window.customElements.define('my-account', MyMyAccountComponent)
+		const myMyAccountObject = new MyMyAccountComponent({ 
+			account: user
+		});
+		const myAccountModalBoxContent = document.querySelector('#my-account-modal-box--open .modal-box__content')
+		myAccountModalBoxContent.insertAdjacentElement('beforeend', myMyAccountObject)
 	}
 	/*
 	INITIALIZE COMMENT SECTION -> With dummy comment
@@ -106,12 +120,17 @@ function ready() {
 		flags: [ ],
 		childCommentIDs: [ 'dummy-placeholder' ]
 	}
-	const myCommentObject = new MyCommentComponent(dummyComment);
-	myCommentObject.flagDisplay = 'hidden'
-	myCommentObject.voteDisplay = 'hidden'
-	myCommentObject.removeDisplay = 'hidden'
-	myCommentObject.shadowRoot.getElementById('up-vote-count').style = 'display: none'
-	myCommentObject.shadowRoot.getElementById('down-vote-count').style = 'display: none'
+	const myCommentObject = new MyCommentComponent({ 
+		comment: dummyComment, 
+		currentUserID: (user && user._id) ? user._id : undefined,
+		isAdmin: (user && user.isAdmin) ? true : false
+	});
+	myCommentObject.shadowRoot.querySelector('#remove-button').classList.add('hidden')
+	myCommentObject.shadowRoot.querySelector('#flag-button').classList.add('hidden')
+	myCommentObject.shadowRoot.querySelector('#up-vote-button').classList.add('hidden')
+	myCommentObject.shadowRoot.querySelector('#up-vote-count').classList.add('hidden')
+	myCommentObject.shadowRoot.querySelector('#down-vote-button').classList.add('hidden')
+	myCommentObject.shadowRoot.querySelector('#down-vote-count').classList.add('hidden')
 	const commentsElement = document.getElementById('comments')
 	commentsElement.insertAdjacentElement('beforeend', myCommentObject)
 	/*
@@ -121,7 +140,7 @@ function ready() {
 		var emailInput = document.getElementById('email')
 	    emailInput.focus();
 	});
-	document.getElementById('local-login-form').addEventListener('submit', function(event) {
+	document.getElementById('login-form').addEventListener('submit', function(event) {
 		event.preventDefault();
 		const httpClient = new XMLHttpRequest();
 		const email = event.target.elements.namedItem('email').value
@@ -156,7 +175,7 @@ function ready() {
 			+'&response_type=token'
 			+'&scope=public_profile,email,user_friends'
 		window.location.href = facebookUrl
-	})
+	});
 	/*
 	REGISTRATION FORM 
 	*/

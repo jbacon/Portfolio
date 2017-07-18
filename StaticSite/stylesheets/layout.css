@@ -9,7 +9,6 @@ body {
   background-repeat: no-repeat;
   background-color: rgba(0,0,0,1);
   background-size: 1000px;
-  color: white;
   font: 15px Verdana, sans-serif;
 }
 #site-header {
@@ -51,12 +50,13 @@ body {
     color: black;
 }
 #main-menu {
+	color: white;
 	display: inline-block;
 	vertical-align: top;
 	padding-left: 110px;
 	float: left;
 	width: 110px;
-	--background-color: rgba(0,0,0,0.8);
+	/*background-color: rgba(0,0,0,0.8);*/
 }
 #main-menu > div {
 	font: bold 15px Verdana, sans-serif;
@@ -79,6 +79,7 @@ body {
 	font: bold 20px Verdana, sans-serif;
 }
 #main-content {
+	color: white;
 	padding: 0px 20px 20px 20px;
 	font: normal 15px Verdana, sans-serif;
 }
@@ -87,7 +88,8 @@ body {
 	font: normal 15px Verdana, sans-serif;
 }
 #site-footer {
-	background-color: rgba(0,0,0,0.8)
+	color: white;
+	background-color: rgba(0,0,0,0.8);
 }
 .hidden {
 	display: none !important;

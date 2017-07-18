@@ -14,6 +14,7 @@
             <a class="clickable" id="logout">Logout</a>
             <img id="profilepic">
             <a class="clickable" id="greeting">Hello</a>
+            <a class="clickable" id="my-account" href="#my-account-modal-box--open">My Account</a>
             <a class="clickable" id="register" href="#register-modal-box--open">Register</a>
             <a class="clickable" id="login" href="#login-modal-box--open">Login</a>
         </nav>
@@ -42,50 +43,91 @@
         <div class="modal-box" id="login-modal-box--open">
             <a class="modal-box__overlay" href="#"></a>
             <div class="modal-box__content"><a class="modal-box--close" id="login-modal-box--close" href="#">X</a>
-                <form id="local-login-form" action="">
-                    <label for="email">Email</label>
-                    <input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld">
-                    <label for="password">Password</label>
-                    <input class="password" id="password" type="password" name="password" placeholder="password..">
-                    <input class="submit" type="submit" href="#">
+                <form id="login-form" action="">
+                    <table>
+                        <tr>
+                            <td>
+                                <label for="email">Email</label>
+                            </td>
+                            <td>
+                                <input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="password">Password</label>
+                            </td>
+                            <td>
+                                <input class="password" id="password" type="password" name="password" placeholder="Password..">
+                            </td>
+                        </tr>
+                    </table>
+                    <input class="submit" type="submit" href="#" value="Login">
                 </form>
                 <form id="facebook-login-form" action="">
-                    <input class="submit" type="submit" name="Facebook">
+                    <input class="submit" type="submit" name="Facebook" value="Facebook Login">
                 </form>
             </div>
         </div>
         <div class="modal-box" id="register-modal-box--open">
             <a class="modal-box__overlay" href="#"></a>
-            <div class="modal-box__content"><a class="modal-box--close" id="register-modal-box--close" href="#">X</a>
+            <div class="modal-box__content">
+                <a class="modal-box--close" id="register-modal-box--close" href="#">X</a>
                 <form id="register-form" action="">
-                    <div>
-                        <label for="email">Email</label>
-                        <input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld">
-                    </div>
-                    <div>
-                        <label for="name-first">First Name</label>
-                        <input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John">
-                    </div>
-                    <div>
-                        <label for="name-last">Last Name</label>
-                        <input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe">
-                    </div>
-                    <div>
-                        <label for="password">Password</label>
-                        <input class="password" id="password" type="password" name="password" placeholder="password..">
-                    </div>
-                    <div>
-                        <label for="passwordRetype">Retype Password</label>
-                        <input class="passwordRetype" id="passwordRetype" type="password" name="passwordRetype" placeholder="password..">
-                    </div>
-                    <div>
-                        <input class="submit" type="submit">
-                    </div>
+                    <table>
+                        <tr>
+                            <td>
+                                <label for="email">Email</label>
+                            </td>
+                            <td>
+                                <input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="name-first">First Name</label>
+                            </td>
+                            <td>
+                                <input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="name-last">Last Name</label>
+                            </td>
+                            <td>
+                                <input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="password">Password</label>
+                            </td>
+                            <td>
+                                <input class="password" id="password" type="password" name="password" placeholder="Password..">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="passwordRetype"></label>
+                            </td>
+                            <td>
+                                <input class="passwordRetype" id="passwordRetype" type="password" name="passwordRetype" placeholder="Retype password..">
+                            </td>
+                        </tr>
+                    </table>
+                    <input class="submit" type="submit">
                 </form>
             </div>
         </div>
+        <div class="modal-box" id="my-account-modal-box--open">
+            <a class="modal-box__overlay" href="#"></a>
+            <div class="modal-box__content">
+                <a class="modal-box--close" id="register-modal-box--close" href="#">X</a>
+        </div>
     </footer>
 </body>
+<script src="javascript/myMyAccountComponent.js"></script>
 <script src="javascript/myCommentComponent.js"></script>
 <script src="javascript/globalWebComponents.js"></script>
 </html>

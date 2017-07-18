@@ -1,17 +1,16 @@
 #register-form {
 	margin: 0px 0px 0px 20px;
+	font: bold 20px Verdana, sans-serif;
+    color: black;
 }
 #register-form input {
 	border: 0px 0px 0px 0px;
 	margin: 0px 0px 0px 0px;
 	padding: 5px 0px 5px 0px;
-	font: bold 20px Verdana, sans-serif;
 }
 #register-form label {
 	border: 0px 0px 0px 0px;
 	margin: 0px 0px 0px 0px;
 	padding: 5px 0px 5px 0px;
-	font: bold 20px Verdana, sans-serif;
-	width: 150px;
 	display: inline-block;
 }

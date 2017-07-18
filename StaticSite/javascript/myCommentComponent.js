@@ -1,17 +1,10 @@
-/*
-In my use-case I want to 
-Web Components! https://developers.google.com/web/fundamentals/getting-started/primers/customelements
-Shadow DOM! - Awesome! Always creating hidden content within an element that will not be added as html to page.
-Examples:
-Authenticated Users: <my-comment reply-display='enabled' flag-display='enabled' vote-display='enabled' replies-display='enabled' data-id='1234'></my-comment>
-Anonymous Users: <my-comment reply-display='hidden' flag-display='hidden' vote-display='hidden' replies-display='enabled' data-id='1234'></my-comment>
-Admin Users:  <my-comment reply-display='enabled' flag-display='enabled' vote-display='enabled' replies-display='enabled' data-id='1234'></my-comment>
-*/
 class MyCommentComponent extends HTMLElement {
 	// Add Listeners, innerHTML, styling, etc...
-	constructor(comment) {
+	constructor({comment, currentUserID, isAdmin}={}) {
 		super();
 		this.comment = comment;
+		this.currentUserID = currentUserID;
+		this.isAdmin = isAdmin;
 		this.attachShadow({ mode: "open" });
 		const component = this;
 		this.shadowRoot.innerHTML = `
@@ -27,13 +20,13 @@ class MyCommentComponent extends HTMLElement {
 			<footer>
 				<div id='actions'>
 					<button id='replies-toggle' name='Replies'>Replies</button>
-					<button id='reply-toggle' name='Reply'>Reply</button>
+					<button id='reply-toggle' name='Reply' class='hidden'>Reply</button>
 					<span id='up-vote-count'>${'+'+comment.upVoteAccountIDs.length}</span>
-					<button id='up-vote-button' name='Up'>Up</button>
+					<button id='up-vote-button' name='Up' class='hidden'>Up</button>
 					<span id='down-vote-count'>${'-'+comment.downVoteAccountIDs.length}</span>
-					<button id='down-vote-button' name='Down'>Down</button>
-					<button id='remove-button' name='Remove'>Remove</button>
-					<button id='flag-button' name='Flag'>Flag</button>
+					<button id='down-vote-button' name='Down' class='hidden'>Down</button>
+					<button id='remove-button' name='Remove' class='hidden'>Remove</button>
+					<button id='flag-button' name='Flag' class='hidden'>Flag</button>
 				</div>
 				<div id='replies' data-start='newest' class='hidden'>
 					<button id='load-new-button' class='hidden' name='Load Newest..'>Load Newest..</button>
@@ -87,30 +80,6 @@ class MyCommentComponent extends HTMLElement {
 				#reply-toggle.active::before {
 					content: "Discard ";
 				}
-				// :host([replies-display=${MyCommentComponent.displayValues.disabled}]) #replies {
-				// }
-				// :host([replies-display=${MyCommentComponent.displayValues.disabled}]) #replies-toggle {
-				// }
-				// :host([replies-display=${MyCommentComponent.displayValues.hidden}]) #replies {
-				// 	color: red
-				// }
-				// :host([replies-display=${MyCommentComponent.displayValues.hidden}]) #replies-toggle {
-				// 	color: red
-				// }
-				// :host([reply-display=disabled]){
-				// 	color: red
-				// }
-				// :host([flag-display=disabled]){
-				// 	color: red
-				// }
-				// :host([remove-display=disabled]) {
-				// 	color: red
-				// }
-				// :host([vote-display=disabled]) {
-				// 	color: red
-				// }
-				// button([disabled]) {
-				// }
 			</style>
 		`;
 		const content = this.shadowRoot.querySelector('#content')
@@ -131,7 +100,7 @@ class MyCommentComponent extends HTMLElement {
 			this._applyStyleRemoved()
 		}
 		repliesToggle.addEventListener('click', function(event) {
-			if(component.repliesDisplay !== MyCommentComponent.displayValues.disabled && component.repliesDisplay !== MyCommentComponent.displayValues.hidden) {
+			if(!repliesToggle.classList.contains('disabled')) {
 				repliesToggle.classList.toggle('active')
 				repliesSection.classList.toggle('hidden')
 				loadNewButton.classList.toggle('hidden')
@@ -144,7 +113,7 @@ class MyCommentComponent extends HTMLElement {
 			}
 		});
 		replyToggle.addEventListener('click', function(event) {
-			if(component.replyDisplay !== MyCommentComponent.displayValues.disabled && component.replyDisplay !== MyCommentComponent.displayValues.hidden) {
+			if(!replyToggle.classList.contains('disabled')) {
 				replyToggle.classList.toggle('active')
 				createForm.classList.toggle('hidden')
 				var firstFormInput = createForm.querySelector('#text')
@@ -156,7 +125,7 @@ class MyCommentComponent extends HTMLElement {
 			}
 		});
 		removeButton.addEventListener('click', function(event) {
-			if(component.removed !== MyCommentComponent.displayValues.disabled && component.removed !== MyCommentComponent.displayValues.hidden) {
+			if(!removeButton.classList.contains('disabled')) {
 				component._remove.call(component, function(err) {
 					if(err)
 						handleServerErrorResponse(err)
@@ -164,7 +133,7 @@ class MyCommentComponent extends HTMLElement {
 			}
 		});
 		flagButton.addEventListener('click', function(event) {
-			if(component.flagDisplay !== MyCommentComponent.displayValues.disabled && component.flagDisplay !== MyCommentComponent.displayValues.hidden) {
+			if(!flagButton.classList.contains('disabled')) {
 				component._flag.call(component, function(err) {
 					if(err) 
 						handleServerErrorResponse(err)
@@ -174,7 +143,7 @@ class MyCommentComponent extends HTMLElement {
 			}
 		});
 		upVoteButton.addEventListener('click', function(event) {
-			if(component.voteDisplay !== MyCommentComponent.displayValues.disabled && component.voteDisplay !== MyCommentComponent.displayValues.hidden) {
+			if(!upVoteButton.classList.contains('disabled')) {
 				component._upVote.call(component, function(err) {
 					if(err) 
 						handleServerErrorResponse(err)
@@ -182,7 +151,7 @@ class MyCommentComponent extends HTMLElement {
 			}
 		});
 		downVoteButton.addEventListener('click', function(event) {
-			if(component.voteDisplay !== MyCommentComponent.displayValues.disabled && component.voteDisplay !== MyCommentComponent.displayValues.hidden) {
+			if(!downVoteButton.classList.contains('disabled')) {
 				component._downVote.call(component, function(err) {
 					if(err) 
 						handleServerErrorResponse(err)
@@ -208,45 +177,21 @@ class MyCommentComponent extends HTMLElement {
 						handleServerErrorResponse(err)
 			});
 		});
+		if(this.currentUserID) {
+			replyToggle.classList.remove('hidden')
+			repliesToggle.classList.remove('hidden')
+			upVoteButton.classList.remove('hidden')
+			downVoteButton.classList.remove('hidden')
+			flagButton.classList.remove('hidden')
+			if(this.isAdmin || this.comment.accountID === this.currentUserID) {
+				removeButton.classList.remove('hidden')
+			}
+		}
 	}
-	static get observedAttributes() { return ["reply-display", "replies-display", "flag-display", "vote-display", "remove-display" ]; };
+	static get observedAttributes() { return [ ]; };
 	// Respond to attribute changes...
 	attributeChangedCallback(attr, oldValue, newValue, namespace) {
 		// super.attributeChangedCallback(attr, oldValue, newValue, namespace);
-		if(attr === 'reply-display') {
-			/* Reset replyToggle activation, Hide Create Form, apply new display value for replyToggle.. */
-			const replyToggle = this.shadowRoot.querySelector('#reply-toggle')
-			replyToggle.classList.remove('active')
-			this._applyDisplayValueClass(replyToggle, newValue)
-			const createForm = this.shadowRoot.querySelector('#create-form')
-			createForm.add('hidden')
-		}
-		else if (attr === 'replies-display') {
-			const repliesToggle = this.shadowRoot.querySelector('#replies-toggle')
-			repliesToggle.remove('active')
-			this._applyDisplayValueClass(repliesToggle, newValue)
-			const replies = this.shadowRoot.querySelector('#replies')
-			replies.add('hidden')
-		}
-		else if (attr === 'flag-display') {
-			const flagButton = this.shadowRoot.querySelector('#flag-button')
-			this._applyDisplayValueClass(flagButton, newValue)
-		}
-		else if (attr === 'vote-display') {
-			const upVoteButton = this.shadowRoot.querySelector('#up-vote-button')
-			this._applyDisplayValueClass(upVoteButton, newValue)
-			const downVoteButton = this.shadowRoot.querySelector('#down-vote-button')
-			this._applyDisplayValueClass(downVoteButton, newValue)
-		}
-		else if (attr === 'remove-display') {
-			const removeButton = this.shadowRoot.querySelector('#remove-button')
-			this._applyDisplayValueClass(removeButton, newValue)
-		}
-		// Propogate AttributeChanged Event to all Child Comment Components (Replies)
-		const myCommentList = this.getElementsByTagName("my-comment")
-		for(var i=0; i < myCommentList.length; i++) {
-			myCommentList[i].setAttribute(attr, newValue)
-		}
 	}
 	// Removed from a document
 	disconnectedCallback() {
@@ -261,62 +206,6 @@ class MyCommentComponent extends HTMLElement {
 		super.adoptedCallback(oldDocument, newDocument);
 	}
 	static get displayValues() { return { disabled: 'disabled', hidden: 'hidden' }; };
-	/* NORMAL ATTRIBUTES (hold state/style/stype) */
-	get replyDisplay() {
-		return this.hasAttribute('reply-display')
-	}
-	set replyDisplay(val) {
-		if(val) {
-			this.setAttribute('reply-display', val)		
-		}
-		else {
-			this.removeAttribute('reply-display')
-		}
-	}
-	get flagDisplay() {
-		return this.hasAttribute('flag-display')
-	}
-	set flagDisplay(val) {
-		if(val) {
-			this.setAttribute('flag-display', val)
-		}
-		else {
-			this.removeAttribute('flag-display')
-		}
-	}
-	get voteDisplay() {
-		return this.hasAttribute('vote-display')
-	}
-	set voteDisplay(val) {
-		if(val) {
-			this.setAttribute('vote-display', val)
-		}
-		else {
-			this.removeAttribute('vote-display')
-		}
-	}
-	get repliesDisplay() {
-		return this.hasAttribute('replies-display')
-	}
-	set repliesDisplay(val) {
-		if(val) {
-			this.setAttribute('replies-display', val)
-		}
-		else {
-			this.removeAttribute('replies-display')
-		}
-	}
-	get removeDisplay() {
-		return this.hasAttribute('remove-display')
-	}
-	set removeDisplay(val) {
-		if(val) {
-			this.setAttribute('remove-display', val)
-		}
-		else {
-			this.removeAttribute('remove-display')
-		}
-	}
 	/* DATA */
 	get comment() {
 		return this._comment
@@ -329,16 +218,26 @@ class MyCommentComponent extends HTMLElement {
 			delete this._comment
 		}
 	}
-	/* CUSTOM FUNCTIONS */
-	get on() {
-		return this._comment
+	get currentUserID() {
+		return this._currentUserID
 	}
-	set comment(val) {
+	set currentUserID(val) {
 		if(val) {
-			this._comment = val
+			this._currentUserID = val
 		}
 		else {
-			delete this._comment
+			delete this._currentUserID
+		}
+	}
+	get isAdmin() {
+		return this._isAdmin
+	}
+	set isAdmin(val) {
+		if(val) {
+			this._isAdmin = val
+		}
+		else {
+			delete this._isAdmin
 		}
 	}
 	/* INTERNAL FUNCIONS */
@@ -488,7 +387,7 @@ class MyCommentComponent extends HTMLElement {
 				if(this.status === 200) {
 					const comments = response.data;
 					for(var i = 0; i < comments.length; i++) {
-						const newComment = new MyCommentComponent(comments[i]);
+						const newComment = new MyCommentComponent({ comment: comments[i], currentUserID: component.currentUserID, isAdmin: component.isAdmin});
 						component.insertAdjacentElement('afterbegin', newComment)
 					}
 					callback.call(component)
@@ -526,7 +425,7 @@ class MyCommentComponent extends HTMLElement {
 					repliesSection.dataset.skipOnPage = ((comments.length + query.skipOnPage) < 5) ? query.skipOnPage + comments.length : 0
 					repliesSection.dataset.pageNum = ((comments.length + query.skipOnPage) < 5) ? query.pageNum : query.pageNum+1
 					for(var i = 0; i < comments.length; i++) {
-						const newComment = new MyCommentComponent(comments[i]);
+						const newComment = new MyCommentComponent({ comment: comments[i], currentUserID: component.currentUserID, isAdmin: component.isAdmin});
 						component.insertAdjacentElement('beforeend', newComment)
 					}
 					callback.call(component)
@@ -554,7 +453,7 @@ class MyCommentComponent extends HTMLElement {
 		const upVoteButton = this.shadowRoot.querySelector('#up-vote-button')
 		const downVoteButton = this.shadowRoot.querySelector('#down-vote-button')
 		const loadNewButton = this.shadowRoot.querySelector('#load-new-button')
-		const loadOldButton = this.shadowRoot.querySelector('#load-old-button') 
+		const loadOldButton = this.shadowRoot.querySelector('#load-old-button')
 		content.classList.add('removed')
 		removeButton.classList.add('disabled')
 		replyToggle.classList.remove('active')
@@ -594,19 +493,6 @@ class MyCommentComponent extends HTMLElement {
 			}
 		}
 		recursivelyPaginateChildrenToDetermineVisbility.call(this)
-	}
-	_applyDisplayValueClass(element, value) {
-		Object.keys(MyCommentComponent.displayValues).forEach((key) => {
-			element.classList.remove(MyCommentComponent.displayValues[key])
-		})
-		element.classList.add(value)
-	}
-	_getDisplayValueClass(element) {
-		Object.keys(MyCommentComponent.displayValues).forEach((key) => {
-			if(element.classList.contains(this.displayValues[key])) {
-				return MyCommentComponent.displayValues[key];
-			}
-		})
 	}
 }
 
