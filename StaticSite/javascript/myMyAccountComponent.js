@@ -2,8 +2,125 @@ class MyMyAccountComponent extends HTMLElement {
 	// Add Listeners, innerHTML, styling, etc...
 	constructor({account}={}) {
 		super();
-		this.userAccount = account;
+		this.account = account;
 		this.attachShadow({ mode: "open" });
+		this._redrawShadowRootDOM()
+	}
+	static get observedAttributes() { return [ ]; };
+	// Respond to attribute changes...
+	attributeChangedCallback(attr, oldValue, newValue, namespace) {
+		// super.attributeChangedCallback(attr, oldValue, newValue, namespace);
+	}
+	// Removed from a document
+	disconnectedCallback() {
+		// super.disconnectedCallback();
+	}
+	// Called when an attribute is changed, appended, removed, or replaced on the element
+	connectedCallback() {
+		// super.connectedCallback();
+	}
+	// Called when the element is adopted into a new document
+	adoptedCallback(oldDocument, newDocument) {
+		super.adoptedCallback(oldDocument, newDocument);
+	}
+	static get displayValues() { return { disabled: 'disabled', hidden: 'hidden' }; };
+	/* DATA */
+	get account() {
+		return this._account
+	}
+	set account(val) {
+		if(val) {
+			this._account = val
+		}
+		else {
+			delete this._account
+		}
+	}
+	/* INTERNAL FUNCIONS */
+	_createPassword() {
+		const component = this;
+		const newPassword = this.shadowRoot.querySelector('#password-reset-form input.new-password').value
+		const newPasswordRetyped =  this.shadowRoot.querySelector('#password-reset-form input.new-password-retyped').value
+		if(newPassword == newPasswordRetypd) {
+			var data = {}
+			data._id = this.account._id;
+			data.newPassword =this.shadowRoot.querySelector('#password-reset-form input.new-password').value
+			const component = this;
+			const client = new XMLHttpRequest();
+			client.onreadystatechange = function() {
+				if (this.readyState === XMLHttpRequest.DONE) {
+					const response = JSON.parse(this.response);
+					if(this.status === 200) {
+						alert('All good!')
+					}
+					else {
+						handleServerErrorResponse(response)
+					}
+				}
+			}
+			client.open('POST', API_SERVER_ADDRESS()+'/account/reset-password');
+			client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+			client.setRequestHeader("Content-Type", "application/json");
+			client.send(JSON.stringify(data));
+		}
+		else {
+			alert('Passwords mismatched. Try retyping password fields.')
+		}
+	}
+	_resetPassword() {
+		const newPassword = this.shadowRoot.querySelector('#password-reset-form input.new-password').value
+		const newPasswordRetyped =  this.shadowRoot.querySelector('#password-reset-form input.new-password-retyped').value
+		if(newPassword == newPasswordRetypd) {
+			var data = {}
+			data._id = this.account._id;
+			data.newPassword = newPassword
+			const component = this;
+			const client = new XMLHttpRequest();
+			client.onreadystatechange = function() {
+				if (this.readyState === XMLHttpRequest.DONE) {
+					const response = JSON.parse(this.response);
+					if(this.status === 200) {
+						alert('All good!')
+					}
+					else {
+						handleServerErrorResponse(response)
+					}
+				}
+			}
+			client.open('POST', API_SERVER_ADDRESS()+'/account/reset-password');
+			client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+			client.setRequestHeader("Content-Type", "application/json");
+			client.send(JSON.stringify(data));
+		}
+		else {
+			alert('Passwords mismatched. Try retyping password fields.')
+		}
+	}
+	_editDetails() {
+		const component = this;
+		const client = new XMLHttpRequest();
+		client.onreadystatechange = function() {
+			if (this.readyState === XMLHttpRequest.DONE) {
+				const response = JSON.parse(this.response);
+				if(this.status === 200) {
+					alert('All good!')
+				}
+				else {
+					handleServerErrorResponse(response)
+				}
+			}
+		}
+		client.open('POST', API_SERVER_ADDRESS()+'/account/edit-details');
+		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+		client.setRequestHeader("Content-Type", "application/json");
+		var data = {}
+		data._id = this.account._id;
+		data.email =this.shadowRoot.querySelector('#edit-details-form input.email').value
+		data.nameFirst = this.shadowRoot.querySelector('#edit-details-form input.name-first').value
+		data.nameLast = this.shadowRoot.querySelector('#edit-details-form input.name-last').value
+		client.send(JSON.stringify(data));
+	}
+	_redrawShadowRootDOM() {
 		const component = this;
 		this.shadowRoot.innerHTML = `
 			<div>
@@ -14,15 +131,15 @@ class MyMyAccountComponent extends HTMLElement {
 				<table>
 					<tr>
 						<td><label for="email">Email</label></td>
-						<td><input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld" val="${account.email}"></td>
+						<td><input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld" value="${this.account.email}"></td>
 					</tr>
 					<tr>
 						<td><label for="name-first">First Name</label></td>
-						<td><input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John" val="${account.nameFirst}"></td>
+						<td><input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John" value="${this.account.nameFirst}"></td>
 					</tr>
 					<tr>
 						<td><label for="name-last">Last Name</label></td>
-						<td><input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe" val="${account.nameLast}"></td>
+						<td><input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe" value="${this.account.nameLast}"></td>
 					</tr>
 				</table>
 	            <div>
@@ -36,15 +153,15 @@ class MyMyAccountComponent extends HTMLElement {
 				<table>
 					<tr>
 						<td><label for="oldPassword">Old Password</label></td>
-						<td><input class="oldPassword" id="oldPassword" type="password" name="oldPassword" placeholder="Old password.."></td>
+						<td><input class="old-password" id="old-password" type="password" name="oldPassword" placeholder="Old password.."></td>
 					</tr>
 					<tr>
 						<td><label for="newPassword">New Password</label></td>
-						<td><input class="newPassword" id="newPassword" type="password" name="newPassword" placeholder="New password.."></td>
+						<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.."></td>
 					</tr>
 					<tr>
 						<td><label for="newPasswordRetyped">New Password Retyped</label></td>
-						<td><input class="newPasswordRetyped" id="newPasswordRetyped" type="password" name="newPasswordRetyped" placeholder="New password.."></td>
+						<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.."></td>
 					</tr>
 				</table>
 	            <div>
@@ -58,11 +175,11 @@ class MyMyAccountComponent extends HTMLElement {
 				<table>
 					<tr>
 						<td><label for="newPassword">New Password</label></td>
-						<td><input class="newPassword" id="newPassword" type="password" name="newPassword" placeholder="New password.."></td>
+						<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.."></td>
 					</tr>
 					<tr>
 						<td><label for="newPasswordRetyped">New Password Retyped</label></td>
-						<td><input class="newPasswordRetyped" id="newPasswordRetyped" type="password" name="newPasswordRetyped" placeholder="New password.."></td>
+						<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.."></td>
 					</tr>
 				</table>
 	            <div>
@@ -125,69 +242,28 @@ class MyMyAccountComponent extends HTMLElement {
 			}
 		});
 		linkFacebookButton.addEventListener('click', function(event) {
-			component._linkFacebook.call(component, function(err) {
-				if(err)
-					handleServerErrorResponse(err)
-				else
-					asdf
-			});
+			component._linkFacebook.call(component);
 		});
 		linkGoogleButton.addEventListener('click', function(event) {
-			component._linkGoogle.call(component, function(err) {
-				if(err)
-					handleServerErrorResponse(err)
-				else
-					asdf
-			});
+			component._linkGoogle.call(component);
 		});
 		deleteAccountButton.addEventListener('click', function(event) {
-
+			component._deleteAccount.call(component);
 		});
 		passwordResetForm.addEventListener('submit', function(event) {
-
+			component._deleteAccount.call(component);
 		});
 		passwordCreateForm.addEventListener('submit', function(event) {
-
+			component._deleteAccount.call(component);
 		});
 		editDetailsForm.addEventListener('submit', function(event) {
-
+			component._editDetails.call(component);
 		});
 		// Apply Styling
-		if(account.facebookProfileID) {
+		if(this.account.facebookProfileID) {
 			linkFacebookButton.classList.add('hidden')
 		}
 	}
-	static get observedAttributes() { return [ ]; };
-	// Respond to attribute changes...
-	attributeChangedCallback(attr, oldValue, newValue, namespace) {
-		// super.attributeChangedCallback(attr, oldValue, newValue, namespace);
-	}
-	// Removed from a document
-	disconnectedCallback() {
-		// super.disconnectedCallback();
-	}
-	// Called when an attribute is changed, appended, removed, or replaced on the element
-	connectedCallback() {
-		// super.connectedCallback();
-	}
-	// Called when the element is adopted into a new document
-	adoptedCallback(oldDocument, newDocument) {
-		super.adoptedCallback(oldDocument, newDocument);
-	}
-	static get displayValues() { return { disabled: 'disabled', hidden: 'hidden' }; };
-	/* DATA */
-	get account() {
-		return this._account
-	}
-	set account(val) {
-		if(val) {
-			this._account = val
-		}
-		else {
-			delete this._account
-		}
-	}
-	/* INTERNAL FUNCIONS */
 }
 
 

@@ -2,196 +2,27 @@ class MyCommentComponent extends HTMLElement {
 	// Add Listeners, innerHTML, styling, etc...
 	constructor({comment, currentUserID, isAdmin}={}) {
 		super();
-		this.comment = comment;
-		this.currentUserID = currentUserID;
-		this.isAdmin = isAdmin;
+		this.comment = comment || null;
+		this.currentUserID = currentUserID || null;
+		this.isAdmin = isAdmin || null;
 		this.attachShadow({ mode: "open" });
-		const component = this;
-		this.shadowRoot.innerHTML = `
-			<div>
-				<span>
-					${ (comment.account && comment.account.facebookProfileID) ? '<img display="inline-block" width="50px" height="50px" alt="" src="http://graph.facebook.com/'+comment.account.facebookProfileID+'/picture?type=large">' : ''}
-				</span>
-				<span style='width: 500px;'>
-					<div id='header'>${(comment.account) ? comment.account.nameFirst+' '+comment.account.nameLast+' @ '+comment.dateCreated : ''}</div>
-					<div id='content'>${comment.text}</div>
-				</span>
-			</div>
-			<footer>
-				<div id='actions'>
-					<button id='replies-toggle' name='Replies'>Replies</button>
-					<button id='reply-toggle' name='Reply' class='hidden'>Reply</button>
-					<span id='up-vote-count'>${'+'+comment.upVoteAccountIDs.length}</span>
-					<button id='up-vote-button' name='Up' class='hidden'>Up</button>
-					<span id='down-vote-count'>${'-'+comment.downVoteAccountIDs.length}</span>
-					<button id='down-vote-button' name='Down' class='hidden'>Down</button>
-					<button id='remove-button' name='Remove' class='hidden'>Remove</button>
-					<button id='flag-button' name='Flag' class='hidden'>Flag</button>
-				</div>
-				<div id='replies' data-start='newest' class='hidden'>
-					<button id='load-new-button' class='hidden' name='Load Newest..'>Load Newest..</button>
-					<slot id="repliesSlot"></slot>
-					<button id='load-old-button' class='hidden'>Load more..</button>
-				</div>
-				<form id='create-form' action='' class='hidden'>
-					<input id='article-id' name='articleID' type='hidden' value='${comment.articleID}'>
-					<input id='parent-comment-id' name='parentCommentID' type='hidden' value='${comment._id}'>
-					<input id='text' name='text' type='text' placeholder='Text...'>
-					<button id='submit' name='Submit'>Submit</button>
-				</form>
-			</footer>
-			<style>
-				#repliesSlot::slotted(*) {
-					display: block;
-				}
-				#replies{
-					margin-left: 20px;
-				}
-				span {
-					display: inline-block;
-					text-align: left;
-					vertical-align: top;
-				}
-				#content.removed > * {
-					display: none;
-				}
-				#content.removed::before {
-					content: '~Comment has been removed~';
-				}
-				.hidden {
-					display: none;
-				}
-				.disabled {
-					color: grey;
-					pointer-events: none;
-				}
-				.active {
-					color: green;
-				}
-				#replies-toggle:not(.active)::before {
-					content: "";
-				}
-				#replies-toggle.active::before {
-					content: "Hide ";
-				}
-				#reply-toggle:not(.active)::before {
-					content: "";
-				}
-				#reply-toggle.active::before {
-					content: "Discard ";
-				}
-			</style>
-		`;
-		const content = this.shadowRoot.querySelector('#content')
-		const repliesToggle = this.shadowRoot.querySelector('#replies-toggle')
-		const repliesSection = this.shadowRoot.querySelector('#replies')
-		const replyToggle = this.shadowRoot.querySelector('#reply-toggle')
-		const createForm = this.shadowRoot.querySelector('#create-form')
-		const removeButton = this.shadowRoot.querySelector('#remove-button')
-		const flagButton = this.shadowRoot.querySelector('#flag-button')
-		const upVoteButton = this.shadowRoot.querySelector('#up-vote-button')
-		const upVoteCount = this.shadowRoot.querySelector('#up-vote-count')
-		const downVoteButton = this.shadowRoot.querySelector('#down-vote-button')
-		const downVoteCount = this.shadowRoot.querySelector('#down-vote-count')
-		const loadNewButton = this.shadowRoot.querySelector('#load-new-button')
-		const loadOldButton = this.shadowRoot.querySelector('#load-old-button')              
-		
-		if(comment.removed) {
-			this._applyStyleRemoved()
-		}
-		repliesToggle.addEventListener('click', function(event) {
-			if(!repliesToggle.classList.contains('disabled')) {
-				repliesToggle.classList.toggle('active')
-				repliesSection.classList.toggle('hidden')
-				loadNewButton.classList.toggle('hidden')
-				loadOldButton.classList.toggle('hidden')
-				// If replies are empty... AND replies are active
-				if(component.childElementCount <= 0 && repliesToggle.classList.contains('active')) {
-					// Query for 1st batch of child comments
-					loadOldButton.click();
-				}
-			}
-		});
-		replyToggle.addEventListener('click', function(event) {
-			if(!replyToggle.classList.contains('disabled')) {
-				replyToggle.classList.toggle('active')
-				createForm.classList.toggle('hidden')
-				var firstFormInput = createForm.querySelector('#text')
-				if(firstFormInput.isEqualNode(document.activeElementcreateForm)) {
-			        firstFormInput.blur();
-			    } else {
-			        firstFormInput.focus();
-			    }
-			}
-		});
-		removeButton.addEventListener('click', function(event) {
-			if(!removeButton.classList.contains('disabled')) {
-				component._remove.call(component, function(err) {
-					if(err)
-						handleServerErrorResponse(err)
-				});
-			}
-		});
-		flagButton.addEventListener('click', function(event) {
-			if(!flagButton.classList.contains('disabled')) {
-				component._flag.call(component, function(err) {
-					if(err) 
-						handleServerErrorResponse(err)
-					else 
-						alert('Comment has been flagged, system admin has been alerted...')
-				});
-			}
-		});
-		upVoteButton.addEventListener('click', function(event) {
-			if(!upVoteButton.classList.contains('disabled')) {
-				component._upVote.call(component, function(err) {
-					if(err) 
-						handleServerErrorResponse(err)
-				});
-			}
-		});
-		downVoteButton.addEventListener('click', function(event) {
-			if(!downVoteButton.classList.contains('disabled')) {
-				component._downVote.call(component, function(err) {
-					if(err) 
-						handleServerErrorResponse(err)
-				});
-			}
-		});
-		loadNewButton.addEventListener('click', function(event) {
-			component._loadNewReplies.call(component, function(err) {
-					if(err) 
-						handleServerErrorResponse(err)
-			});
-		});
-		loadOldButton.addEventListener('click', function(event) {
-			component._loadMoreReplies.call(component, function(err) {
-					if(err) 
-						handleServerErrorResponse(err)
-			});
-		});
-		createForm.addEventListener('submit', function(event) {
-			event.preventDefault();
-			component._create.call(component, function(err) {
-					if(err)
-						handleServerErrorResponse(err)
-			});
-		});
-		if(this.currentUserID) {
-			replyToggle.classList.remove('hidden')
-			repliesToggle.classList.remove('hidden')
-			upVoteButton.classList.remove('hidden')
-			downVoteButton.classList.remove('hidden')
-			flagButton.classList.remove('hidden')
-			if(this.isAdmin || this.comment.accountID === this.currentUserID) {
-				removeButton.classList.remove('hidden')
-			}
-		}
+		this._redrawShadowRootDOM()
 	}
 	static get observedAttributes() { return [ ]; };
 	// Respond to attribute changes...
 	attributeChangedCallback(attr, oldValue, newValue, namespace) {
 		// super.attributeChangedCallback(attr, oldValue, newValue, namespace);
+		// Just Redraw the Element U.I. because changing any attribute 
+		// will propogate changes to all decendant elements anyway
+		if(attr === 'comment') {
+			this._redrawShadowRootDOM()
+		}
+		else if(attr === 'current-user-id') {
+			this._redrawShadowRootDOM()
+		}
+		else if(attr === 'is-admin') {
+			this._redrawShadowRootDOM()
+		}
 	}
 	// Removed from a document
 	disconnectedCallback() {
@@ -208,36 +39,36 @@ class MyCommentComponent extends HTMLElement {
 	static get displayValues() { return { disabled: 'disabled', hidden: 'hidden' }; };
 	/* DATA */
 	get comment() {
-		return this._comment
+		return JSON.parse(this.getAttribute('comment'));
 	}
 	set comment(val) {
 		if(val) {
-			this._comment = val
+			this.setAttribute('comment', JSON.stringify(val));
 		}
 		else {
-			delete this._comment
+			this.removeAttribute('comment');
 		}
 	}
 	get currentUserID() {
-		return this._currentUserID
+		return this.getAttribute('current-user-id');
 	}
 	set currentUserID(val) {
 		if(val) {
-			this._currentUserID = val
+			this.setAttribute('current-user-id', val);
 		}
 		else {
-			delete this._currentUserID
+			this.removeAttribute('current-user-id');
 		}
 	}
 	get isAdmin() {
-		return this._isAdmin
+		return this.getAttribute('is-admin');
 	}
 	set isAdmin(val) {
 		if(val) {
-			this._isAdmin = val
+			this.setAttribute('is-admin', val);
 		}
 		else {
-			delete this._isAdmin
+			this.removeAttribute('is-admin');
 		}
 	}
 	/* INTERNAL FUNCIONS */
@@ -437,6 +268,189 @@ class MyCommentComponent extends HTMLElement {
 		}
 		client.open('GET', API_SERVER_ADDRESS()+'/comments/read?data='+encodedQuery);
 		client.send();
+	}
+	_redrawShadowRootDOM() {
+		const component = this;
+		this.shadowRoot.innerHTML = `
+			<div>
+				<span>
+					${ (this.comment.account && this.comment.account.facebookProfileID) ? '<img display="inline-block" width="50px" height="50px" alt="" src="http://graph.facebook.com/'+this.comment.account.facebookProfileID+'/picture?type=large">' : ''}
+				</span>
+				<span style='width: 500px;'>
+					<div id='header'>${(this.comment.account) ? this.comment.account.nameFirst+' '+this.comment.account.nameLast+' @ '+this.comment.dateCreated : ''}</div>
+					<div id='content'>${this.comment.text}</div>
+				</span>
+			</div>
+			<footer>
+				<div id='actions'>
+					<button id='replies-toggle' name='Replies'>Replies</button>
+					<button id='reply-toggle' name='Reply' class='hidden'>Reply</button>
+					<span id='up-vote-count'>${'+'+this.comment.upVoteAccountIDs.length}</span>
+					<button id='up-vote-button' name='Up' class='hidden'>Up</button>
+					<span id='down-vote-count'>${'-'+this.comment.downVoteAccountIDs.length}</span>
+					<button id='down-vote-button' name='Down' class='hidden'>Down</button>
+					<button id='remove-button' name='Remove' class='hidden'>Remove</button>
+					<button id='flag-button' name='Flag' class='hidden'>Flag</button>
+				</div>
+				<div id='replies' data-start='newest' class='hidden'>
+					<button id='load-new-button' class='hidden' name='Load Newest..'>Load Newest..</button>
+					<slot id="repliesSlot"></slot>
+					<button id='load-old-button' class='hidden'>Load more..</button>
+				</div>
+				<form id='create-form' action='' class='hidden'>
+					<input id='article-id' name='articleID' type='hidden' value='${this.comment.articleID}'>
+					<input id='parent-comment-id' name='parentCommentID' type='hidden' value='${this.comment._id}'>
+					<input id='text' name='text' type='text' placeholder='Text...'>
+					<button id='submit' name='Submit'>Submit</button>
+				</form>
+			</footer>
+			<style>
+				#repliesSlot::slotted(*) {
+					display: block;
+				}
+				#replies{
+					margin-left: 20px;
+				}
+				span {
+					display: inline-block;
+					text-align: left;
+					vertical-align: top;
+				}
+				#content.removed > * {
+					display: none;
+				}
+				#content.removed::before {
+					content: '~Comment has been removed~';
+				}
+				.hidden {
+					display: none;
+				}
+				.disabled {
+					color: grey;
+					pointer-events: none;
+				}
+				.active {
+					color: green;
+				}
+				#replies-toggle:not(.active)::before {
+					content: "";
+				}
+				#replies-toggle.active::before {
+					content: "Hide ";
+				}
+				#reply-toggle:not(.active)::before {
+					content: "";
+				}
+				#reply-toggle.active::before {
+					content: "Discard ";
+				}
+			</style>
+		`;
+		const content = this.shadowRoot.querySelector('#content')
+		const repliesToggle = this.shadowRoot.querySelector('#replies-toggle')
+		const repliesSection = this.shadowRoot.querySelector('#replies')
+		const replyToggle = this.shadowRoot.querySelector('#reply-toggle')
+		const createForm = this.shadowRoot.querySelector('#create-form')
+		const removeButton = this.shadowRoot.querySelector('#remove-button')
+		const flagButton = this.shadowRoot.querySelector('#flag-button')
+		const upVoteButton = this.shadowRoot.querySelector('#up-vote-button')
+		const upVoteCount = this.shadowRoot.querySelector('#up-vote-count')
+		const downVoteButton = this.shadowRoot.querySelector('#down-vote-button')
+		const downVoteCount = this.shadowRoot.querySelector('#down-vote-count')
+		const loadNewButton = this.shadowRoot.querySelector('#load-new-button')
+		const loadOldButton = this.shadowRoot.querySelector('#load-old-button')              
+		
+		if(this.comment.removed) {
+			this._applyStyleRemoved()
+		}
+		repliesToggle.addEventListener('click', function(event) {
+			if(!repliesToggle.classList.contains('disabled')) {
+				repliesToggle.classList.toggle('active')
+				repliesSection.classList.toggle('hidden')
+				loadNewButton.classList.toggle('hidden')
+				loadOldButton.classList.toggle('hidden')
+				// If replies are empty... AND replies are active
+				if(component.childElementCount <= 0 && repliesToggle.classList.contains('active')) {
+					// Query for 1st batch of child comments
+					loadOldButton.click();
+				}
+			}
+		});
+		replyToggle.addEventListener('click', function(event) {
+			if(!replyToggle.classList.contains('disabled')) {
+				replyToggle.classList.toggle('active')
+				createForm.classList.toggle('hidden')
+				var firstFormInput = createForm.querySelector('#text')
+				if(firstFormInput.isEqualNode(document.activeElementcreateForm)) {
+			        firstFormInput.blur();
+			    } else {
+			        firstFormInput.focus();
+			    }
+			}
+		});
+		removeButton.addEventListener('click', function(event) {
+			if(!removeButton.classList.contains('disabled')) {
+				component._remove.call(component, function(err) {
+					if(err)
+						handleServerErrorResponse(err)
+				});
+			}
+		});
+		flagButton.addEventListener('click', function(event) {
+			if(!flagButton.classList.contains('disabled')) {
+				component._flag.call(component, function(err) {
+					if(err) 
+						handleServerErrorResponse(err)
+					else 
+						alert('Comment has been flagged, system admin has been alerted...')
+				});
+			}
+		});
+		upVoteButton.addEventListener('click', function(event) {
+			if(!upVoteButton.classList.contains('disabled')) {
+				component._upVote.call(component, function(err) {
+					if(err) 
+						handleServerErrorResponse(err)
+				});
+			}
+		});
+		downVoteButton.addEventListener('click', function(event) {
+			if(!downVoteButton.classList.contains('disabled')) {
+				component._downVote.call(component, function(err) {
+					if(err) 
+						handleServerErrorResponse(err)
+				});
+			}
+		});
+		loadNewButton.addEventListener('click', function(event) {
+			component._loadNewReplies.call(component, function(err) {
+					if(err) 
+						handleServerErrorResponse(err)
+			});
+		});
+		loadOldButton.addEventListener('click', function(event) {
+			component._loadMoreReplies.call(component, function(err) {
+					if(err) 
+						handleServerErrorResponse(err)
+			});
+		});
+		createForm.addEventListener('submit', function(event) {
+			event.preventDefault();
+			component._create.call(component, function(err) {
+					if(err)
+						handleServerErrorResponse(err)
+			});
+		});
+		if(this.currentUserID) {
+			replyToggle.classList.remove('hidden')
+			repliesToggle.classList.remove('hidden')
+			upVoteButton.classList.remove('hidden')
+			downVoteButton.classList.remove('hidden')
+			flagButton.classList.remove('hidden')
+			if(this.isAdmin || this.comment.accountID === this.currentUserID) {
+				removeButton.classList.remove('hidden')
+			}
+		}
 	}
 	_applyStyleRemoved() {
 		/* Complicated logic....

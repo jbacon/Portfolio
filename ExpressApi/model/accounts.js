@@ -56,11 +56,7 @@ module.exports = class Account extends Document {
 		return this._passwordHashAndSalt;
 	}
 	set passwordHashAndSalt(val) {
-		// if(typeof(val) === 'string') {
-			this._passwordHashAndSalt = val;
-		// }
-		// else
-		// 	throw new Error('Failed to construct account. Invalid entry for... val')
+		this._passwordHashAndSalt = val;
 	}
 	toObject() {
 		var obj = super.toObject()
@@ -108,5 +104,39 @@ module.exports = class Account extends Document {
 		});
 		const newAccountClass = new Account(result.ops[0])
 		return newAccountClass
+	}
+	static async editDetails({ _id, email, nameFirst, nameLast } = {}) {
+		/* Find Account */
+		Account.read({
+			query: { _id: mongodb.ObjectID(_id) },
+			pageSize: 1,
+			pageNum: 1
+		})
+		.then((accounts) => {
+			if(accounts.length === 1) {
+				/* Edit Account */
+				const account = accounts[0]
+				account.email = email;
+				account.nameFirst = nameFirst;
+				account.nameLast = nameLast;
+				/* Update Account */
+				Account.update({
+					account: account
+				})
+				.then((account) => {
+					/* Return  Account */
+					return account
+				})
+				.catch((err) => {
+					throw err
+				})
+			}
+			else {
+				throw new Error('Failed to edit account. Account does not exsit.')
+			}
+		})
+		.catch((err) => {
+			throw err
+		})
 	}
 }

@@ -6,12 +6,12 @@ router.post('/create', function(req, res, next) {
 	try {
 		var account = new Account(req.body)
 		Account.create(account)
-			.then((results) => {
-				res.json({ data: results });
-			})
-			.catch((err) => {
-				next(err)
-			})
+		.then((results) => {
+			res.json({ data: results });
+		})
+		.catch((err) => {
+			next(err)
+		})
 	}
 	catch(err) {
 		next(err)
@@ -19,12 +19,12 @@ router.post('/create', function(req, res, next) {
 });
 router.get('/read', function(req, res, next) {
 	Account.read(req.query)
-		.then((results) => {
-			res.json({ data: results });
-		})
-		.catch((err) => {
-			next(err)
-		})
+	.then((results) => {
+		res.json({ data: results });
+	})
+	.catch((err) => {
+		next(err)
+	})
 });
 router.post('/delete', function(req, res, next) {
 	Account.delete(req.body)
@@ -35,16 +35,44 @@ router.post('/delete', function(req, res, next) {
 			next(err)
 		})
 });
-router.post('/update', function(req, res, next) {
-	try {
-		var account = new Account(req.body)
-		Account.update(account)
-			.then((results) => {
-				res.json({ data: results });
-			})
-			.catch((err) => {
-				next(err)
-			})
+// router.post('/update', function(req, res, next) {
+// 	try {
+// 		var account = new Account(req.body)
+// 		Account.update(account)
+// 		.then((results) => {
+// 			res.json({ data: results });
+// 		})
+// 		.catch((err) => {
+// 			next(err)
+// 		})
+// 	}
+// 	catch(err) {
+// 		next(err)
+// 	}
+// });
+router.post('/edit-details', function(req, res, next) {
+	try{
+		Account.editDetails(req.body)
+		.then((results) => {
+			res.json({ data: results })
+		})
+		.catch((err) => {
+			next(err)
+		})
+	}
+	catch(err) {
+		next(err)
+	}
+});
+router.post('/reset-password', function(req, res, next) {
+	try{
+		Account.editDetails(req.body)
+		.then((results) => {
+			
+		})
+		.catch((err) => {
+			
+		})
 	}
 	catch(err) {
 		next(err)
