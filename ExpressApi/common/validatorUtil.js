@@ -4,7 +4,7 @@ var CustomError = require('../common/errorUtil');
 
 exports.isValidNull = function(val) {
 	try {
-		exports.normalizeNullable(val)
+		exports.normalizeNull(val)
 		return true
 	}
 	catch(err) {

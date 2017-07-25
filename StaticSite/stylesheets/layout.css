@@ -12,6 +12,7 @@ body {
   font: 15px Verdana, sans-serif;
 }
 #site-header {
+	/* Side in from left*/
 	height: 245px;
 }
 #site-title {
@@ -69,6 +70,7 @@ body {
 	cursor: pointer;
 }
 #main-section {
+	/* Scroll in from Right */
 	display: inline-block;
 	vertical-align: top;
 	max-width: 780px;
@@ -85,6 +87,7 @@ body {
 	font: normal 15px Verdana, sans-serif;
 }
 #main-footer {
+	/* Scroll in fromt top of footer*/
 	padding: 0px 20px 20px 20px;
 	font: normal 15px Verdana, sans-serif;
 }

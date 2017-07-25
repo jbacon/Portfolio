@@ -69,7 +69,11 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 3. About Me
 	- Early Life
 	- Location
-4. Contact:
+4. Photos:
+	- Create a simple photo gallary
+5. Blogs:
+	- Create some blog posts accessible by Date/Search
+6. Contact:
 	- Email
 	- Phone
 	- Tech Profiles:
@@ -81,13 +85,13 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 		- LinkedIn
 		- Facebook
 		- Google
-5. Email Integration
+7. Email Integration
 	- Forgot Password.. no problem!
 	- Personal Administration Alerts!
 	- Automated Email Administration & Stats:
 		- Did I get a visitor?
 		- Did I get a registration?
-6. Ads!
+8. Ads!
 	- How do I accomplish this... no idea!
 9. HTTPS:
 	- Initially tried Amazon Certificate Manager, but had no luck (domain verification emails were never being sent to my administrative email account). After wasting lots of time trouble-shooting, I gave up and claim it's broken.
