@@ -1,7 +1,9 @@
 var mongoUtil = require('../common/mongoUtil');
 var Document = require('../model/document');
 var Account = require('../model/accounts');
+var validatorUtil = require('../common/validatorUtil')
 var validator = require('validator');
+var CustomError = require('../common/errorUtil');
 var mongodb = require('mongodb');
 
 module.exports = class Comment extends Document {
@@ -27,16 +29,7 @@ module.exports = class Comment extends Document {
 		return this._accountID;
 	}
 	set accountID(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '') {
-			this._accountID = null;
-		}
-		else if(mongodb.ObjectID.isValid(val)) {
-			var objectID = mongodb.ObjectID(val)
-			this._accountID = objectID;
-		}
-		else {
-			throw new TypeError('Invalid entry for accountID: '+val)
-		}
+		this._accountID = validatorUtil.normalizeID(val)
 	}
 	// Virtual Account
 	get account() {
@@ -68,141 +61,90 @@ module.exports = class Comment extends Document {
 		return this._text;
 	}
 	set text(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '') {
-			this._text = null;
-		}
-		else if(typeof(val) === 'string') {
-			this._text = val;
-		}
-		else {
-			throw new TypeError('Invalid entry for text: '+val)
-		}
+		this._text = _verifyAndNormalizeText(val)
 	}
 	get articleID() {
 		return this._articleID;
 	}
 	set articleID(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '') {
-			this._articleID = null;
-		}
-		else if(mongodb.ObjectID.isValid(val)) {
-			var objectID = mongodb.ObjectID(val)
-			this._articleID = objectID;
-		}
-		else {
-			throw new TypeError('Invalid entry for articleID: '+val)
-		}
+		this._articleID = validatorUtil.normalizeID(val)
 	}
 	get parentCommentID() {
 		return this._parentCommentID;
 	}
 	set parentCommentID(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '') {
-			this._parentCommentID = null;
-		}
-		else if(mongodb.ObjectID.isValid(val)) {
-			var objectID = mongodb.ObjectID(val)
-			this._parentCommentID = objectID;
-		}
-		else {
-			throw new TypeError('Invalid entry for parentCommentID: '+val)
-		}
+		this._parentCommentID = validatorUtil.normalizeID(val, { allowNullable: true })
 	}
 	get upVoteAccountIDs() {
 		return this._upVoteAccountIDs;
 	}
 	set upVoteAccountIDs(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '')
-			this._upVoteAccountIDs = [];
-		else if(val instanceof Array)
-			this._upVoteAccountIDs = val;
-		else
-			throw new TypeError('Invalid entry for val: '+val)
+		this._upVoteAccountIDs = validatorUtil.noramlizeArrayIDs(val)
 	}
 	get downVoteAccountIDs() {
 		return this._downVoteAccountIDs;
 	}
 	set downVoteAccountIDs(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '')
-			this._downVoteAccountIDs = [];
-		else if(val instanceof Array)
-			this._downVoteAccountIDs = val;
-		else
-			throw new TypeError('Invalid entry for... val: '+val)
+		this._downVoteAccountIDs = validatorUtil.noramlizeArrayIDs(val)
 	}
 	get flags() {
 		return this._flags;
 	}
 	set flags(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '')
-			this._flags = [];
-		else if(val instanceof Array)
-			this._flags = val;
-		else
-			throw new TypeError('Invalid entry for... val: '+val)
+		this._flags = validatorUtil.noramlizeArrayIDs(val)
 	}
 	get removed() {
 		return this._removed;
 	}
 	set removed(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '')
-			this._removed = null;
-		else if(mongodb.ObjectID.isValid(val))
-			this._removed = val;
-		else
-			throw new TypeError('Invalid entry for... val: '+val)
+		this._flags = validatorUtil.normalizeID(val, { allowNullable: true })
 	}
 	get childCommentIDs() {
 		return this._childCommentIDs;
 	}
 	set childCommentIDs(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '')
-			this._childCommentIDs = [];
-		else if(val instanceof Array)
-			this._childCommentIDs = val
-		else
-			throw new TypeError('Invalid entry for... val: '+val)
+		this._childCommentIDs = validatorUtil.noramlizeArrayIDs(val)
 	}
 	async toObjectWithVirtuals() {
 		var obj = super.toObject()
-		obj.accountID = this.accountID;
+		obj.accountID = this.accountID.toHexString();
 		const account = await this.account;
 		obj.account = (account) ? account.toObject() : null;
 		obj.text = this.text;
-		obj.articleID = this.articleID;
-		obj.parentCommentID = this.parentCommentID;
-		obj.upVoteAccountIDs = this.upVoteAccountIDs;
-		obj.downVoteAccountIDs = this.downVoteAccountIDs;
-		obj.flags = this.flags;
-		obj.removed = this.removed;
-		obj.childCommentIDs = this.childCommentIDs;
+		obj.articleID = this.articleID.toHexString();
+		obj.parentCommentID = this.parentCommentID.toHexString();
+		obj.upVoteAccountIDs = this.upVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
+		obj.downVoteAccountIDs = this.downVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
+		obj.flags = this.flags.map((objectID) => { return objectID.toHexString() });
+		obj.removed = this.removed.toHexString();
+		obj.childCommentIDs = this.childCommentIDs.map((objectID) => { return objectID.toHexString() });
 		return obj;
 	}
  	toObject() {
 		var obj = super.toObject()
-		obj.accountID = this.accountID;
+		obj.accountID = this.accountID.toHexString();
 		obj.text = this.text;
-		obj.articleID = this.articleID;
-		obj.parentCommentID = this.parentCommentID;
-		obj.upVoteAccountIDs = this.upVoteAccountIDs;
-		obj.downVoteAccountIDs = this.downVoteAccountIDs;
-		obj.flags = this.flags;
-		obj.removed = this.removed;
-		obj.childCommentIDs = this.childCommentIDs;
-		return obj
+		obj.articleID = this.articleID.toHexString();
+		obj.parentCommentID = this.parentCommentID.toHexString();
+		obj.upVoteAccountIDs = this.upVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
+		obj.downVoteAccountIDs = this.downVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
+		obj.flags = this.flags.map((objectID) => { return objectID.toHexString() });
+		obj.removed = this.removed.toHexString();
+		obj.childCommentIDs = this.childCommentIDs.map((objectID) => { return objectID.toHexString() });
+		return obj;
 	}
 	static async create({ comment } = {}) {
 		if(!(comment instanceof Comment))
-			throw new Error('Parameter not instance of Comment')
+			throw new CustomError('Parameter not instance of Comment', 500, comment)
 		// Try CREATE!
 		const result = await super.create({
 			doc: comment
 		})
 		// If new comment has a PARENT, then add new ID to the PARENTS childCommentList (for purpose as secondary search criteria)
 		if(result.ops[0].parentCommentID) {
-			Comment.addChildComments({
+			Comment.addChildCommentID({
 				_id: result.ops[0].parentCommentID.toString(),
-				childCommentIDs: [ result.ops[0]._id ]
+				childCommentID: result.ops[0]._id
 			})
 		}
 		const newComment = new Comment(result.ops[0])
@@ -211,42 +153,25 @@ module.exports = class Comment extends Document {
 	static async read({ id=undefined, articleID=undefined, parentCommentID=undefined, start=undefined, pageSize=10, sortOrder=-1/*Ascending*/, pageNum=1, skipOnPage=0 } = {}) {
 		//Build match query (based on paramaters)
 		const match = {}
-		if(id !== undefined) { 
-			if(id === 'null' || id === '' || id === null)
-				match._id = null
-			else if(mongodb.ObjectID.isValid(id))
-				match._id = mongodb.ObjectID(id);
-			else
-				throw new Error('Query parameter ID invalid for value: '+ID)
+		if(id !== undefined) {
+			match._id = validatorUtil.normalizeID(id, { allowNullable: true })
 		}
 		else { // IF ID PROVIDED, then START IS IRRELEVANT TO QUERY!
 			var startObject;
 			if(start === 'newest')
 				startObject = mongodb.ObjectID()
-			else if(start !== undefined && start !== null && start !== 'null' && start !== 'undefined' && mongodb.ObjectID.isValid(start))
-				startObject = mongodb.ObjectID(start)
-			else
-				throw new Error('Query parameter start invalid for value: '+start)
+			else 
+				startObject = validatorUtil.normalizeID(start)
 			if(sortOrder === -1) //New -> Old
 				match._id = { $lte: startObject }
 			else if(sortOrder === 1) //Old -> New
 				match._id = { $gt: startObject };
 		}
 		if(articleID !== undefined) {
-			if(articleID === 'null' || articleID === null)
-				match.articleID = null
-			else if(mongodb.ObjectID.isValid(articleID))
-				match.articleID = mongodb.ObjectID(articleID);
-			else
-				throw new Error('Query parameter articleID invalid for value: '+articleID)
+			match.articleID = validatorUtil.normalizeID(articleID)
 		}
 		if(parentCommentID !== undefined) {
-			if(parentCommentID === 'null' || parentCommentID === null)
-				match.parentCommentID = null
-			else if(mongodb.ObjectID.isValid(parentCommentID))
-				match.parentCommentID = mongodb.ObjectID(parentCommentID);
-			else
-				throw new Error('Query parameter parentCommentID invalid for value: '+parentCommentID)
+			match.parentCommentID = validatorUtil.normalizeID(parentCommentID, { allowNullable: true })
 		}
 		const results = await mongoUtil.getDB()
 			.collection(Comment.COLLECTION_NAME)
@@ -275,7 +200,7 @@ module.exports = class Comment extends Document {
 	}
 	static async update({ comment } = {}) {
 		if(!(comment instanceof Comment))
-			throw new Error('Failed to create document. Parameter not instance of Comment')
+			throw new CustomError('Failed to create document. Parameter not instance of Comment', 500, comment)
 		const result = await super.update({
 			doc: comment
 		})
@@ -288,76 +213,71 @@ module.exports = class Comment extends Document {
 		});
 		return result
 	}
-	static async addChildComments({ _id, childCommentIDs } = {}) {
-		const objectID = new mongodb.ObjectID(_id);
+	static async addChildCommentID({ _id, childCommentID } = {}) {
 		const result = await mongoUtil.getDB()
 			.collection(Comment.COLLECTION_NAME).updateOne(
 				{
-					_id: objectID
+					_id: validatorUtil.normalizeID(_id)
 				},
 				{
 					$addToSet: {
-						childCommentIDs: { $each: childCommentIDs }
+						childCommentIDs: validatorUtil.normalizeID(childCommentID) 
 					}
 				}
 			);
 		return result
 	}
 	static async userDownVote({ _id, accountID } = {}) {
-		const objectID = new mongodb.ObjectID(_id);
 		const result = await mongoUtil.getDB()
 			.collection(Comment.COLLECTION_NAME).updateOne(
 				{
-					_id: objectID 
+					_id: validatorUtil.normalizeID(_id)  
 				},
 				{
 					$addToSet: {
-						downVoteAccountIDs: accountID
+						downVoteAccountIDs: validatorUtil.normalizeID(accountID) 
 					}
 				}
 			);
 		return result;
 	}
 	static async userUpVote({ _id, accountID } = {}) {
-		const objectID = new mongodb.ObjectID(_id);
 		const result = await mongoUtil.getDB()
 			.collection(Comment.COLLECTION_NAME).updateOne(
 				{
-					_id: objectID 
+					_id: validatorUtil.normalizeID(_id)  
 				},
 				{
 					$addToSet: {
-						upVoteAccountIDs: accountID
+						upVoteAccountIDs: validatorUtil.normalizeID(accountID) 
 					}
 				}
 			);
 		return result
 	}
 	static async flag({ _id, accountID } = {}) {
-		const objectID = new mongodb.ObjectID(_id);
 		const result = await mongoUtil.getDB()
 			.collection(Comment.COLLECTION_NAME).updateOne(
 				{
-					_id: objectID 
+					_id: validatorUtil.normalizeID(_id) 
 				},
 				{
 					$addToSet: {
-						flags: accountID
+						flags: validatorUtil.normalizeID(accountID)
 					}
 				}
 			);
 		return result;
 	}
 	static async remove({ _id, accountID } = {}) {
-		const objectID = new mongodb.ObjectID(_id);
 		const result = await mongoUtil.getDB()
 			.collection(Comment.COLLECTION_NAME).updateOne(
 				{
-					_id: objectID
+					_id: validatorUtil.normalizeID(_id) 
 				},
 				{
 					$set: { 
-						removed: accountID 
+						removed: validatorUtil.normalizeID(accountID)
 					}
 				}
 			);

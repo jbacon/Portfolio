@@ -1,60 +1,34 @@
 var mongoUtil = require('../common/mongoUtil');
 var validator = require('validator');
+var validatorUtil = require('../common/validatorUtil')
+var CustomError = require('../common/errorUtil');
 var mongodb = require('mongodb');
 
 module.exports = class Document {
 	constructor(doc) {
 		// Use Set methods to perform validation
 		// Set Default/Initial values
-		this._id = doc._id;
-		this.dateUpdated = doc.dateUpdated
-		this.dateCreated = doc.dateCreated
+		this._id = doc._id || new mongodb.ObjectID();
+		this.dateUpdated = doc.dateUpdated || new Date();
+		this.dateCreated = doc.dateCreated || new Date();
 	}
 	get _id() {
 		return this.__id;
 	}
 	set _id(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '') {
-			this.__id = new mongodb.ObjectID();
-		}
-		else if(mongodb.ObjectID.isValid(val)) {
-			var objectID = mongodb.ObjectID(val)
-			this.__id = objectID;
-		}
-		else if(val instanceof mongodb.ObjectID) {
-			this.__id = val;
-		}
-		else {
-			throw new Error('Failed to construct document. Invalid entry for... val: '+val)
-		}
+		this.__id = validatorUtil.normalizeID(val)
 	}
 	get dateUpdated() {
-		return this._name;
+		return this._dateUpdated;
 	}
 	set dateUpdated(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '') {
-			this._dateUpdated = new Date
-		}
-		else if(val instanceof Date)
-			this._dateUpdated = val;
-		else if(Date.parse(val))
-			this._dateUpdated = Date.parse(val);
-		else
-			throw new Error('Failed to construct document. Invalid entry for... val: '+val)
+		this._dateUpdated = validatorUtil.normalizeDate(val)
 	}
 	get dateCreated() {
 		return this._dateCreated;
 	}
 	set dateCreated(val) {
-		if(val === undefined || val === null || val === 'null' || val === 'undefined' || val === '') {
-			this._dateCreated = new Date
-		}
-		else if(val instanceof Date)
-			this._dateCreated = val;
-		else if(Date.parse(val))
-			this._dateCreated = Date.parse(val);
-		else
-			throw new Error('Failed to construct document. Invalid entry for... val: '+val)
+		this._dateCreated = validatorUtil.normalizeDate(val)
 	}
 	/* This enforces use of get methods for creating Object.
 		Otherwise "_" instance variables would be used.
@@ -68,7 +42,7 @@ module.exports = class Document {
 	}
 	static async create({ doc } = {}) {
 		if(!(doc instanceof Document))
-			throw new Error('Invalid document')
+			throw new CustomError('Invalid document', 500, doc)
 		var results = await mongoUtil.getDB()
 			.collection(doc.constructor.COLLECTION_NAME)
 			.insertOne(doc.toObject());
@@ -83,7 +57,7 @@ module.exports = class Document {
 	}
 	static async update({ doc } = {}) {
 		if(!(doc instanceof Document))
-			throw new Error('Invalid document')
+			throw new CustomError('Invalid document', 500, doc)
 		var docJson = doc.toObject()
 		var results = await mongoUtil.getDB()
 			.collection(doc.constructor.COLLECTION_NAME)

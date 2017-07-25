@@ -6,6 +6,7 @@ var passport = require('passport'); // Authentication Framework
 var LocalStrategy = require('passport-local').Strategy; // Authentication Strategy
 var JwtStrategy = require('passport-jwt').Strategy;
 var ExtractJwt = require('passport-jwt').ExtractJwt;
+var CustomError = require('../common/errorUtil');
 var FacebookTokenStrategy = require('passport-facebook-token');
 
 exports.getPassport = function() {
@@ -45,9 +46,7 @@ exports.ensureAdmin = function(req, res, next) {
     next()
   }
   else {
-      var err = new Error('Action requires adminstrative account access..')
-      err.status = 401
-      next(err)
+    next(new CustomError('', 401))
   }
 }
 exports.ensureAuthenticated = function(req, res, next) {
@@ -55,18 +54,15 @@ exports.ensureAuthenticated = function(req, res, next) {
     [ 'jwt' ],
     (err, user, info) => {
       if (err) {
-        err.status = 500
-        next(err); 
+        next(new CustomError('JWT verification failed.', 500, err))
       }
       else if (!user) {
-        info.status = 401
-        next(info);
+        next(new CustomError('JWT invalid.', 401, info))
       }
       else {
         req.logIn(user, (err) => {
           if (err) { 
-            err.status = 500
-            next(err); 
+            next(new CustomError('JWT failed login user.', 500, err))
           }
           else {
             next();
@@ -117,29 +113,25 @@ passport.use('local', new LocalStrategy(
             const account = new Account(accounts[0]);
             if(account.passwordHashAndSalt) {
               if(!bcrypt.compareSync(password, account.passwordHashAndSalt)) {
-                var err = new Error('Incorrect Password!')
-                err.status = 401
-                next(null, false, err)
+                next(new CustomError('Incorrect Password!', 401))
+                // next(null, false, new CustomError('Incorrect Password!', 401))
               }
               else {
                 next(null, account)
               }
             }
             else {
-              var err = new Error('This account was registered via an external Social Media service, either login using with the appropriate method (then link your social account with a local password).')
-              err.status = 500
-              next(null, false, err)
+              next(new CustomError('This account was registered via an external Social Media service, either login using with the appropriate method (then link your social account with a local password).', 401));
+              // next(null, false, new CustomError('This account was registered via an external Social Media service, either login using with the appropriate method (then link your social account with a local password).', 401))
             }
             break;
           case 0: // NOT FOUND
-            var err = new Error('Account not found!')
-            err.status = 404
-            next(null, false, err)
+            next(new CustomError('Account not found!', 404));
+            // next(null, false, new CustomError('Account not found!', 404))
             break;
           default: // TOO MANY FOUND
-            var err = new Error('Too many accounts were found matching this email. Contact server admin.')
-            err.status = 500
-            next(null, false, err)
+            next(new Customer('Too many accounts were found matching this email. Contact server admin.', 500));
+            // next(null, false, new CustomError('Too many accounts were found matching this email. Contact server admin.', 500))
             break;
         }
       })
@@ -212,9 +204,7 @@ passport.use('facebook', new FacebookTokenStrategy({
                 }
                 else {
                   // Email mismatch between System and Facebook... Weird error!
-                  const err = new Error('This facebook profile matches an ID in the backend, but the email on record does not match!')
-                  err.status = 500
-                  next(err)
+                  next(new CustomError('This facebook profile matches an ID in the backend, but the email on record does not match!', 500))
                 }
               }
             }
@@ -236,9 +226,7 @@ passport.use('facebook', new FacebookTokenStrategy({
             });
             break;
           default: // ERROR!!! Too many matches...
-            const err = new Error('This facebook profile seems to match multiple accounts this system, which should never be the case!')
-            err.status = 500
-            next(err)
+            next(new CustomError('This facebook profile seems to match multiple accounts this system, which should never be the case!', 500))
             break;
         }
       }

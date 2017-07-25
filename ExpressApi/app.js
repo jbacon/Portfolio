@@ -9,6 +9,7 @@ var routesComments = require('./routes/comments');
 var routesAuth = require('./routes/auth');
 var routesAccounts = require('./routes/accounts');
 var commonLogging = require('./common/loggingUtil');
+var CustomError = require('./common/errorUtil');
 var commonMongo = require('./common/mongoUtil'); 
 var commonMarkdown = require('./common/markdownUtil'); 
 var commonAuth = require('./common/authUtil'); 
@@ -49,13 +50,11 @@ app.use(function(req, res, next) {
 
 // ROUTERS
 app.use('/comments', routesComments);
-app.use('/article', routesArticles);
+// app.use('/article', routesArticles);
 app.use('/auth', routesAuth);
 app.use('/account', routesAccounts);
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+  next(new CustomError('Not Found', 404))
 });
 // ERROR LOGGING (AFTER routers BEFORE handlers)
 app.use(commonLogging.routerLoggingMiddleware);

@@ -1,4 +1,8 @@
 var Document = require('../model/document');
+var mongodb = require('mongodb');
+var mongoUtil = require('../common/mongoUtil');
+var validatorUtil = require('../common/validatorUtil')
+var CustomError = require('../common/errorUtil');
 var validator = require('validator');
 
 module.exports = class Account extends Document {
@@ -23,10 +27,7 @@ module.exports = class Account extends Document {
 		return this._email;
 	}
 	set email(val) {
-		if(val && validator.isEmail(val))
-			this._email = validator.normalizeEmail(val);
-		else
-			throw new Error('Failed to construct account. Invalid entry for... val: '+val)
+		this._email = validator.normalizeEmail(val)
 	}
 	get isAdmin() {
 		if(this._email === 'jbacon@zagmail.gonzaga.edu')
@@ -38,19 +39,13 @@ module.exports = class Account extends Document {
 		return this._nameFirst;
 	}
 	set nameFirst(val) {
-		if(val && validator.isAlpha(val))
-			this._nameFirst = val;
-		else
-			throw new Error('Failed to construct account. Invalid entry for... val: '+val)
+		this._nameFirst = (validator.isAlpha(val)) ? val : (()=> {throw new CustomError('Invalid entry...', 500, val);})
 	}
 	get nameLast() {
 		return this._nameLast;
 	}
 	set nameLast(val) {
-		if(val && validator.isAlpha(val))
-			this._nameLast = val;
-		else
-			throw new Error('Failed to construct account. Invalid entry for... val: '+val)
+		this._nameLast = (validator.isAlpha(val)) ? val : (()=> {throw new CustomError('Invalid entry..', 500, val);})
 	}
 	get passwordHashAndSalt() {
 		return this._passwordHashAndSalt;
@@ -70,7 +65,7 @@ module.exports = class Account extends Document {
 	}
 	static async create({ account } = {}) {
 		if(!(account instanceof Account)) 
-			throw new Error('Failed to create account. Parameter not instance of Account')
+			throw new CustomError('Failed to create account. Parameter not instance of Account', 500, account)
 		const result = await super.create({
 			doc: account
 		})
@@ -90,7 +85,7 @@ module.exports = class Account extends Document {
 	}
 	static async update({ account } = {}) {
 		if(!(account instanceof Account))
-			throw new Error('Failed to create account. Parameter not instance of Account')
+			throw new CustomError('Failed to create account. Parameter not instance of Account', 500, account)
 		const result = await super.update({
 			doc: account
 		});
@@ -106,37 +101,33 @@ module.exports = class Account extends Document {
 		return newAccountClass
 	}
 	static async editDetails({ _id, email, nameFirst, nameLast } = {}) {
-		/* Find Account */
-		Account.read({
-			query: { _id: mongodb.ObjectID(_id) },
-			pageSize: 1,
-			pageNum: 1
-		})
-		.then((accounts) => {
-			if(accounts.length === 1) {
-				/* Edit Account */
-				const account = accounts[0]
-				account.email = email;
-				account.nameFirst = nameFirst;
-				account.nameLast = nameLast;
-				/* Update Account */
-				Account.update({
-					account: account
-				})
-				.then((account) => {
-					/* Return  Account */
-					return account
-				})
-				.catch((err) => {
-					throw err
-				})
+		const result = await mongoUtil.getDB()
+		.collection(Account.COLLECTION_NAME).updateOne(
+			{
+				_id: validatorUtil.normalizeID(_id)
+			},
+			{
+				$set: {
+					email: validator.normalizeEmail(email),
+					nameFirst: (validator.isAlpha(nameFirst)) ? nameFirst : (()=> {throw new CustomError('Invalid entry...', 500, nameFirst);}),
+					nameLast: (validator.isAlpha(nameLast)) ? nameLast : (()=> {throw new CustomError('Invalid entry...', 500, nameFirst);})
+				}
 			}
-			else {
-				throw new Error('Failed to edit account. Account does not exsit.')
+		);
+		return result
+	}
+	static async createPassword({ _id, passwordHashAndSalt }={}) {
+		const result = await mongoUtil.getDB()
+		.collection(Account.COLLECTION_NAME).updateOne(
+			{
+				_id: validatorUtil.normalizeID(_id)
+			},
+			{
+				$set: {
+					passwordHashAndSalt: passwordHashAndSalt
+				}
 			}
-		})
-		.catch((err) => {
-			throw err
-		})
+		);
+		return result
 	}
 }

@@ -23,7 +23,6 @@ class MyMyAccountComponent extends HTMLElement {
 	adoptedCallback(oldDocument, newDocument) {
 		super.adoptedCallback(oldDocument, newDocument);
 	}
-	static get displayValues() { return { disabled: 'disabled', hidden: 'hidden' }; };
 	/* DATA */
 	get account() {
 		return this._account
@@ -39,26 +38,25 @@ class MyMyAccountComponent extends HTMLElement {
 	/* INTERNAL FUNCIONS */
 	_createPassword() {
 		const component = this;
-		const newPassword = this.shadowRoot.querySelector('#password-reset-form input.new-password').value
-		const newPasswordRetyped =  this.shadowRoot.querySelector('#password-reset-form input.new-password-retyped').value
-		if(newPassword == newPasswordRetypd) {
+		const newPassword = this.shadowRoot.querySelector('#password-create-form input.new-password').value
+		const newPasswordRetyped =  this.shadowRoot.querySelector('#password-create-form input.new-password-retyped').value
+		if(newPassword == newPasswordRetyped) {
 			var data = {}
-			data._id = this.account._id;
-			data.newPassword =this.shadowRoot.querySelector('#password-reset-form input.new-password').value
+			data.password =this.shadowRoot.querySelector('#password-create-form input.new-password').value
 			const component = this;
 			const client = new XMLHttpRequest();
 			client.onreadystatechange = function() {
 				if (this.readyState === XMLHttpRequest.DONE) {
 					const response = JSON.parse(this.response);
 					if(this.status === 200) {
-						alert('All good!')
+						alert('Password created! Logout to apply changes.')
 					}
 					else {
 						handleServerErrorResponse(response)
 					}
 				}
 			}
-			client.open('POST', API_SERVER_ADDRESS()+'/account/reset-password');
+			client.open('POST', API_SERVER_ADDRESS()+'/account/create-password');
 			client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 			client.setRequestHeader("Content-Type", "application/json");
 			client.send(JSON.stringify(data));
@@ -68,19 +66,17 @@ class MyMyAccountComponent extends HTMLElement {
 		}
 	}
 	_resetPassword() {
+		const oldPassword = this.shadowRoot.querySelector('#password-reset-form input.old-password').value
 		const newPassword = this.shadowRoot.querySelector('#password-reset-form input.new-password').value
 		const newPasswordRetyped =  this.shadowRoot.querySelector('#password-reset-form input.new-password-retyped').value
-		if(newPassword == newPasswordRetypd) {
-			var data = {}
-			data._id = this.account._id;
-			data.newPassword = newPassword
+		if(newPassword == newPasswordRetyped) {
 			const component = this;
 			const client = new XMLHttpRequest();
 			client.onreadystatechange = function() {
 				if (this.readyState === XMLHttpRequest.DONE) {
 					const response = JSON.parse(this.response);
 					if(this.status === 200) {
-						alert('All good!')
+						alert('Password reset! Logout to apply changes')
 					}
 					else {
 						handleServerErrorResponse(response)
@@ -90,6 +86,9 @@ class MyMyAccountComponent extends HTMLElement {
 			client.open('POST', API_SERVER_ADDRESS()+'/account/reset-password');
 			client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 			client.setRequestHeader("Content-Type", "application/json");
+			var data = {}
+			data.oldPassword = oldPassword
+			data.newPassword = newPassword
 			client.send(JSON.stringify(data));
 		}
 		else {
@@ -103,7 +102,7 @@ class MyMyAccountComponent extends HTMLElement {
 			if (this.readyState === XMLHttpRequest.DONE) {
 				const response = JSON.parse(this.response);
 				if(this.status === 200) {
-					alert('All good!')
+					alert('Edits succeeded! Logout to apply changes.')
 				}
 				else {
 					handleServerErrorResponse(response)
@@ -131,15 +130,15 @@ class MyMyAccountComponent extends HTMLElement {
 				<table>
 					<tr>
 						<td><label for="email">Email</label></td>
-						<td><input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld" value="${this.account.email}"></td>
+						<td><input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld" value="${this.account.email}" required></td>
 					</tr>
 					<tr>
 						<td><label for="name-first">First Name</label></td>
-						<td><input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John" value="${this.account.nameFirst}"></td>
+						<td><input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John" value="${this.account.nameFirst}" required></td>
 					</tr>
 					<tr>
 						<td><label for="name-last">Last Name</label></td>
-						<td><input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe" value="${this.account.nameLast}"></td>
+						<td><input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe" value="${this.account.nameLast}" required></td>
 					</tr>
 				</table>
 	            <div>
@@ -153,15 +152,15 @@ class MyMyAccountComponent extends HTMLElement {
 				<table>
 					<tr>
 						<td><label for="oldPassword">Old Password</label></td>
-						<td><input class="old-password" id="old-password" type="password" name="oldPassword" placeholder="Old password.."></td>
+						<td><input class="old-password" id="old-password" type="password" name="oldPassword" placeholder="Old password.." required></td>
 					</tr>
 					<tr>
 						<td><label for="newPassword">New Password</label></td>
-						<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.."></td>
+						<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.." ></td>
 					</tr>
 					<tr>
 						<td><label for="newPasswordRetyped">New Password Retyped</label></td>
-						<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.."></td>
+						<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.." required></td>
 					</tr>
 				</table>
 	            <div>
@@ -175,11 +174,11 @@ class MyMyAccountComponent extends HTMLElement {
 				<table>
 					<tr>
 						<td><label for="newPassword">New Password</label></td>
-						<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.."></td>
+						<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.." required></td>
 					</tr>
 					<tr>
 						<td><label for="newPasswordRetyped">New Password Retyped</label></td>
-						<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.."></td>
+						<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.." required></td>
 					</tr>
 				</table>
 	            <div>
@@ -222,7 +221,6 @@ class MyMyAccountComponent extends HTMLElement {
 		const linkGoogleButton = this.shadowRoot.querySelector('#link-google-button')
 		const deleteAccountButton = this.shadowRoot.querySelector('#delete-account-button')
 		
-		
 		editDetailsToggle.addEventListener('click', function(event) {
 			if(!editDetailsToggle.classList.contains('disabled')) {
 				editDetailsToggle.classList.toggle('active')
@@ -251,12 +249,15 @@ class MyMyAccountComponent extends HTMLElement {
 			component._deleteAccount.call(component);
 		});
 		passwordResetForm.addEventListener('submit', function(event) {
-			component._deleteAccount.call(component);
+			event.preventDefault();
+			component._resetPassword.call(component);
 		});
 		passwordCreateForm.addEventListener('submit', function(event) {
-			component._deleteAccount.call(component);
+			event.preventDefault();
+			component._createPassword.call(component);
 		});
 		editDetailsForm.addEventListener('submit', function(event) {
+			event.preventDefault();
 			component._editDetails.call(component);
 		});
 		// Apply Styling

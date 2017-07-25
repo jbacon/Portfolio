@@ -11,7 +11,6 @@ var API_SERVER_ADDRESS = function() {
 		return 'https://portfolioapi.joshbacon.name'
 	}
 }
-
 /* 
 PARSING URL FRAGMENT
 When this page is loaded off a redirect from an OAuth2 Server, the URL fragment will
@@ -154,7 +153,8 @@ function ready() {
 					// Reload page... (to adjust U.I. accordingly for authenticated user)
 					window.localStorage.token = response.token;
 					window.localStorage.tokenExpiration = response.expiration;
-					window.localStorage.user = response.user;
+					const userString = JSON.stringify(response.user)
+					window.localStorage.user = userString;
 					window.location.href = '/';
 				}
 				else {
@@ -213,7 +213,10 @@ function ready() {
 }
 
 function handleServerErrorResponse(response) {
-	alert(response.status+' - '+response.message+'. '+((response.stack) ? response.stack : ''));
+	if(response)
+		alert(response.status+' - '+response.message+'. '+((response.stack) ? response.stack : ''));
+	else
+		alert('Something went wrong!')
 }
 function deleteUserSession() {
 	delete window.localStorage.token;

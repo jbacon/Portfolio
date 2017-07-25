@@ -1,10 +1,10 @@
 var mongodb = require('mongodb')
+var CustomError = require('../common/errorUtil');
 var dbContext;
 
 exports.connectDB = function (url, callback) {
   if(dbContext) {
-    var error = new Error('Database context already exists')
-    callback(error)
+    callback(new CustomError('Database context already exists', 500))
   }
   else {
     mongodb.MongoClient.connect(
@@ -31,7 +31,7 @@ exports.getDB = function() {
     return dbContext
   }
   else {
-    throw new Error('Database context does not exist.')
+    throw new CustomError('Database context does not exist.', 500)
   }
 }
 exports.configureDB = function(callback) {
@@ -40,7 +40,6 @@ exports.configureDB = function(callback) {
     callback()
   }
   else{
-    var error = new Error('Database context does not exist.')
-    callback(error)
+    callback(new CustomError('Database content does not exist.', 500))
   }
 }

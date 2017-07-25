@@ -36,7 +36,6 @@ class MyCommentComponent extends HTMLElement {
 	adoptedCallback(oldDocument, newDocument) {
 		super.adoptedCallback(oldDocument, newDocument);
 	}
-	static get displayValues() { return { disabled: 'disabled', hidden: 'hidden' }; };
 	/* DATA */
 	get comment() {
 		return JSON.parse(this.getAttribute('comment'));
@@ -114,7 +113,7 @@ class MyCommentComponent extends HTMLElement {
 			if (this.readyState === XMLHttpRequest.DONE) {
 				const response = JSON.parse(this.response);
 				if(this.status === 200) {
-					component._applyStyleRemoved()
+					component._applyStyleRemoved.call(component)
 					callback.call(component)
 				}
 				else {
@@ -136,7 +135,7 @@ class MyCommentComponent extends HTMLElement {
 			if (this.readyState === XMLHttpRequest.DONE) {
 				const response = JSON.parse(this.response);
 				if(this.status === 200) {
-					component._applyStyleRemoved()
+					component._applyStyleRemoved.call(component)
 					callback.call(component)
 				}
 				else {
@@ -401,8 +400,6 @@ class MyCommentComponent extends HTMLElement {
 				component._flag.call(component, function(err) {
 					if(err) 
 						handleServerErrorResponse(err)
-					else 
-						alert('Comment has been flagged, system admin has been alerted...')
 				});
 			}
 		});
@@ -455,8 +452,8 @@ class MyCommentComponent extends HTMLElement {
 	_applyStyleRemoved() {
 		/* Complicated logic....
 		DYNAMIC STYLING OPTIONS:
-			- Hide Entire Comment -> Only if no dependent children exist
-			- Hide Only Comment Content/User -> Only if dependent children exist 
+			- Hide Entire Comment -> Only if no unremoved children exist
+			- Hide Only Comment Content/User -> Only if unremoved children exist 
 		*/
 		const content = this.shadowRoot.querySelector('#content')
 		const replyToggle = this.shadowRoot.querySelector('#reply-toggle')
