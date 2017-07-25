@@ -1,17 +1,19 @@
-# Personal Website (Single Page Application)
-## API Server: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/), & [VanillaJS](http://vanilla-js.com/))
-## Static Public Content: [VanillaJS](http://vanilla-js.com/), [WebComponents](https://www.webcomponents.org/introduction)
+# PORTFOLIO WEB APP - [https://portfolio.joshbacon.name](http://portfolio.joshbacon.name)
 
-This is a web app built entirely by me, Josh Bacon, for the purpose of learning all about modern web application development. Applies Single-Page application architecture. Static website files are hosted using AWS S3+CloudFront while API/Authentication Server is hosted directly on AWS EC2 w/ Docker.
+An interactive website built entirely by me, Josh Bacon, for use as an personal engineering portfolio. This hub employs a single-page application architecture and a modern technology stack/infrastructure.
+Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
+
+## BACK-END API: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/), [Docker](), [AWS EC2]()
+## FRONT-END U.I.: [VanillaJS](http://vanilla-js.com/), [Web-Components](https://www.webcomponents.org/introduction), [AWS S3/CloudFront]()
 ![alt text](screenshots/home.png)
 
-## Technologies Used (both current & abandoned):
+## TECHNOLOGY STACK (current & deprecated)
 - Front-End:
 	-Javascript
-	- Document Object Model (DOM) <- Awesome browser native stuff!
-		- Web Components!
-		- Shadow DOM Elements!
-		- HTML Imports!
+	- Document Object Model (DOM) <- Awesome native browser stuff!
+		- Web Components
+		- Shadow DOM Elements
+		- HTML Imports
 	- JQuery (deprecated.. I don't really care about browser compatibility for this project, update your browsers!)
 	- SystemJS
 	- PassportJS
@@ -28,7 +30,7 @@ This is a web app built entirely by me, Josh Bacon, for the purpose of learning 
 - Package Managers:
 	- JSPM
 	- NPM
-- Infrastructure/Hostin:
+- Prod Infrastructure:
 	- AWS
 		- EC2
 			- Security Groups
@@ -38,66 +40,71 @@ This is a web app built entirely by me, Josh Bacon, for the purpose of learning 
 			- DNS
 			- Domain Registration
 		- ACM <- Didn't work...
+		- S3 
+		- CloudFront
 	- LetsEncrypt
+	- Nginx Reverse Proxy Server
+- Dev Intrastructure:
+	- Dockerized Everything
+	- Nginx Server for Hosting Static Content
+	- Nginx Server for Reverse Proxy in-front of API Server
 	
-## Features to Implement:
-1. Threaded Comments Section - like Reddit
-	- Hierarchical Data 
-	- Materialized Path? Nested Set? etc..?
+## FEATURES IMPLEMENTED:
+1. Comments:
+	- Similar to Reddit
+	- Support Threaded/Nested Comments - Hierarchial Data
+	- Roles: Admin/User/Anonymous
+	- Hybrid Materialized Path & Nested Set
 	- Self-Referencing MongoDB table?
 	- Single Comment Document vs Many Comment Document? Size constraint considerations?
 	- Combine Many Comment Document w/ Single Comment Document?
 		- Architect data model to support this optimized/efficient approach.
 ![alt text](screenshots/comments.png)
-2. Markdown Blog Entries - Articles
-	- Backed in MongoDB!
-	- Integrate Markdown Editor! (browser based...)
-	- Validate against XXS, XSFR, Scripts, etc...!
-	- Pictures/Images! Via S3?
-3. User Accounts
-	- JWT Tokens
-	- MongoDB User storage
-	- Administrative accounts
-	- User accounts
-	- Facebook User Accounts
-	- Ownership ideas
-	- Facebook Authentication via passport-facebook-token.js
-	- Local Account Registration
+2. Accounts:
+	- Session-less - Token-based Authentication (JWT)
+	- Login/Register via Local, Facebook, & Google
+	- RBAC - Admin, Anonymous, User 
+	- Forgot Password
 ![alt text](screenshots/register.png)
-4. About Me
-	- Static Content
-	- Resume
-	- Social Profiles:
+3. About Me
+	- Early Life
+	- Location
+4. Contact:
+	- Email
+	- Phone
+	- Tech Profiles:
 		- GitHub
 		- DockerHub
+		- StackOverflow
+		- Apache
+	- Social Profiles: 
 		- LinkedIn
-		- Email
+		- Facebook
 		- Google
-5. Donation Integration via PayPal, etc..
-6. Email Integration
-	- Forgot Password, no problem!
-	- Spam! (jk)
+5. Email Integration
+	- Forgot Password.. no problem!
+	- Personal Administration Alerts!
 	- Automated Email Administration & Stats:
-		- Did I get a visitor!? Yay!
-		- Did I get a registration/login!? Yay!
-		- Did I get a million dollars!! Probably not..
-7. Ads!
+		- Did I get a visitor?
+		- Did I get a registration?
+6. Ads!
 	- How do I accomplish this... no idea!
-8. Rest API:
-	- JsonWebToken Authentication.
-	- Documenting the express REST api, how to!
-	- Securing the REST api!
 9. HTTPS:
-	- Initially tried Amazon Certificate Manager, but it did not work for me (domain verification emails were never being sent to my administrative email account). After wasting lots of time trouble-shooting, I gave up and said it's broken.
+	- Initially tried Amazon Certificate Manager, but had no luck (domain verification emails were never being sent to my administrative email account). After wasting lots of time trouble-shooting, I gave up and claim it's broken.
 	- I've since switched to LetsEncrypt + certbot. Super easy setup ~10minutes to generate certs.
-10. Remove Spaghetti Code: Find Front-End Development Pattern...
-	- ReactJS
-	- VanillaJS (Web Components?) <- Future choice.
-	- Polymer (Google)
-11. Reduce Spangethhi code
-
+10. Reduced Spaghetti Code: 
+	- Adapt a Front-End Framework...
+		- ReactJS?
+		- VanillaJS? (Web Components?)
+		- Polymer? (Google Web Components)
+11. Static Content Hosted vai S3/CloudFront
+12. API Hosted via EC2/LoadBalancer
 
 ## Future Plans:
+- Hosting API Server:
+	- Adapt Container Orchastration Platform
+		- Kubernetes
+		- ECS (sucks?)
 - Host Static Content
 	- GitHub.io? AWS S3? EC2?
 - Host NodeJS API
