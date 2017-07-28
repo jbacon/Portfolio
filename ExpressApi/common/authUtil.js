@@ -35,7 +35,7 @@ exports.createJwt = function(account) {
     {
       exp: expiration,
       data: {
-        user: account.toObject()
+        user: account.toJSON()
       }
     },
     commonConfig.jwtSecret);
@@ -130,7 +130,7 @@ passport.use('local', new LocalStrategy(
             // next(null, false, new CustomError('Account not found!', 404))
             break;
           default: // TOO MANY FOUND
-            next(new Customer('Too many accounts were found matching this email. Contact server admin.', 500));
+            next(new CustomError('Too many accounts were found matching this email. Contact server admin.', 500));
             // next(null, false, new CustomError('Too many accounts were found matching this email. Contact server admin.', 500))
             break;
         }
@@ -240,14 +240,10 @@ passport.use('facebook', new FacebookTokenStrategy({
   })
 );
 passport.serializeUser(function(accountObject, done) {
-  const accountJson = accountObject.toObject()
-  const clientFriendlyAccountString = JSON.stringify(accountJson)
-  done(null, clientFriendlyAccountString);
-  // done(null, account.id);
+  done(null, JSON.stringify(accountObject));
 });
 passport.deserializeUser(function(accountString, done) {
   const accountJson = JSON.parse(accountString);
   const accountClass = new Account(accountJson);
   done(null, accountClass);
-  // done(err, { id: '1234', username: 'Josh' });
 });

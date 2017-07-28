@@ -64,30 +64,26 @@ router.post('/edit-details', commonAuth.ensureAuthenticated, function(req, res, 
 });
 router.post('/reset-password', commonAuth.ensureAuthenticated, function(req, res, next) {
 	if(req.user.passwordHashAndSalt) {
-		var oldPasswordHashAndSalt;
 		var newPasswordHashAndSalt;
 		try {
-			oldPasswordHashAndSalt = bcrypt.hashSync(req.body.oldPassword, 10);
+			if(!bcrypt.compareSync(req.body.oldPassword, req.user.passwordHashAndSalt)) {
+				return next(new CustomError('Original password entered is incorrect', 409))
+           	}
 			newPasswordHashAndSalt = bcrypt.hashSync(req.body.newPassword, 10);
 		}
 		catch(err) {
 			return next(err)
 		}
-		if(req.user.passwordHashAndSalt !== oldPasswordHashAndSalt) {
-			return next(new CustomError('Original password entered is incorrect', 409))
-		}
-		else {
-			Account.createPassword({
-				_id: req.user._id, 
-				passwordHashAndSalt: newPasswordHashAndSalt 
-			})
-	        .then((account) => {
-				res.json({ data: account });
-	        })
-	        .catch((err) => {
-	          next(err)
-	        })
-		}
+		Account.createPassword({
+			_id: req.user._id, 
+			passwordHashAndSalt: newPasswordHashAndSalt 
+		})
+        .then((account) => {
+			res.json({ data: account });
+        })
+        .catch((err) => {
+          next(err)
+        })
 	}
 	else {
 		next(new CustomError('Account does not have a local password to reset, use "create password" instead!', 409));

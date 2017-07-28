@@ -27,19 +27,10 @@ router.post('/local/register', (req, res, next) => {
     			}
 				Account.create({ account: newAccount })
 				.then((account) => {
-					authUtil.getPassport().authenticate('local')(
-						req, 
-						res, 
-						(req, res, next) => {
-							const tokenDetails = authUtil.createJwt(req.user)
-							const token = tokenDetails.token
-							const expiration = tokenDetails.expiration
-			    			res.json({
-			    				token: token, 
-			    				expiration: expiration, 
-			    				user: req.user.toObject() 
-			    			})
-						});
+					const tokenDetails = authUtil.createJwt(account)
+					const token = tokenDetails.token
+					const expiration = tokenDetails.expiration
+				    res.json({ token: token, expiration: expiration, user: account.toJSON() })
 				})
 				.catch((err) => {
 					next(err)
@@ -61,7 +52,7 @@ router.get('/local/token',
 		const tokenDetails = authUtil.createJwt(req.user)
 		const token = tokenDetails.token
 		const expiration = tokenDetails.expiration
-	    res.json({ token: token, expiration: expiration, user: req.user.toObject() })
+	    res.json({ token: token, expiration: expiration, user: req.user.toJSON() })
 });
 // Generates JWT Token for Client Authentication from Facebook Token
 router.get('/facebook/token',
@@ -70,7 +61,7 @@ router.get('/facebook/token',
 		const tokenDetails = authUtil.createJwt(req.user)
 		const token = tokenDetails.token
 		const expiration = tokenDetails.expiration
-	    res.json({ token: token, expiration: expiration, user: req.user.toObject() })
+	    res.json({ token: token, expiration: expiration, user: req.user.toJSON() })
 });
 
 module.exports = router;

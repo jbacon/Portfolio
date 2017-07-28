@@ -16,14 +16,14 @@ module.exports = class Comment extends Document {
 		super(comment);
 		this.accountID = comment.accountID;
 		this._account = (comment._account) ? new Account(comment._account) : undefined;
-		this.text = comment.text;
+		this.text = comment.text || null
 		this.articleID = comment.articleID;
-		this.parentCommentID = comment.parentCommentID
-		this.upVoteAccountIDs = comment.upVoteAccountIDs
-		this.downVoteAccountIDs = comment.downVoteAccountIDs
-		this.flags = comment.flags
-		this.removed = comment.removed
-		this.childCommentIDs = comment.childCommentIDs
+		this.parentCommentID = comment.parentCommentID || null
+		this.upVoteAccountIDs = comment.upVoteAccountIDs || []
+		this.downVoteAccountIDs = comment.downVoteAccountIDs || []
+		this.flags = comment.flags || []
+		this.removed = comment.removed || null
+		this.childCommentIDs = comment.childCommentIDs || []
 	}
 	get accountID() {
 		return this._accountID;
@@ -61,7 +61,7 @@ module.exports = class Comment extends Document {
 		return this._text;
 	}
 	set text(val) {
-		this._text = _verifyAndNormalizeText(val)
+		this._text = val
 	}
 	get articleID() {
 		return this._articleID;
@@ -79,57 +79,57 @@ module.exports = class Comment extends Document {
 		return this._upVoteAccountIDs;
 	}
 	set upVoteAccountIDs(val) {
-		this._upVoteAccountIDs = validatorUtil.noramlizeArrayIDs(val)
+		this._upVoteAccountIDs = validatorUtil.normalizeArrayIDs(val)
 	}
 	get downVoteAccountIDs() {
 		return this._downVoteAccountIDs;
 	}
 	set downVoteAccountIDs(val) {
-		this._downVoteAccountIDs = validatorUtil.noramlizeArrayIDs(val)
+		this._downVoteAccountIDs = validatorUtil.normalizeArrayIDs(val)
 	}
 	get flags() {
 		return this._flags;
 	}
 	set flags(val) {
-		this._flags = validatorUtil.noramlizeArrayIDs(val)
+		this._flags = validatorUtil.normalizeArrayIDs(val)
 	}
 	get removed() {
 		return this._removed;
 	}
 	set removed(val) {
-		this._flags = validatorUtil.normalizeID(val, { allowNullable: true })
+		this._removed = validatorUtil.normalizeID(val, { allowNullable: true })
 	}
 	get childCommentIDs() {
 		return this._childCommentIDs;
 	}
 	set childCommentIDs(val) {
-		this._childCommentIDs = validatorUtil.noramlizeArrayIDs(val)
+		this._childCommentIDs = validatorUtil.normalizeArrayIDs(val)
 	}
 	async toObjectWithVirtuals() {
-		var obj = super.toObject()
+		var obj = super.toJSON()
 		obj.accountID = this.accountID.toHexString();
 		const account = await this.account;
-		obj.account = (account) ? account.toObject() : null;
+		obj.account = (account) ? account.toJSON() : null;
 		obj.text = this.text;
 		obj.articleID = this.articleID.toHexString();
-		obj.parentCommentID = this.parentCommentID.toHexString();
+		obj.parentCommentID = (this.parentCommentID) ? this.parentCommentID.toHexString() : null;
 		obj.upVoteAccountIDs = this.upVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
 		obj.downVoteAccountIDs = this.downVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
 		obj.flags = this.flags.map((objectID) => { return objectID.toHexString() });
-		obj.removed = this.removed.toHexString();
+		obj.removed = (this.removed) ? this.removed.toHexString() : null;
 		obj.childCommentIDs = this.childCommentIDs.map((objectID) => { return objectID.toHexString() });
 		return obj;
 	}
- 	toObject() {
-		var obj = super.toObject()
+	toJSON() {
+		var obj = super.toJSON()
 		obj.accountID = this.accountID.toHexString();
 		obj.text = this.text;
 		obj.articleID = this.articleID.toHexString();
-		obj.parentCommentID = this.parentCommentID.toHexString();
+		obj.parentCommentID = (this.parentCommentID) ? this.parentCommentID.toHexString() : null;
 		obj.upVoteAccountIDs = this.upVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
 		obj.downVoteAccountIDs = this.downVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
 		obj.flags = this.flags.map((objectID) => { return objectID.toHexString() });
-		obj.removed = this.removed.toHexString();
+		obj.removed = (this.removed) ? this.removed.toHexString() : null
 		obj.childCommentIDs = this.childCommentIDs.map((objectID) => { return objectID.toHexString() });
 		return obj;
 	}
@@ -168,10 +168,11 @@ module.exports = class Comment extends Document {
 				match._id = { $gt: startObject };
 		}
 		if(articleID !== undefined) {
-			match.articleID = validatorUtil.normalizeID(articleID)
+			match.articleID = validatorUtil.normalizeID(articleID).toHexString()
 		}
 		if(parentCommentID !== undefined) {
 			match.parentCommentID = validatorUtil.normalizeID(parentCommentID, { allowNullable: true })
+			match.parentCommentID = (match.parentCommentID) ? match.parentCommentID.toHexString() : match.parentCommentID
 		}
 		const results = await mongoUtil.getDB()
 			.collection(Comment.COLLECTION_NAME)

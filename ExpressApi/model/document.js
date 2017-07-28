@@ -33,7 +33,7 @@ module.exports = class Document {
 	/* This enforces use of get methods for creating Object.
 		Otherwise "_" instance variables would be used.
 		Object to be stored in Mongo. */
-	toObject() {
+	toJSON() {
 		var obj = {}
 		obj._id = this._id;
 		obj.dateUpdated = this.dateUpdated;
@@ -45,7 +45,7 @@ module.exports = class Document {
 			throw new CustomError('Invalid document', 500, doc)
 		var results = await mongoUtil.getDB()
 			.collection(doc.constructor.COLLECTION_NAME)
-			.insertOne(doc.toObject());
+			.insertOne(doc.toJSON());
 		return results;
 	}
 	static async delete({ _id, collection } = {}) {
@@ -58,7 +58,7 @@ module.exports = class Document {
 	static async update({ doc } = {}) {
 		if(!(doc instanceof Document))
 			throw new CustomError('Invalid document', 500, doc)
-		var docJson = doc.toObject()
+		var docJson = doc.toJSON()
 		var results = await mongoUtil.getDB()
 			.collection(doc.constructor.COLLECTION_NAME)
 			.updateOne({ _id: doc._id }, docJson)

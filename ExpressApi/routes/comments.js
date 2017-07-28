@@ -8,9 +8,9 @@ var router = express.Router();
 // Route Handler
 router.post('/create', commonAuth.ensureAuthenticated, function(req, res, next) {
 	try {
-		var comment = new Comment(req.body)
 		// Associate current user's account w/ comment
-		comment.accountID = new mongodb.ObjectID(req.user._id);
+		req.body.accountID = req.user._id;
+		var comment = new Comment(req.body)
 	}
 	catch(err) {
 		return next(err)
@@ -116,7 +116,7 @@ router.post('/flag', commonAuth.ensureAuthenticated, function(req, res, next) {
 	})
 	.then((results) => {
 		if(results.modifiedCount === 0) {
-			next(new CustomError('Failed to downvote comment', 500));
+			next(new CustomError('Failed to flag comment', 500));
 		}
 		else {
 			res.json({ data: results });

@@ -50,8 +50,8 @@
 // 		else
 // 			throw new Error('Failed to construct article. Invalid entry for... newContentType: '+newContentType)
 // 	}
-// 	toObject() {
-// 		var obj = super.toObject()
+// .toJSON() {
+// 		var obj = super.toJSON()
 // 		obj.title = this.title;
 // 		obj.summary = this.summary;
 // 		obj.content = this.content;

@@ -371,7 +371,19 @@ class MyCommentComponent extends HTMLElement {
 				// If replies are empty... AND replies are active
 				if(component.childElementCount <= 0 && repliesToggle.classList.contains('active')) {
 					// Query for 1st batch of child comments
-					loadOldButton.click();
+					component._loadMoreReplies.call(component, function(err) {
+						if(err) 
+							handleServerErrorResponse(err)
+						else {
+							// Revert toggle 
+							// if(component.childElementCount <= 0) {
+							// 	repliesToggle.classList.toggle('active')
+							// 	repliesSection.classList.toggle('hidden')
+							// 	loadNewButton.classList.toggle('hidden')
+							// 	loadOldButton.classList.toggle('hidden')
+							// }
+						}
+					});
 				}
 			}
 		});

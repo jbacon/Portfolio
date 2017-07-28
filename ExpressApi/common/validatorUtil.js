@@ -12,7 +12,7 @@ exports.isValidNull = function(val) {
 	}
 }
 exports.normalizeNull = function(val) {
-	if(val === undefined || val === null || val === '' || val === "" || 'null' || 'undefined')
+	if(val === undefined || val === null || val === '' || val === "" || val === 'null' || val === 'undefined')
 		return null
 	throw new CustomError('Value ('+val+') can not be converted to null')
 }
@@ -50,7 +50,7 @@ exports.normalizeArrayIDs = function(val, { allowNullable=false }={}) {
 		return exports.normalizeNull(val)
 	else if(val instanceof Array) {
 		return val.map((id) => {
-			return normalizeID(id)
+			return exports.normalizeID(id)
 		})
 	}
 	throw new CustomError('Value ('+val+') can not be converted to Mongo ObjectID')

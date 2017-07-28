@@ -39,13 +39,23 @@ module.exports = class Account extends Document {
 		return this._nameFirst;
 	}
 	set nameFirst(val) {
-		this._nameFirst = (validator.isAlpha(val)) ? val : (()=> {throw new CustomError('Invalid entry...', 500, val);})
+		if(typeof(val) === 'string' && validator.isAlpha(val)) {
+			this._nameFirst = val
+		}
+		else {
+			throw new CustomError('Invalid entry...', 500, val)
+		}
 	}
 	get nameLast() {
 		return this._nameLast;
 	}
 	set nameLast(val) {
-		this._nameLast = (validator.isAlpha(val)) ? val : (()=> {throw new CustomError('Invalid entry..', 500, val);})
+		if(typeof(val) === 'string' && validator.isAlpha(val)) {
+			this._nameLast = val
+		}
+		else {
+			throw new CustomError('Invalid entry...', 500, val)
+		}
 	}
 	get passwordHashAndSalt() {
 		return this._passwordHashAndSalt;
@@ -53,8 +63,8 @@ module.exports = class Account extends Document {
 	set passwordHashAndSalt(val) {
 		this._passwordHashAndSalt = val;
 	}
-	toObject() {
-		var obj = super.toObject()
+	toJSON() {
+		var obj = super.toJSON()
 		obj.facebookProfileID = this.facebookProfileID
 		obj.email = this.email;
 		obj.isAdmin = this.isAdmin;
