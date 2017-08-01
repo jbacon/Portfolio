@@ -1,34 +1,35 @@
 # PORTFOLIO WEB APP - [https://portfolio.joshbacon.name](http://portfolio.joshbacon.name)
 
-An interactive website built entirely by me, Josh Bacon, for use as an personal engineering portfolio. This hub employs a single-page application architecture and a modern technology stack/infrastructure.
+An interactive website built entirely by me, Josh Bacon, for use as an personal engineering portfolio. This hub employs a both a single-page application architecture and static-site architecture, along with a modern technology stack. Static Assets/Pages are hosted on S3/CloudFront where my API is hosted on EC2.
+
 Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 
-## BACK-END API: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/), [Docker](), [AWS EC2]()
-## FRONT-END U.I.: [VanillaJS](http://vanilla-js.com/), [Web-Components](https://www.webcomponents.org/introduction), [AWS S3/CloudFront]()
-![alt text](screenshots/home.png)
+## HOSTING: [AWS](), [EC2](), [S3/CloudFront](), [Docker](), 
+## BACK-END API: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/)
+## FRONT-END U.I.: [Static Assets](), [VanillaJS](http://vanilla-js.com/), [Web-Components](https://www.webcomponents.org/introduction)
 
-## TECHNOLOGY STACK (current & deprecated)
+## TECHNOLOGIES EXPLORED (including deprecated/abandoned tech)
 - Front-End:
 	-Javascript
 	- Document Object Model (DOM) <- Awesome native browser stuff!
 		- Web Components
 		- Shadow DOM Elements
 		- HTML Imports
-	- JQuery (deprecated.. I don't really care about browser compatibility for this project, update your browsers!)
-	- SystemJS
+	- JQuery (deprecated)
+	- SystemJS (deprecated)
 	- PassportJS
 	- Json Web Tokens
-	- PugJS
+	- PugJS (deprecated)
 - Back-End:
 	- NodeJS
 	- ExpressJS
 	- ESLint
-	- PugJS
-	- Winston
+	- PugJS (deprecated)
+	- Winston 
 - Databases:
 	- MongoDB
 - Package Managers:
-	- JSPM
+	- JSPM (deprecated)
 	- NPM
 - Prod Infrastructure:
 	- AWS
@@ -39,7 +40,7 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 			- Public Hosted Zone
 			- DNS
 			- Domain Registration
-		- ACM <- Didn't work...
+		- ACM (deprecated) <- Could not get this to work.
 		- S3 
 		- CloudFront
 	- LetsEncrypt
@@ -47,74 +48,46 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 - Dev Intrastructure:
 	- Dockerized Everything
 	- Nginx Server for Hosting Static Content
-	- Nginx Server for Reverse Proxy in-front of API Server
+	- Nginx Server for Reverse Proxy in-front of Node API Server
 	
 ## FEATURES IMPLEMENTED:
-1. Comments:
-	- Similar to Reddit
-	- Support Threaded/Nested Comments - Hierarchial Data
-	- Roles: Admin/User/Anonymous
-	- Hybrid Materialized Path & Nested Set
-	- Self-Referencing MongoDB table?
-	- Single Comment Document vs Many Comment Document? Size constraint considerations?
-	- Combine Many Comment Document w/ Single Comment Document?
-		- Architect data model to support this optimized/efficient approach.
-![alt text](screenshots/comments.png)
-2. Accounts:
-	- Session-less - Token-based Authentication (JWT)
-	- Login/Register via Local, Facebook, & Google
-	- RBAC - Admin, Anonymous, User 
-	- Forgot Password
-![alt text](screenshots/register.png)
-3. About Me
-	- Early Life
-	- Location
-4. Photos:
-	- Create a simple photo gallary
-5. Blogs:
-	- Create some blog posts accessible by Date/Search
-6. Contact:
-	- Email
-	- Phone
-	- Tech Profiles:
-		- GitHub
-		- DockerHub
-		- StackOverflow
-		- Apache
-	- Social Profiles: 
-		- LinkedIn
-		- Facebook
-		- Google
-7. Email Integration
-	- Forgot Password.. no problem!
-	- Personal Administration Alerts!
-	- Automated Email Administration & Stats:
-		- Did I get a visitor?
-		- Did I get a registration?
-8. Ads!
-	- How do I accomplish this... no idea!
-9. HTTPS:
-	- Initially tried Amazon Certificate Manager, but had no luck (domain verification emails were never being sent to my administrative email account). After wasting lots of time trouble-shooting, I gave up and claim it's broken.
-	- I've since switched to LetsEncrypt + certbot. Super easy setup ~10minutes to generate certs.
-10. Reduced Spaghetti Code: 
-	- Adapt a Front-End Framework...
-		- ReactJS?
-		- VanillaJS? (Web Components?)
-		- Polymer? (Google Web Components)
-11. Static Content Hosted vai S3/CloudFront
-12. API Hosted via EC2/LoadBalancer
+1. Models:
+	- Comment
+		- Threaded / nested comment section similar to Reddit
+		- Hybrid Materialized Path & Nested Set
+		- 
+	- Account
+		- Visitors can register via Local, Facebook, and/or Google accounts.
+		- Impliments:
+			- Login 
+			- Forgot Password
+			- Link Accounts (local+facebook)
+			- Edit Account Details
+2. Pages:
+	- About Me
+	- Photo Gallery via S3
+	- Blog Posts
+	- Contact
+3. Extras:
+4. Email Integration
+	- Send forgot password emails
+	- Administrative Notification Emails to myself
+5. Ads
+6. HTTPS
+	- LetsEncrypt
 
-## Future Plans:
-- Hosting API Server:
-	- Adapt Container Orchastration Platform
+## FUTURE PLANS / CONSIDERATIONS
+- Class Decorators & Annotations
+	- I'd like to use decorators to accomplish dependency injection on my data models.
+	Things that could be injected include RBAC on Fields/Classes/Methods, conditional logic,
+	or any other reusable middleware for building data models.
+- Hosting API Server
+	- Adapt a Container Orchastration Platform
 		- Kubernetes
 		- ECS (sucks?)
-- Host Static Content
-	- GitHub.io? AWS S3? EC2?
-- Host NodeJS API
 	- EC2 w/ Docker? Lambda+API Gateway?
-	- I wouldn't want to modularize my NodeJS code into separate Lambda functios, that'd be difficult to manage (I'd assume). Instaed route all traffic to one lambda, which handles all server API requests.
-	- Probably start with EC2 VM + Docker, easiest to get started, decoupled from platform/service.
+	- Modularizing my NodeJS code into separate Lambda functions might become difficult to manage/version. Alternative would be to use a single lambda to route all traffic for all API calls.
+	- EC2 + Docker, easiest to get started, decoupled from platform/service.
 - Host NoSQL/MongoDB?
 	- Separate EC2? Shared?
 	- DBaaS?

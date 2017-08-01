@@ -126,7 +126,7 @@ module.exports = class Account extends Document {
 		);
 		return result
 	}
-	static async createPassword({ _id, passwordHashAndSalt }={}) {
+	static async setPassword({ _id, passwordHashAndSalt }={}) {
 		const result = await mongoUtil.getDB()
 		.collection(Account.COLLECTION_NAME).updateOne(
 			{

@@ -29,6 +29,10 @@ exports.extractJwt = function(req) {
     }
     return token;
 };
+exports.decodeToken = function(token) {
+  var decoded = jwt.verify(token, commonConfig.jwtSecret)
+  return decoded;
+}
 exports.createJwt = function(account) {
   const expiration = Math.floor(Date.now() / 1000) + (60 * 60);
   const token = jwt.sign(

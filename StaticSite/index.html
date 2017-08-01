@@ -13,9 +13,9 @@
         <nav id="site-nav-bar">
             <a class="clickable" id="logout">Logout</a>
             <a class="clickable" id="greeting">Hello</a>
-            <a class="clickable" id="my-account" href="#my-account-modal-box--open">My Account</a>
-            <a class="clickable" id="register" href="#register-modal-box--open">Register</a>
-            <a class="clickable" id="login" href="#login-modal-box--open">Login</a>
+            <a class="clickable" id="my-account" href="#my-account-popup">My Account</a>
+            <a class="clickable" id="register" href="#register-popup">Register</a>
+            <a class="clickable" id="login-link" href="#login-popup">Login</a>
         </nav>
     </header>
     <main>
@@ -39,9 +39,10 @@
     </main>
     <footer id="site-footer">
         <article id="comments"></article>
-        <div class="modal-box" id="login-modal-box--open">
+        <div id="login-popup" class="modal-box">
             <a class="modal-box__overlay" href="#"></a>
-            <div class="modal-box__content"><a class="modal-box--close" id="login-modal-box--close" href="#">X</a>
+            <div class="modal-box__content">
+                <a class="modal-box--close" id="login-modal-box--close" href="#">X</a>
                 <form id="login-form" action="">
                     <table>
                         <tr>
@@ -49,7 +50,7 @@
                                 <label for="email">Email</label>
                             </td>
                             <td>
-                                <input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                                <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
                             </td>
                         </tr>
                         <tr>
@@ -57,18 +58,22 @@
                                 <label for="password">Password</label>
                             </td>
                             <td>
-                                <input class="password" id="password" type="password" name="password" placeholder="Password.." required>
+                                <input class="password" type="password" name="password" placeholder="Password.." required>
                             </td>
                         </tr>
                     </table>
                     <input class="submit" type="submit" href="#" value="Login">
                 </form>
+                <a class="clickable" id="forgot-password-link" href="#forgot-password-popup">Forgot Password?</a>
                 <form id="facebook-login-form" action="">
                     <input class="submit" type="submit" name="Facebook" value="Facebook Login">
                 </form>
+                <form id="google-login-form" action="">
+                    <input class="submit" type="submit" name="Google" value="Google Login">
+                </form>
             </div>
         </div>
-        <div class="modal-box" id="register-modal-box--open">
+        <div id="register-popup" class="modal-box">
             <a class="modal-box__overlay" href="#"></a>
             <div class="modal-box__content">
                 <a class="modal-box--close" id="register-modal-box--close" href="#">X</a>
@@ -79,7 +84,7 @@
                                 <label for="email">Email</label>
                             </td>
                             <td>
-                                <input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                                <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
                             </td>
                         </tr>
                         <tr>
@@ -87,7 +92,7 @@
                                 <label for="name-first">First Name</label>
                             </td>
                             <td>
-                                <input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John" required>
+                                <input class="name-first" type="name" name="nameFirst" placeholder="John" required>
                             </td>
                         </tr>
                         <tr>
@@ -95,7 +100,7 @@
                                 <label for="name-last">Last Name</label>
                             </td>
                             <td>
-                                <input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe" required>
+                                <input class="name-last" type="name" name="nameLast" placeholder="Doe" required>
                             </td>
                         </tr>
                         <tr>
@@ -103,7 +108,7 @@
                                 <label for="password">Password</label>
                             </td>
                             <td>
-                                <input class="password" id="password" type="password" name="password" placeholder="Password.." required>
+                                <input class="password" type="password" name="password" placeholder="Password.." required>
                             </td>
                         </tr>
                         <tr>
@@ -111,7 +116,7 @@
                                 <label for="passwordRetype"></label>
                             </td>
                             <td>
-                                <input class="passwordRetype" id="passwordRetype" type="password" name="passwordRetype" placeholder="Retype password.." required>
+                                <input class="passwordRetype" type="password" name="passwordRetype" placeholder="Retype password.." required>
                             </td>
                         </tr>
                     </table>
@@ -119,7 +124,26 @@
                 </form>
             </div>
         </div>
-        <div class="modal-box" id="my-account-modal-box--open">
+        <div id="forgot-password-popup" class="modal-box">
+            <a class="modal-box__overlay" href="#"></a>
+            <div class="modal-box__content">
+                <a class="modal-box--close" id="forgot-password-modal-box--close" href="#">X</a>
+                <form id="forgot-password-form" action="">
+                    <table>
+                        <tr>
+                            <td>
+                                <label for="email">Email</label>
+                            </td>
+                            <td>
+                                <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                            </td>
+                        </tr>
+                    </table>
+                    <input class="submit" type="submit" href="#" value="Submit">
+                </form>
+            </div>
+        </div>
+        <div id="my-account-popup" class="modal-box">
             <a class="modal-box__overlay" href="#"></a>
             <div class="modal-box__content">
                 <a class="modal-box--close" id="register-modal-box--close" href="#">X</a>

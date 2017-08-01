@@ -74,7 +74,7 @@ router.post('/reset-password', commonAuth.ensureAuthenticated, function(req, res
 		catch(err) {
 			return next(err)
 		}
-		Account.createPassword({
+		Account.setPassword({
 			_id: req.user._id, 
 			passwordHashAndSalt: newPasswordHashAndSalt 
 		})
@@ -98,7 +98,7 @@ router.post('/create-password', commonAuth.ensureAuthenticated, function(req, re
 		catch(err) {
 			return next(err)
 		}
-		Account.createPassword({ 
+		Account.setPassword({ 
 			_id: req.user._id, 
 			passwordHashAndSalt: passwordHashAndSalt 
 		})

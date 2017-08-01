@@ -56,6 +56,34 @@ if(fragment) {
 		httpClient.send();
 		window.location.hash = undefined
 	}
+	else if(fragment.includes('email_token')) {
+		// FACEBOOK REDIRECT...
+		// Make API call to verify access_token & generate a JWT token for subsequent requests...
+		const httpClient = new XMLHttpRequest();
+		httpClient.open('GET', API_SERVER_ADDRESS()+'/auth/local/token?'+fragment);
+		httpClient.setRequestHeader("Content-Type", "application/json");
+		httpClient.onreadystatechange = function() {
+			if (this.readyState === XMLHttpRequest.DONE) {
+				const response = JSON.parse(this.response);
+				if(this.status === 200) {
+					// Store JWT for future API call authentication...
+					// localStorage allows multiple windows open to still have access to token,
+					// sessionStorage would require login from multiple tabs/windows.
+					window.localStorage.token = response.token;
+					window.localStorage.tokenExpiration = response.expiration;
+					const userString = JSON.stringify(response.user)
+					window.localStorage.user = userString;
+				}
+				else {
+					deleteUserSession()
+					handleServerErrorResponse(response)
+				}
+				ready();
+			}
+		}
+		httpClient.send();
+		window.location.hash = undefined
+	}
 	else {
 		ready();
 	}
@@ -77,7 +105,7 @@ function ready() {
 		&& currentTime < Number(window.localStorage.tokenExpiration)) {
 		user = JSON.parse(window.localStorage.user)
 		document.querySelector('#logout').classList.remove('hidden')
-		document.querySelector('#login').classList.add('hidden')
+		document.querySelector('#login-link').classList.add('hidden')
 		document.querySelector('#register').classList.add('hidden')
 		document.querySelector('#greeting').classList.remove('hidden')
 		document.querySelector('#greeting').innerHTML = 'Welcome, '+user.nameFirst+' '+user.nameLast
@@ -88,7 +116,7 @@ function ready() {
 		document.querySelector('#greeting').classList.add('hidden')
 		document.querySelector('#my-account').classList.add('hidden')
 		document.querySelector('#logout').classList.add('hidden')
-		document.querySelector('#login').classList.remove('hidden')
+		document.querySelector('#login-link').classList.remove('hidden')
 		document.querySelector('#register').classList.remove('hidden')
 		deleteUserSession()
 	}
@@ -135,8 +163,8 @@ function ready() {
 	/*
 	LOGIN 
 	*/
-	document.getElementById('login').addEventListener('mouseup', function(event) {
-		var emailInput = document.getElementById('email')
+	document.getElementById('login-link').addEventListener('mouseup', function(event) {
+		var emailInput = document.querySelector('#login-form input.email')
 	    emailInput.focus();
 	});
 	document.getElementById('login-form').addEventListener('submit', function(event) {
@@ -165,6 +193,31 @@ function ready() {
 		}
 		httpClient.send()
 	});
+	/* FORGOT PASSWORD */
+	document.getElementById('forgot-password-link').addEventListener('mouseup', function(event) {
+		var emailInput = document.getElementById('forgot-password-form input.email')
+	    emailInput.focus();
+	})
+	document.getElementById('forgot-password-form').addEventListener('submit', function(event) {
+		event.preventDefault();
+		const email = event.target.elements.namedItem('email').value
+		const httpClient = new XMLHttpRequest();
+		httpClient.open('GET', API_SERVER_ADDRESS()+'/auth/forgotpassword?email='+encodeURIComponent(email));
+		httpClient.setRequestHeader("Content-Type", "application/json");
+		httpClient.onreadystatechange = function() {
+			if (this.readyState === XMLHttpRequest.DONE) {
+				const response = JSON.parse(this.response);
+				if(this.status === 200) {
+					alert('Check Email for Temporary Login Link!')
+					window.location.href = '/';
+				}
+				else {
+					handleServerErrorResponse(response)
+				}
+			}
+		}
+		httpClient.send();
+	})
 	document.getElementById('facebook-login-form').addEventListener('submit', function(event) {
 		event.preventDefault();
 		var clientId = '144772189413167'
