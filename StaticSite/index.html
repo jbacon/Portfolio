@@ -11,9 +11,9 @@
     <header id="site-header">
         <h1 id="site-title">Josh Bacon Software Engineer</h1>
         <nav id="site-nav-bar">
-            <a class="clickable" id="logout">Logout</a>
-            <a class="clickable" id="greeting">Hello</a>
-            <a class="clickable" id="my-account" href="#my-account-popup">My Account</a>
+            <a class="hidden clickable" id="logout">Logout</a>
+            <a class="hidden clickable" id="greeting">Hello</a>
+            <a class="hidden clickable" id="my-account" href="#my-account-popup">My Account</a>
             <a class="clickable" id="register" href="#register-popup">Register</a>
             <a class="clickable" id="login-link" href="#login-popup">Login</a>
         </nav>
@@ -64,10 +64,14 @@
                     </table>
                     <input class="submit" type="submit" href="#" value="Login">
                 </form>
-                <a class="clickable" id="forgot-password-link" href="#forgot-password-popup">Forgot Password?</a>
+                <button type="button" value="Forgot Password?" title="Forgot Password?" onclick="location.href='/#forgot-password-popup'">Forgot Password?</button>
                 <form id="facebook-login-form" action="">
                     <input class="submit" type="submit" name="Facebook" value="Facebook Login">
                 </form>
+                <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
+                <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true"></div>
+                <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+                <div id="status"></div>
                 <form id="google-login-form" action="">
                     <input class="submit" type="submit" name="Google" value="Google Login">
                 </form>
@@ -150,7 +154,7 @@
         </div>
     </footer>
 </body>
-    <script src="javascript/myMyAccountComponent.js"></script>
-    <script src="javascript/myCommentComponent.js"></script>
-    <script src="javascript/globalWebComponents.js"></script>
+<script src="javascript/myMyAccountComponent.js"></script>
+<script src="javascript/myCommentComponent.js"></script>
+<script src="javascript/globalWebComponents.js"></script>
 </html>

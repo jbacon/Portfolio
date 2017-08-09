@@ -33,14 +33,12 @@ exports.decodeToken = function(token) {
   var decoded = jwt.verify(token, commonConfig.jwtSecret)
   return decoded;
 }
-exports.createJwt = function(account) {
+exports.createJwt = function(data) {
   const expiration = Math.floor(Date.now() / 1000) + (60 * 60);
   const token = jwt.sign(
     {
       exp: expiration,
-      data: {
-        user: account.toJSON()
-      }
+      data: data
     },
     commonConfig.jwtSecret);
   return { token: token, expiration: expiration };
@@ -93,7 +91,7 @@ passport.use('jwt', new JwtStrategy(
     // Technically not necessary to verify credentials here.
     // If this function is reach it is already implied that
     // the user is authenticated via a valid signed token found in the auth header.
-    var user = new Account(jwt_payload.data.user);
+    var user = new Account(jwt_payload.data);
     // Refresh jwt... if needed? (bad practice, because otherwise tokens would never expire..)
     next(null, user)
   })

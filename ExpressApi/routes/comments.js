@@ -139,7 +139,7 @@ router.post('/remove', commonAuth.ensureAuthenticated, function(req, res, next) 
 				}
 				else {
 					// Comment Found!!
-					if(results[0].accountID.toString() === req.user._id) {
+					if(results[0].accountID.toString() === req.user._id.toString()) {
 						// User owns Comment! Allow removal...
 						Comment.remove({
 							_id: req.body._id,
