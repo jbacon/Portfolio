@@ -23,24 +23,26 @@ var API_SERVER_ADDRESS = function() {
 }
 /*
 HANDLE URL FRAGMENT
-Examples:
-1. 	When page is loaded via a redirect from an OAuth2 Server, the URL fragment will
-	contain an access_token (Implicit Grant Authentication Flow).
-	This access_token needs to be parsed out of the URL fragment and sent to my API server,
-	so that it can verify the token, respond with the corresponding User account, and
-	then return it's own signed JWT token...
-	Subsequent request to the API server authenticate using this new JWT token 
-	(NOT the original external OAuth2 access_token).
-	This design decision intends to reduce authentication complexity, but using a single
-	JWT middleware to verify API calls, instead of relying upon switching between many
-	different auth flows which inherently occurs while using passportjs middlware
-	(e.i. via facebook, google, twitter, etc..).
-2. 	Back-Button to navigate to various content areas/anchors.
+Scenarios:
+1. forgot-password-callback
+2. registration-callback
+3. achors
+4. facebook-callback:
+	 	When page is loaded via a redirect from an OAuth2 Server, the URL fragment will
+		contain an access_token (Implicit Grant Authentication Flow).
+		This access_token needs to be parsed out of the URL fragment and sent to my API server,
+		so that it can verify the token, respond with the corresponding User account, and
+		then return it's own signed JWT token...
+		Subsequent request to the API server authenticate using this new JWT token 
+		(NOT the original external OAuth2 access_token).
+		This design decision intends to reduce authentication complexity, but using a single
+		JWT middleware to verify API calls, instead of relying upon switching between many
+		different auth flows which inherently occurs while using passportjs middlware
+		(e.i. via facebook, google, twitter, etc..).
 */
 if(window.location.hash) {
 	var fragment = window.location.hash.slice(1)
 	if(fragment.includes('access_token') && fragment.includes('expires_in')) {
-		//fragment
 		authViaFacebookToken(fragment)
 	}
 	else if(fragment.startsWith('forgot-password-callback?')) {
@@ -76,8 +78,6 @@ window.fbAsyncInit = function() {
     FB.getLoginStatus(function(response) {
 	    console.log(response);
 	    if (response.status === 'connected') {
-	    	// Facebook User Currently Authenticated.
-	    	// Now Authenticate with API Server.
 			if(!hasUserSession()) {
 				authViaFacebookToken('access_token='+response.authResponse.accessToken+'&expires_in='+response.authResponse.expiresIn)
 			}
@@ -87,7 +87,7 @@ window.fbAsyncInit = function() {
     });
 };
 /*
-	USER U.I. ALTERATIONS
+USER U.I. ALTERATIONS
 */
 if(hasUserSession()) {
 	var session = getUserSession()
@@ -199,7 +199,7 @@ document.getElementById('register-form').addEventListener('submit', function(eve
 		if (this.readyState === XMLHttpRequest.DONE) {
 			const response = JSON.parse(this.response);
 			if(this.status === 200) {
-				window.location.href = '/';
+				alert('Thanks for registering! To activate your account continue registration steps in the verification email that has been sent to your address.')
 			}
 			else {
 				handleServerErrorResponse(response)
@@ -244,7 +244,6 @@ function authViaGoogleToken(google_access_token) {
 			else {
 				handleServerErrorResponse(response)
 			}
-			ready()
 		}
 	}
 	httpClient.send();
@@ -255,7 +254,6 @@ GET AUTHENTICATION JWT via FACEBOOK - Get api server auth token by verifying fac
 function authViaFacebookToken(facebook_access_token) {
 	const httpClient = new XMLHttpRequest();
 	httpClient.open('GET', API_SERVER_ADDRESS()+'/auth/facebook/token?'+facebook_access_token);
-	// httpClient.setRequestHeader("Bearer", facebook_access_token)
 	httpClient.setRequestHeader("Content-Type", "application/json");
 	httpClient.onreadystatechange = function() {
 		if (this.readyState === XMLHttpRequest.DONE) {
@@ -266,7 +264,6 @@ function authViaFacebookToken(facebook_access_token) {
 			else {
 				handleServerErrorResponse(response)
 			}
-			ready()
 		}
 	}
 	httpClient.send();
@@ -277,7 +274,6 @@ GET AUTHENTICATION JWT via EMAIL - Get api server auth token by verifying email'
 function authViaEmailToken(email_access_token) {
 	const httpClient = new XMLHttpRequest();
 	httpClient.open('GET', API_SERVER_ADDRESS()+'/auth/email/token?'+email_access_token);
-	// httpClient.setRequestHeader("Bearer", facebook_access_token)
 	httpClient.setRequestHeader("Content-Type", "application/json");
 	httpClient.onreadystatechange = function() {
 		if (this.readyState === XMLHttpRequest.DONE) {
@@ -288,7 +284,6 @@ function authViaEmailToken(email_access_token) {
 			else {
 				handleServerErrorResponse(response)
 			}
-			ready()
 		}
 	}
 	httpClient.send();
