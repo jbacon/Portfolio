@@ -16,6 +16,7 @@
             <a class="hidden clickable" id="my-account" href="#my-account-popup">My Account</a>
             <a class="clickable" id="register" href="#register-popup">Register</a>
             <a class="clickable" id="login-link" href="#login-popup">Login</a>
+            <a class="clickable" id="login-link-2">Login2</a>
         </nav>
     </header>
     <main>
@@ -68,15 +69,47 @@
                 <form id="facebook-login-form" action="">
                     <input class="submit" type="submit" name="Facebook" value="Facebook Login">
                 </form>
-                <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
-                <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true"></div>
-                <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+                <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onlogin="fbCheckLoginStatus();"></div>
+                <fb:login-button scope="public_profile,email" onlogin="fbCheckLoginStatus();"></fb:login-button>
                 <div id="status"></div>
                 <form id="google-login-form" action="">
                     <input class="submit" type="submit" name="Google" value="Google Login">
                 </form>
             </div>
         </div>
+        <dialog close id="login-dialog">
+            <form id="login-form" method="dialog" action="">
+                <table>
+                    <tr>
+                        <td>
+                            <label for="email">Email</label>
+                        </td>
+                        <td>
+                            <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="password">Password</label>
+                        </td>
+                        <td>
+                            <input class="password" type="password" name="password" placeholder="Password.." required>
+                        </td>
+                    </tr>
+                </table>
+                <input class="submit" type="submit" href="#" value="Login">
+            </form>
+            <button tmethod="dialog" ype="button" value="Forgot Password?" title="Forgot Password?" onclick="location.href='/#forgot-password-popup'">Forgot Password?</button>
+            <form method="dialog" id="facebook-login-form" action="">
+                <input class="submit" type="submit" name="Facebook" value="Facebook Login">
+            </form>
+            <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onlogin="fbCheckLoginStatus();"></div>
+            <fb:login-button scope="public_profile,email" onlogin="fbCheckLoginStatus();"></fb:login-button>
+            <div id="status"></div>
+            <form id="google-login-form" action="" method="dialog">
+                <input class="submit" type="submit" name="Google" value="Google Login">
+            </form>
+        </dialog>
         <div id="register-popup" class="modal-box">
             <a class="modal-box__overlay" href="#"></a>
             <div class="modal-box__content">

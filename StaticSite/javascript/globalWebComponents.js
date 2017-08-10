@@ -24,10 +24,10 @@ var API_SERVER_ADDRESS = function() {
 /*
 HANDLE URL FRAGMENT
 Scenarios:
-1. forgot-password-callback
-2. registration-callback
-3. achors
-4. facebook-callback:
+1. forgot-password-callback - Contains token for temporary session so user can reset password.
+2. registration-callback - Contains token for temporary session to 
+3. achors - Determines page 
+4. facebook-callback - Contains token for facebook authentication
 	 	When page is loaded via a redirect from an OAuth2 Server, the URL fragment will
 		contain an access_token (Implicit Grant Authentication Flow).
 		This access_token needs to be parsed out of the URL fragment and sent to my API server,
@@ -43,13 +43,13 @@ Scenarios:
 if(window.location.hash) {
 	var fragment = window.location.hash.slice(1)
 	if(fragment.includes('access_token') && fragment.includes('expires_in')) {
-		authViaFacebookToken(fragment)
+		getAuthenticatedViaFacebook(fragment)
 	}
 	else if(fragment.startsWith('forgot-password-callback?')) {
 		const dataStringEncoded = fragment.substr('forgot-password-callback?'.length)
 		const dataStringDecoded = decodeURIComponent(dataStringEncoded)
 		const dataJson = JSON.parse(dataStringDecoded)
-		authViaEmailToken(dataJson.token)
+		getAuthenticatedViaEmail(dataJson.token)
 	}
 	else if(fragment.startsWith('registration-callback?')) {
 		const dataStringEncoded = fragment.substr('registration-callback?'.length)
@@ -65,7 +65,6 @@ if(window.location.hash) {
 else {
 	document.body.classList.remove('hidden')
 }
-
 window.fbAsyncInit = function() {
     FB.init({
         appId            : '144772189413167',
@@ -75,17 +74,37 @@ window.fbAsyncInit = function() {
         cookie           : false
     });
     FB.AppEvents.logPageView();
-    FB.getLoginStatus(function(response) {
-	    console.log(response);
+    // Check for Login Status. 
+    fbCheckLoginStatus()
+	FB.Event.subscribe('auth.login', function(response) {
+		getAuthenticatedViaFacebook('access_token='+response.authResponse.accessToken+'&expires_in='+response.authResponse.expiresIn)
+	});
+};
+function fbCheckLoginStatus() {
+	FB.getLoginStatus(function(response) {
 	    if (response.status === 'connected') {
 			if(!hasUserSession()) {
-				authViaFacebookToken('access_token='+response.authResponse.accessToken+'&expires_in='+response.authResponse.expiresIn)
+	    		/* Facebook Session exists but no API Server Session.
+	    			Create new API Server Session */
+				getAuthenticatedViaFacebook('access_token='+response.authResponse.accessToken+'&expires_in='+response.authResponse.expiresIn)
+			}
+			else {
+				const session = getUserSession()
+				/* Both Facebook Session & API Server Session exit. */
+				if(session.user.facebookProfileID !== response.authResponse.userID) {
+					/* If mismatch profile prefer Facebook Session.
+						Reauthenticate w/ API Server */
+					getAuthenticatedViaFacebook('access_token='+response.authResponse.accessToken+'&expires_in='+response.authResponse.expiresIn)
+				}
+				else {
+					// Do nothing..
+				}
 			}
 		} else {
-	        // Not logged into your app or unable to tell.
+	        // Do nothing...
 	    }
     });
-};
+}
 /*
 USER U.I. ALTERATIONS
 */
@@ -138,12 +157,18 @@ commentsElement.insertAdjacentElement('beforeend', myCommentObject)
 /*
 LOGIN 
 */
+document.getElementById('login-link-2').addEventListener('click', function(event) {
+	document.getElementById('login-dialog').showModal()
+});
+document.getElementById('login-dialog-close').addEventListener('cancel', function(event) {
+	document.getElementById('login-dialog').close()
+});
 document.getElementById('login-link').addEventListener('mouseup', function(event) {
 	var emailInput = document.querySelector('#login-form input.email')
     emailInput.focus();
 });
 document.getElementById('login-form').addEventListener('submit', function(event) {
-	authViaLocalPassword({
+	getAuthenticatedViaLocal({
 		username: event.target.elements.namedItem('email').value,
 		password: event.target.elements.namedItem('password').value
 	})
@@ -154,7 +179,7 @@ document.getElementById('login-form').addEventListener('submit', function(event)
 //     emailInput.focus();
 // })
 document.getElementById('forgot-password-form').addEventListener('submit', function(event) {
-	authViaLocalPassword({
+	getAuthenticatedViaLocal({
 		username: event.target.elements.namedItem('email').value,
 		password: event.target.elements.namedItem('password').value
 	})
@@ -215,100 +240,60 @@ document.getElementById('register-form').addEventListener('submit', function(eve
 })
 document.getElementById('logout').addEventListener('click', function(event) {
 	deleteUserSession()
-	window.location.href = '/';
+	FB.getLoginStatus(function(response) {
+	    if (response.status === 'connected') {
+			FB.logout(function(response) {
+				window.location.href = '/';
+			});
+		} else {
+			window.location.href = '/';
+	    }
+    });
 })
-function handleServerAuthResponse(response) {
-	createUserSession({
-		token: response.token,
-		expiration: response.expiration,
-		user: response.user
-	})
-	window.location.href = '/';
-}
 function handleServerErrorResponse(response) {
 	if(response)
 		alert(response.status+' - '+response.message+'. '+((response.stack) ? response.stack : ''));
 	else
 		alert('Something went wrong!')
 }
-function authViaGoogleToken(google_access_token) {
-	const httpClient = new XMLHttpRequest();
-	httpClient.open('GET', API_SERVER_ADDRESS()+'/auth/facebook/token?'+facebook_access_token);
-	httpClient.setRequestHeader("Content-Type", "application/json");
-	httpClient.onreadystatechange = function() {
-		if (this.readyState === XMLHttpRequest.DONE) {
-			const response = JSON.parse(this.response);
-			if(this.status === 200) {
-				handleServerAuthResponse(response)
-			}
-			else {
-				handleServerErrorResponse(response)
-			}
-		}
-	}
-	httpClient.send();
+function getAuthenticatedViaGoogle(google_access_token) {
+	getAuthenticated('/auth/google/token?'+google_access_token)
 }
-/*
-GET AUTHENTICATION JWT via FACEBOOK - Get api server auth token by verifying facebook's token
-*/
-function authViaFacebookToken(facebook_access_token) {
-	const httpClient = new XMLHttpRequest();
-	httpClient.open('GET', API_SERVER_ADDRESS()+'/auth/facebook/token?'+facebook_access_token);
-	httpClient.setRequestHeader("Content-Type", "application/json");
-	httpClient.onreadystatechange = function() {
-		if (this.readyState === XMLHttpRequest.DONE) {
-			const response = JSON.parse(this.response);
-			if(this.status === 200) {
-				handleServerAuthResponse(response)
-			}
-			else {
-				handleServerErrorResponse(response)
-			}
-		}
-	}
-	httpClient.send();
+function getAuthenticatedViaFacebook(facebook_access_token) {
+	getAuthenticated('/auth/facebook/token?'+facebook_access_token)
 }
-/*
-GET AUTHENTICATION JWT via EMAIL - Get api server auth token by verifying email's token
-*/
-function authViaEmailToken(email_access_token) {
-	const httpClient = new XMLHttpRequest();
-	httpClient.open('GET', API_SERVER_ADDRESS()+'/auth/email/token?'+email_access_token);
-	httpClient.setRequestHeader("Content-Type", "application/json");
-	httpClient.onreadystatechange = function() {
-		if (this.readyState === XMLHttpRequest.DONE) {
-			const response = JSON.parse(this.response);
-			if(this.status === 200) {
-				handleServerAuthResponse(response)
-			}
-			else {
-				handleServerErrorResponse(response)
-			}
-		}
-	}
-	httpClient.send();
+function getAuthenticatedViaEmail(email_access_token) {
+	getAuthenticated('/auth/email/token?'+email_access_token)
 }
-/*
-GET AUTHENTICATION JWT via LOCAL CREDENTIALS - Get api server auth token by verifying credentials
-*/
-function authViaLocalPassword({ username, password }={}) {
-	event.preventDefault();
-	const httpClient = new XMLHttpRequest();
+function getAuthenticatedViaLocal({ username, password }={}) {
 	const email = event.target.elements.namedItem('email').value
 	const password = event.target.elements.namedItem('password').value
-	httpClient.open('GET', API_SERVER_ADDRESS()+'/auth/local/token?email='+encodeURIComponent(email)+'&password='+encodeURIComponent(password));
+	getAuthenticated('/auth/local/token?email='+encodeURIComponent(email)+'&password='+encodeURIComponent(password))
+}
+function getAuthenticatedViaRegistration() {
+	
+}
+function getAuthenticated(rest_api_path) {
+	const httpClient = new XMLHttpRequest();
+	httpClient.open('GET', API_SERVER_ADDRESS()+rest_api_path);
+	httpClient.setRequestHeader("Content-Type", "application/json");
 	httpClient.onreadystatechange = function() {
 		if (this.readyState === XMLHttpRequest.DONE) {
 			const response = JSON.parse(this.response);
 			if(this.status === 200) {
-				handleServerAuthResponse(response)
+				setUserSession({
+					token: response.token,
+					expiration: response.expiration,
+					user: response.user
+				})
+				window.location.href = '/';
 			}
 			else {
 				handleServerErrorResponse(response)
 			}
 		}
 	}
-	httpClient.send()
+	httpClient.send();
 }
 function hasUserSession() {
 	if(window.localStorage.token
@@ -321,15 +306,16 @@ function hasUserSession() {
 }
 function getUserSession() {
 	if(hasUserSession()) {
-		return {
+		const session = {
 			token: window.localStorage.token,
 			expiration: window.localStorage.tokenExpiration,
 			user: JSON.parse(window.localStorage.user)
 		}
+		return session
 	}
 	return null
 }
-function createUserSession({ token, expiration, user }={}) {
+function setUserSession({ token, expiration, user }={}) {
 	window.localStorage.token = token;
 	window.localStorage.expiration = expiration;
 	window.localStorage.user = JSON.stringify(user);
@@ -339,3 +325,9 @@ function deleteUserSession() {
 	delete window.localStorage.expiration
 	delete window.localStorage.user;
 }
+
+/* Features of Auth Pattern:
+token
+api path
+
+*/

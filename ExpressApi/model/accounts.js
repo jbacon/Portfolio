@@ -11,11 +11,13 @@ module.exports = class Account extends Document {
 	}
 	constructor(account) {
 		super(account);
-		this.facebookProfileID = account.facebookProfileID
+		this.facebookProfileID = account.facebookProfileID || null
 		this.email = account.email;
 		this.nameFirst = account.nameFirst;
 		this.nameLast = account.nameLast;
-		this.passwordHashAndSalt = account.passwordHashAndSalt;
+		this.passwordHashAndSalt = account.passwordHashAndSalt || null;
+		this.dateLastAuthenticated = account.dateLastAuthenticated  || null;
+		thi
 	}
 	get facebookProfileID() {
 		return this._facebookProfileID
@@ -63,6 +65,12 @@ module.exports = class Account extends Document {
 	set passwordHashAndSalt(val) {
 		this._passwordHashAndSalt = val;
 	}
+	get dateLastAuthenticated() {
+		return this._dateLastAuthenticated;
+	}
+	set dateLastAuthenticated(val) {
+		this._dateLastAuthenticated = val;
+	}
 	toJSON() {
 		var obj = super.toJSON()
 		obj.facebookProfileID = this.facebookProfileID
@@ -71,6 +79,7 @@ module.exports = class Account extends Document {
 		obj.nameFirst = this.nameFirst;
 		obj.nameLast = this.nameLast;
 		obj.passwordHashAndSalt = this.passwordHashAndSalt;
+		obj.dateLastAuthenticated = this.dateLastAuthenticated
 		return obj
 	}
 	static async create({ account } = {}) {
