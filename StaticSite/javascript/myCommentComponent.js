@@ -1,36 +1,36 @@
 class MyCommentComponent extends HTMLElement {
 	// Add Listeners, innerHTML, styling, etc...
-	constructor({comment, currentUserID, isAdmin}={}) {
+	constructor() {
 		super();
-		this.comment = comment || null;
-		this.currentUserID = currentUserID || null;
-		this.isAdmin = isAdmin || null;
+		this._comment = {};
+		this._currentUserID = null;
+		this._isAdmin = false;
 		this.attachShadow({ mode: "open" });
-		this._redrawShadowRootDOM()
 	}
-	static get observedAttributes() { return [ ]; };
+	static get observedAttributes() { return [ 'comment', 'currentUserID', 'isAdmin' ]; };
 	// Respond to attribute changes...
 	attributeChangedCallback(attr, oldValue, newValue, namespace) {
 		// super.attributeChangedCallback(attr, oldValue, newValue, namespace);
 		// Just Redraw the Element U.I. because changing any attribute 
 		// will propogate changes to all decendant elements anyway
 		if(attr === 'comment') {
-			this._redrawShadowRootDOM()
+			this._comment = JSON.parse(newValue);
 		}
 		else if(attr === 'current-user-id') {
-			this._redrawShadowRootDOM()
+			this._currentUserID = newValue;
 		}
 		else if(attr === 'is-admin') {
-			this._redrawShadowRootDOM()
+			this._isAdmin = newValue;
 		}
 	}
 	// Removed from a document
 	disconnectedCallback() {
-		// super.disconnectedCallback();
+		super.disconnectedCallback();
 	}
 	// Called when an attribute is changed, appended, removed, or replaced on the element
 	connectedCallback() {
 		// super.connectedCallback();
+		this._redrawShadowRootDOM()
 	}
 	// Called when the element is adopted into a new document
 	adoptedCallback(oldDocument, newDocument) {
@@ -38,7 +38,7 @@ class MyCommentComponent extends HTMLElement {
 	}
 	/* DATA */
 	get comment() {
-		return JSON.parse(this.getAttribute('comment'));
+		return this._comment;
 	}
 	set comment(val) {
 		if(val) {
@@ -49,7 +49,7 @@ class MyCommentComponent extends HTMLElement {
 		}
 	}
 	get currentUserID() {
-		return this.getAttribute('current-user-id');
+		return this._currentUserID;
 	}
 	set currentUserID(val) {
 		if(val) {
@@ -60,7 +60,7 @@ class MyCommentComponent extends HTMLElement {
 		}
 	}
 	get isAdmin() {
-		return this.getAttribute('is-admin');
+		return this._isAdmin;
 	}
 	set isAdmin(val) {
 		if(val) {
@@ -97,8 +97,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', API_SERVER_ADDRESS()+'/comments/create');
-		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+		client.open('POST', window.portfolio.getApiServerAddress+'/comments/create');
+		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var jsonData = {}
 		for(var i = 0; i < event.target.length - 1; i++) {
@@ -121,8 +121,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', API_SERVER_ADDRESS()+'/comments/remove');
-		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+		client.open('POST', window.portfolio.getApiServerAddress+'/comments/remove');
+		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.comment._id || null;
@@ -143,8 +143,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', API_SERVER_ADDRESS()+'/comments/flag');
-		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+		client.open('POST', window.portfolio.getApiServerAddress+'/comments/flag');
+		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.comment._id || null;
@@ -166,8 +166,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', API_SERVER_ADDRESS()+'/comments/up-vote');
-		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+		client.open('POST', window.portfolio.getApiServerAddress+'/comments/up-vote');
+		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.comment._id || null;
@@ -189,8 +189,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', API_SERVER_ADDRESS()+'/comments/down-vote');
-		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+		client.open('POST', window.portfolio.getApiServerAddress+'/comments/down-vote');
+		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.comment._id || null;
@@ -227,7 +227,7 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('GET', API_SERVER_ADDRESS()+'/comments/read?data='+encodedQuery);
+		client.open('GET', window.portfolio.getApiServerAddress+'/comments/read?data='+encodedQuery);
 		client.send();
 	}
 	_loadMoreReplies(callback) {
@@ -265,7 +265,7 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('GET', API_SERVER_ADDRESS()+'/comments/read?data='+encodedQuery);
+		client.open('GET', window.portfolio.getApiServerAddress+'/comments/read?data='+encodedQuery);
 		client.send();
 	}
 	_redrawShadowRootDOM() {
@@ -273,20 +273,20 @@ class MyCommentComponent extends HTMLElement {
 		this.shadowRoot.innerHTML = `
 			<div>
 				<span>
-					${ (this.comment.account && this.comment.account.facebookProfileID) ? '<img display="inline-block" width="50px" height="50px" alt="" src="http://graph.facebook.com/'+this.comment.account.facebookProfileID+'/picture?type=large">' : ''}
+					${ (this.comment && this.comment.account && this.comment.account.facebookProfileID) ? '<img display="inline-block" width="50px" height="50px" alt="" src="http://graph.facebook.com/'+this.comment.account.facebookProfileID+'/picture?type=large">' : ''}
 				</span>
 				<span style='width: 500px;'>
-					<div id='header'>${(this.comment.account) ? this.comment.account.nameFirst+' '+this.comment.account.nameLast+' @ '+this.comment.dateCreated : ''}</div>
-					<div id='content'>${this.comment.text}</div>
+					<div id='header'>${(this.comment && this.comment.account) ? this.comment.account.nameFirst+' '+this.comment.account.nameLast+' @ '+this.comment.dateCreated : ''}</div>
+					<div id='content'>${this.comment && this.comment.text}</div>
 				</span>
 			</div>
 			<footer>
 				<div id='actions'>
 					<button id='replies-toggle' name='Replies'>Replies</button>
 					<button id='reply-toggle' name='Reply' class='hidden'>Reply</button>
-					<span id='up-vote-count'>${'+'+this.comment.upVoteAccountIDs.length}</span>
+					<span id='up-vote-count'>${(this.comment && this.comment.upVoteAccountIDs) ? '+'+this.comment.upVoteAccountIDs.length : ''}</span>
 					<button id='up-vote-button' name='Up' class='hidden'>Up</button>
-					<span id='down-vote-count'>${'-'+this.comment.downVoteAccountIDs.length}</span>
+					<span id='down-vote-count'>${(this.comment && this.comment.downVoteAccountIDs) ? '-'+this.comment.downVoteAccountIDs.length : ''}</span>
 					<button id='down-vote-button' name='Down' class='hidden'>Down</button>
 					<button id='remove-button' name='Remove' class='hidden'>Remove</button>
 					<button id='flag-button' name='Flag' class='hidden'>Flag</button>
@@ -297,8 +297,8 @@ class MyCommentComponent extends HTMLElement {
 					<button id='load-old-button' class='hidden'>Load more..</button>
 				</div>
 				<form id='create-form' action='' class='hidden'>
-					<input id='article-id' name='articleID' type='hidden' value='${this.comment.articleID}'>
-					<input id='parent-comment-id' name='parentCommentID' type='hidden' value='${this.comment._id}'>
+					<input id='article-id' name='articleID' type='hidden' value='${this.comment && this.comment.articleID}'>
+					<input id='parent-comment-id' name='parentCommentID' type='hidden' value='${this.comment && this.comment._id}'>
 					<input id='text' name='text' type='text' placeholder='Text...'>
 					<button id='submit' name='Submit'>Submit</button>
 				</form>
@@ -518,5 +518,4 @@ class MyCommentComponent extends HTMLElement {
 		recursivelyPaginateChildrenToDetermineVisbility.call(this)
 	}
 }
-
-
+window.customElements.define('my-comment', MyCommentComponent)

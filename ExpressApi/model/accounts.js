@@ -17,7 +17,6 @@ module.exports = class Account extends Document {
 		this.nameLast = account.nameLast;
 		this.passwordHashAndSalt = account.passwordHashAndSalt || null;
 		this.dateLastAuthenticated = account.dateLastAuthenticated  || null;
-		thi
 	}
 	get facebookProfileID() {
 		return this._facebookProfileID

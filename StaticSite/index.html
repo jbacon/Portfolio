@@ -2,119 +2,25 @@
 <html>
 <head>
     <title>Josh Bacon</title>
+    <script src="javascript/mySessionManager.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://connect.facebook.net/en_US/sdk.js" async defer></script>
+    <script src="javascript/myGlobal.js" async defer></script>
+    <script src="javascript/myMyAccountComponent.js"></script>
+    <script src="javascript/myCommentComponent.js"></script>
+    <script src="javascript/myDialogButtonComponent.js"></script>
     <link rel="stylesheet" href="/stylesheets/layout.css">
     <link rel="stylesheet" href="/stylesheets/login.css">
     <link rel="stylesheet" href="/stylesheets/register.css">
     <link rel="stylesheet" href="/stylesheets/modal-window.css">
 </head>
-<body class="hidden">
+<body>
     <header id="site-header">
-        <h1 id="site-title">Josh Bacon Software Engineer</h1>
+        <h1 id="site-title">Josh Bacon - Software Engineer</h1>
         <nav id="site-nav-bar">
-            <a class="hidden clickable" id="logout">Logout</a>
-            <a class="hidden clickable" id="greeting">Hello</a>
-            <a class="hidden clickable" id="my-account" href="#my-account-popup">My Account</a>
-            <a class="clickable" id="register" href="#register-popup">Register</a>
-            <a class="clickable" id="login-link" href="#login-popup">Login</a>
-            <a class="clickable" id="login-link-2">Login2</a>
-        </nav>
-    </header>
-    <main>
-        <nav id="main-menu">
-            <div>About Me</div>
-            <div>Articles</div>
-            <div>Photos</div>
-            <div>Contact</div>
-        </nav>
-        <section id="main-section">
-            <header id="main-header">
-                <article id="article-header" data-article-id="59344c18e987af001c119f93">Welcome!</article>
-            </header>
-            <div id="main-content">
-                <p id="article-content"> Hello! I'm Josh Bacon and you've entered my personal web app portfolio! Please explore my site, I'd love to share my passion for technology with you! You're invite to read through my articles, visit my social profiles, identify yourself via Facebook authentication, and/or provide any feedback you'd like in the below comment sections (no vulgarity please). Creating this app was great fun, and I hope you find it interesting. Behind-the-scenes is M.E..N technology stack.. MongoDB, ExpressJS, and the NodeJS runtime. I chose to ignore front-end frameworks for this project so I could focus on improving my understanding of native DOM manipulation and VanillaJS (Although I also would have enjoyed learning ReactJS for a more robust production application!). Hosting/Infrastructure for my site is backed entirely on my personal AWS account. From domain registration (R53), to DNS resolution (R53), certification management (ACM), and AWS EC2. Other technologies used include: Docker, PugJS templating engine, JSPM, NPM, CSS... Please Email me if you have any questions or interest in further discussions. Thanks for stopping by!</p>
-            </div>
-            <footer id="main-footer" class="hidden">
-                <section id="actions"><span class="clickable">Share</span><span class="clickable">Print</span><span class="clickable">Contact</span></section>
-            </footer>
-        </section>
-    </main>
-    <footer id="site-footer">
-        <article id="comments"></article>
-        <div id="login-popup" class="modal-box">
-            <a class="modal-box__overlay" href="#"></a>
-            <div class="modal-box__content">
-                <a class="modal-box--close" id="login-modal-box--close" href="#">X</a>
-                <form id="login-form" action="">
-                    <table>
-                        <tr>
-                            <td>
-                                <label for="email">Email</label>
-                            </td>
-                            <td>
-                                <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="password">Password</label>
-                            </td>
-                            <td>
-                                <input class="password" type="password" name="password" placeholder="Password.." required>
-                            </td>
-                        </tr>
-                    </table>
-                    <input class="submit" type="submit" href="#" value="Login">
-                </form>
-                <button type="button" value="Forgot Password?" title="Forgot Password?" onclick="location.href='/#forgot-password-popup'">Forgot Password?</button>
-                <form id="facebook-login-form" action="">
-                    <input class="submit" type="submit" name="Facebook" value="Facebook Login">
-                </form>
-                <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onlogin="fbCheckLoginStatus();"></div>
-                <fb:login-button scope="public_profile,email" onlogin="fbCheckLoginStatus();"></fb:login-button>
-                <div id="status"></div>
-                <form id="google-login-form" action="">
-                    <input class="submit" type="submit" name="Google" value="Google Login">
-                </form>
-            </div>
-        </div>
-        <dialog close id="login-dialog">
-            <form id="login-form" method="dialog" action="">
-                <table>
-                    <tr>
-                        <td>
-                            <label for="email">Email</label>
-                        </td>
-                        <td>
-                            <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="password">Password</label>
-                        </td>
-                        <td>
-                            <input class="password" type="password" name="password" placeholder="Password.." required>
-                        </td>
-                    </tr>
-                </table>
-                <input class="submit" type="submit" href="#" value="Login">
-            </form>
-            <button tmethod="dialog" ype="button" value="Forgot Password?" title="Forgot Password?" onclick="location.href='/#forgot-password-popup'">Forgot Password?</button>
-            <form method="dialog" id="facebook-login-form" action="">
-                <input class="submit" type="submit" name="Facebook" value="Facebook Login">
-            </form>
-            <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onlogin="fbCheckLoginStatus();"></div>
-            <fb:login-button scope="public_profile,email" onlogin="fbCheckLoginStatus();"></fb:login-button>
-            <div id="status"></div>
-            <form id="google-login-form" action="" method="dialog">
-                <input class="submit" type="submit" name="Google" value="Google Login">
-            </form>
-        </dialog>
-        <div id="register-popup" class="modal-box">
-            <a class="modal-box__overlay" href="#"></a>
-            <div class="modal-box__content">
-                <a class="modal-box--close" id="register-modal-box--close" href="#">X</a>
-                <form id="register-form" action="">
+            <my-dialog-button id='register-nav-item' class="nav-item clickable">
+                <a slot="open">Register</a>
+                <form slot='content' id="register-form" action="">
                     <table>
                         <tr>
                             <td>
@@ -159,35 +65,89 @@
                     </table>
                     <input class="submit" type="submit">
                 </form>
+            </my-dialog-button>
+            <my-dialog-button id='login-nav-item' class="nav-item clickable">
+                <a slot="open">Login</a>
+                <div slot="content">
+                    <form id="login-form-local" action="">
+                        <table>
+                            <tr>
+                                <td>
+                                    <label for="email">Email</label>
+                                </td>
+                                <td>
+                                    <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="password">Password</label>
+                                </td>
+                                <td>
+                                    <input class="password" type="password" name="password" placeholder="Password.." required>
+                                </td>
+                            </tr>
+                        </table>
+                        <input class="submit" type="submit" value="Login">
+                    </form>
+                    <my-dialog-button>
+                        <button slot="open">Forgot Password?</button>
+                        <form slot='content' id="forgot-password-form" action="">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label for="email">Email</label>
+                                    </td>
+                                    <td>
+                                        <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                                    </td>
+                                </tr>
+                            </table>
+                            <input class="submit" type="submit" href="#" value="Submit">
+                        </form>
+                    </my-dialog-button>
+                    <form id="login-form-facebook" class='hidden' action="">
+                        <input class="submit" type="submit" name="Facebook" value="Facebook Login">
+                    </form>
+                    <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onlogin="fbCheckLoginStatus();"></div>
+                    <fb:login-button scope="public_profile,email" onlogin="fbCheckLoginStatus();" class='hidden'></fb:login-button>
+                    <div id="status"></div>
+                    <form id="login-form-google" action="">
+                        <input class="submit" type="submit" name="Google" value="Google Login">
+                    </form>
+                </div>
+            </my-dialog-button>
+            <a id="logout-nav-item" class="logout-link hidden clickable">Logout</a>
+            <my-dialog-button id='account-nav-item' class="nav-item clickable hidden">
+                <a slot="open">Account</a>
+                <my-account slot='content'></my-account>
+            </my-dialog-button>
+            <a id="greeting-nav-item" class="hidden clickable">Hello</a>
+        </nav>
+    </header>
+    <main>
+        <nav id="main-menu">
+            <div>About Me</div>
+            <div>Articles</div>
+            <div>Photos</div>
+            <div>Contact</div>
+        </nav>
+        <section id="main-section">
+            <header id="main-header">
+                <article id="article-header" data-article-id="59344c18e987af001c119f93">Welcome!</article>
+            </header>
+            <div id="main-content">
+                <p id="article-content"> Hello! I'm Josh Bacon and you've entered my personal web app portfolio! Please explore my site, I'd love to share my passion for technology with you! You're invite to read through my articles, visit my social profiles, identify yourself via Facebook authentication, and/or provide any feedback you'd like in the below comment sections (no vulgarity please). Creating this app was great fun, and I hope you find it interesting. Behind-the-scenes is M.E..N technology stack.. MongoDB, ExpressJS, and the NodeJS runtime. I chose to ignore front-end frameworks for this project so I could focus on improving my understanding of native DOM manipulation and VanillaJS (Although I also would have enjoyed learning ReactJS for a more robust production application!). Hosting/Infrastructure for my site is backed entirely on my personal AWS account. From domain registration (R53), to DNS resolution (R53), certification management (ACM), and AWS EC2. Other technologies used include: Docker, PugJS templating engine, JSPM, NPM, CSS... Please Email me if you have any questions or interest in further discussions. Thanks for stopping by!</p>
             </div>
-        </div>
-        <div id="forgot-password-popup" class="modal-box">
-            <a class="modal-box__overlay" href="#"></a>
-            <div class="modal-box__content">
-                <a class="modal-box--close" id="forgot-password-modal-box--close" href="#">X</a>
-                <form id="forgot-password-form" action="">
-                    <table>
-                        <tr>
-                            <td>
-                                <label for="email">Email</label>
-                            </td>
-                            <td>
-                                <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
-                            </td>
-                        </tr>
-                    </table>
-                    <input class="submit" type="submit" href="#" value="Submit">
-                </form>
-            </div>
-        </div>
-        <div id="my-account-popup" class="modal-box">
-            <a class="modal-box__overlay" href="#"></a>
-            <div class="modal-box__content">
-                <a class="modal-box--close" id="register-modal-box--close" href="#">X</a>
-        </div>
+            <footer id="main-footer" class="hidden">
+                <section id="actions"><span class="clickable">Share</span><span class="clickable">Print</span><span class="clickable">Contact</span></section>
+            </footer>
+        </section>
+    </main>
+    <footer id="site-footer">
+        <article id="comments">
+            <my-comment id='comment-placeholder' comment="{&quot;_id&quot;:null,&quot;accountID&quot;:null,&quot;articleID&quot;:&quot;59344c18e987af001c119f93&quot;,&quot;parentCommentID&quot;:null,&quot;upVoteAccountIDs&quot;:[],&quot;downVoteAccountIDs&quot;:[],&quot;text&quot;:&quot;Comment Section&quot;,&quot;facebookProfileID&quot;:null,&quot;flags&quot;:[],&quot;childCommentIDs&quot;:[&quot;dummy-placeholder&quot;]}" is-admin="false"></my-comment>
+        </article>
     </footer>
 </body>
-<script src="javascript/myMyAccountComponent.js"></script>
-<script src="javascript/myCommentComponent.js"></script>
-<script src="javascript/globalWebComponents.js"></script>
 </html>

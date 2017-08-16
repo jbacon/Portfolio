@@ -30,7 +30,7 @@ body {
 	color: white;
 	font: bold 20px Verdana, sans-serif;
 }
-#site-nav-bar > a {
+#site-nav-bar > * {
     text-decoration: none;
 	display: inline-block;
 	float: right;
@@ -38,16 +38,16 @@ body {
 	border-left: 3px solid;
 	--background-color: rgba(0,0,0,0.3);
 }
-#site-nav-bar > a:visited {
+#site-nav-bar > *:visited {
     color: white;
 }
-#site-nav-bar > a:hover {
+#site-nav-bar > *:hover {
     text-decoration: none;
 	color: black;
 	cursor: pointer;
-	font-size: 22px;
 }
-#site-nav-bar > a:active {
+#site-nav-bar > *:active {
+    text-decoration: underline;
     color: black;
 }
 #main-menu {
@@ -104,5 +104,4 @@ body {
 .clickable:hover {
     text-decoration: underline;
 	cursor: pointer;
-	font-size: 120%;
 }

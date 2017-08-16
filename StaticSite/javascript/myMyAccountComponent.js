@@ -1,10 +1,8 @@
 class MyMyAccountComponent extends HTMLElement {
 	// Add Listeners, innerHTML, styling, etc...
-	constructor({account}={}) {
+	constructor() {
 		super();
-		this.account = account;
 		this.attachShadow({ mode: "open" });
-		this._redrawShadowRootDOM()
 	}
 	static get observedAttributes() { return [ ]; };
 	// Respond to attribute changes...
@@ -18,6 +16,7 @@ class MyMyAccountComponent extends HTMLElement {
 	// Called when an attribute is changed, appended, removed, or replaced on the element
 	connectedCallback() {
 		// super.connectedCallback();
+		this._redrawShadowRootDOM()
 	}
 	// Called when the element is adopted into a new document
 	adoptedCallback(oldDocument, newDocument) {
@@ -25,15 +24,10 @@ class MyMyAccountComponent extends HTMLElement {
 	}
 	/* DATA */
 	get account() {
-		return this._account
-	}
-	set account(val) {
-		if(val) {
-			this._account = val
-		}
-		else {
-			delete this._account
-		}
+		if(window.portfolio && window.portfolio.session)
+			return window.portfolio.session.user;
+		else 
+			return null
 	}
 	/* INTERNAL FUNCIONS */
 	_createPassword() {
@@ -56,8 +50,8 @@ class MyMyAccountComponent extends HTMLElement {
 					}
 				}
 			}
-			client.open('POST', API_SERVER_ADDRESS()+'/account/create-password');
-			client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+			client.open('POST', window.portfolio.getApiServerAddress+'/account/create-password');
+			client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
 			client.setRequestHeader("Content-Type", "application/json");
 			client.send(JSON.stringify(data));
 		}
@@ -83,8 +77,8 @@ class MyMyAccountComponent extends HTMLElement {
 					}
 				}
 			}
-			client.open('POST', API_SERVER_ADDRESS()+'/account/reset-password');
-			client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+			client.open('POST', window.portfolio.getApiServerAddress+'/account/reset-password');
+			client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
 			client.setRequestHeader("Content-Type", "application/json");
 			var data = {}
 			data.oldPassword = oldPassword
@@ -110,7 +104,7 @@ class MyMyAccountComponent extends HTMLElement {
 			}
 		}
 		client.open('POST', API_SERVER_ADDRESS()+'/account/edit-details');
-		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
+		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.account._id;
@@ -121,150 +115,151 @@ class MyMyAccountComponent extends HTMLElement {
 	}
 	_redrawShadowRootDOM() {
 		const component = this;
-		this.shadowRoot.innerHTML = `
-			<div>
-	        	<button id='edit-details-toggle' name='Edit Account Details'>Edit Account Details</button>
-	        </div>
-	        <div>
-			<form id='edit-details-form' action='' class='hidden'>
-				<table>
-					<tr>
-						<td><label for="email">Email</label></td>
-						<td><input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld" value="${this.account.email}" required></td>
-					</tr>
-					<tr>
-						<td><label for="name-first">First Name</label></td>
-						<td><input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John" value="${this.account.nameFirst}" required></td>
-					</tr>
-					<tr>
-						<td><label for="name-last">Last Name</label></td>
-						<td><input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe" value="${this.account.nameLast}" required></td>
-					</tr>
-				</table>
-	            <div>
-	                <input class="submit" type="submit">
-	            </div>
-			</form>
-			<div>
-				<button id='password-reset-toggle' name='Reset Password'>Reset Password</button>
-			</div>
-			<form id='password-reset-form' action='' class='hidden'>
-				<table>
-					<tr>
-						<td><label for="oldPassword">Old Password</label></td>
-						<td><input class="old-password" id="old-password" type="password" name="oldPassword" placeholder="Old password.." required></td>
-					</tr>
-					<tr>
-						<td><label for="newPassword">New Password</label></td>
-						<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.." ></td>
-					</tr>
-					<tr>
-						<td><label for="newPasswordRetyped">New Password Retyped</label></td>
-						<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.." required></td>
-					</tr>
-				</table>
-	            <div>
-	                <input class="submit" type="submit">
-	            </div>
-			</form>
-			<div>
-				<button id='password-create-toggle' name='Create Password'>Create Password</button>
-			</div>
-			<form id='password-create-form' action='' class='hidden'>
-				<table>
-					<tr>
-						<td><label for="newPassword">New Password</label></td>
-						<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.." required></td>
-					</tr>
-					<tr>
-						<td><label for="newPasswordRetyped">New Password Retyped</label></td>
-						<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.." required></td>
-					</tr>
-				</table>
-	            <div>
-	                <input class="submit" type="submit">
-	            </div>
-			</form>
-			<div>
-				<button id='link-facebook-button' name='Link Facebook'>Link Facebook</button>
-			</div>
-			<div>
-				<button id='link-google-button' name='Link Google Account'>Link Google Account</button>
-			</div>
-			<div>
-				<button id='delete-account-button' name='Delete Account'>Delete Account</button>
-			</div>
-			<style>
-				label {
-					font: bold 15px Verdana, sans-serif;
-					color: black;
+		if(this.account) {
+			this.shadowRoot.innerHTML = `
+				<div>
+		        	<button id='edit-details-toggle' name='Edit Account Details'>Edit Account Details</button>
+		        </div>
+		        <div>
+				<form id='edit-details-form' action='' class='hidden'>
+					<table>
+						<tr>
+							<td><label for="email">Email</label></td>
+							<td><input class="email" id="email" type="email" name="email" placeholder="local-part@sldomain.tld" value="${this.account.email}" required></td>
+						</tr>
+						<tr>
+							<td><label for="name-first">First Name</label></td>
+							<td><input class="name-first" id="name-first" type="name" name="nameFirst" placeholder="John" value="${this.account.nameFirst}" required></td>
+						</tr>
+						<tr>
+							<td><label for="name-last">Last Name</label></td>
+							<td><input class="name-last" id="name-last" type="name" name="nameLast" placeholder="Doe" value="${this.account.nameLast}" required></td>
+						</tr>
+					</table>
+		            <div>
+		                <input class="submit" type="submit">
+		            </div>
+				</form>
+				<div>
+					<button id='password-reset-toggle' name='Reset Password'>Reset Password</button>
+				</div>
+				<form id='password-reset-form' action='' class='hidden'>
+					<table>
+						<tr>
+							<td><label for="oldPassword">Old Password</label></td>
+							<td><input class="old-password" id="old-password" type="password" name="oldPassword" placeholder="Old password.." required></td>
+						</tr>
+						<tr>
+							<td><label for="newPassword">New Password</label></td>
+							<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.." ></td>
+						</tr>
+						<tr>
+							<td><label for="newPasswordRetyped">New Password Retyped</label></td>
+							<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.." required></td>
+						</tr>
+					</table>
+		            <div>
+		                <input class="submit" type="submit">
+		            </div>
+				</form>
+				<div>
+					<button id='password-create-toggle' name='Create Password'>Create Password</button>
+				</div>
+				<form id='password-create-form' action='' class='hidden'>
+					<table>
+						<tr>
+							<td><label for="newPassword">New Password</label></td>
+							<td><input class="new-password" id="new-password" type="password" name="newPassword" placeholder="New password.." required></td>
+						</tr>
+						<tr>
+							<td><label for="newPasswordRetyped">New Password Retyped</label></td>
+							<td><input class="new-password-retyped" id="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.." required></td>
+						</tr>
+					</table>
+		            <div>
+		                <input class="submit" type="submit">
+		            </div>
+				</form>
+				<div>
+					<button id='link-facebook-button' name='Link Facebook'>Link Facebook</button>
+				</div>
+				<div>
+					<button id='link-google-button' name='Link Google Account'>Link Google Account</button>
+				</div>
+				<div>
+					<button id='delete-account-button' name='Delete Account'>Delete Account</button>
+				</div>
+				<style>
+					label {
+						font: bold 15px Verdana, sans-serif;
+						color: black;
+					}
+					.hidden {
+						display: none;
+					}
+					.disabled {
+						color: grey;
+						pointer-events: none;
+					}
+					.active {
+						color: green;
+					}
+				</style>
+			`;
+			const editDetailsToggle = this.shadowRoot.querySelector('#edit-details-toggle')
+			const editDetailsForm = this.shadowRoot.querySelector('#edit-details-form')
+			const passwordResetToggle = this.shadowRoot.querySelector('#password-reset-toggle')
+			const passwordResetForm = this.shadowRoot.querySelector('#password-reset-form')
+			const passwordCreateToggle = this.shadowRoot.querySelector('#password-create-toggle')
+			const passwordCreateForm = this.shadowRoot.querySelector('#password-create-form')
+			const linkFacebookButton = this.shadowRoot.querySelector('#link-facebook-button')
+			const linkGoogleButton = this.shadowRoot.querySelector('#link-google-button')
+			const deleteAccountButton = this.shadowRoot.querySelector('#delete-account-button')
+			
+			editDetailsToggle.addEventListener('click', function(event) {
+				if(!editDetailsToggle.classList.contains('disabled')) {
+					editDetailsToggle.classList.toggle('active')
+					editDetailsForm.classList.toggle('hidden')
 				}
-				.hidden {
-					display: none;
+			});
+			passwordResetToggle.addEventListener('click', function(event) {
+				if(!passwordResetToggle.classList.contains('disabled')) {
+					passwordResetToggle.classList.toggle('active')
+					passwordResetForm.classList.toggle('hidden')
 				}
-				.disabled {
-					color: grey;
-					pointer-events: none;
+			});
+			passwordCreateToggle.addEventListener('click', function(event) {
+				if(!passwordCreateToggle.classList.contains('disabled')) {
+					passwordCreateToggle.classList.contains('disabled')
+					passwordCreateForm.classList.toggle('hidden')
 				}
-				.active {
-					color: green;
-				}
-			</style>
-		`;
-		const editDetailsToggle = this.shadowRoot.querySelector('#edit-details-toggle')
-		const editDetailsForm = this.shadowRoot.querySelector('#edit-details-form')
-		const passwordResetToggle = this.shadowRoot.querySelector('#password-reset-toggle')
-		const passwordResetForm = this.shadowRoot.querySelector('#password-reset-form')
-		const passwordCreateToggle = this.shadowRoot.querySelector('#password-create-toggle')
-		const passwordCreateForm = this.shadowRoot.querySelector('#password-create-form')
-		const linkFacebookButton = this.shadowRoot.querySelector('#link-facebook-button')
-		const linkGoogleButton = this.shadowRoot.querySelector('#link-google-button')
-		const deleteAccountButton = this.shadowRoot.querySelector('#delete-account-button')
-		
-		editDetailsToggle.addEventListener('click', function(event) {
-			if(!editDetailsToggle.classList.contains('disabled')) {
-				editDetailsToggle.classList.toggle('active')
-				editDetailsForm.classList.toggle('hidden')
+			});
+			linkFacebookButton.addEventListener('click', function(event) {
+				component._linkFacebook.call(component);
+			});
+			linkGoogleButton.addEventListener('click', function(event) {
+				component._linkGoogle.call(component);
+			});
+			deleteAccountButton.addEventListener('click', function(event) {
+				component._deleteAccount.call(component);
+			});
+			passwordResetForm.addEventListener('submit', function(event) {
+				event.preventDefault();
+				component._resetPassword.call(component);
+			});
+			passwordCreateForm.addEventListener('submit', function(event) {
+				event.preventDefault();
+				component._createPassword.call(component);
+			});
+			editDetailsForm.addEventListener('submit', function(event) {
+				event.preventDefault();
+				component._editDetails.call(component);
+			});
+			// Apply Styling
+			if(this.account.facebookProfileID) {
+				linkFacebookButton.classList.add('hidden')
 			}
-		});
-		passwordResetToggle.addEventListener('click', function(event) {
-			if(!passwordResetToggle.classList.contains('disabled')) {
-				passwordResetToggle.classList.toggle('active')
-				passwordResetForm.classList.toggle('hidden')
-			}
-		});
-		passwordCreateToggle.addEventListener('click', function(event) {
-			if(!passwordCreateToggle.classList.contains('disabled')) {
-				passwordCreateToggle.classList.contains('disabled')
-				passwordCreateForm.classList.toggle('hidden')
-			}
-		});
-		linkFacebookButton.addEventListener('click', function(event) {
-			component._linkFacebook.call(component);
-		});
-		linkGoogleButton.addEventListener('click', function(event) {
-			component._linkGoogle.call(component);
-		});
-		deleteAccountButton.addEventListener('click', function(event) {
-			component._deleteAccount.call(component);
-		});
-		passwordResetForm.addEventListener('submit', function(event) {
-			event.preventDefault();
-			component._resetPassword.call(component);
-		});
-		passwordCreateForm.addEventListener('submit', function(event) {
-			event.preventDefault();
-			component._createPassword.call(component);
-		});
-		editDetailsForm.addEventListener('submit', function(event) {
-			event.preventDefault();
-			component._editDetails.call(component);
-		});
-		// Apply Styling
-		if(this.account.facebookProfileID) {
-			linkFacebookButton.classList.add('hidden')
 		}
 	}
 }
-
-
+window.customElements.define('my-account', MyMyAccountComponent)
