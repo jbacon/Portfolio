@@ -2,10 +2,11 @@ class MyCommentComponent extends HTMLElement {
 	// Add Listeners, innerHTML, styling, etc...
 	constructor() {
 		super();
+		this.attachShadow({ mode: "open" });
 		this._comment = {};
 		this._currentUserID = null;
 		this._isAdmin = false;
-		this.attachShadow({ mode: "open" });
+		this._redrawShadowRootDOM()
 	}
 	static get observedAttributes() { return [ 'comment', 'currentUserID', 'isAdmin' ]; };
 	// Respond to attribute changes...
@@ -25,7 +26,7 @@ class MyCommentComponent extends HTMLElement {
 	}
 	// Removed from a document
 	disconnectedCallback() {
-		super.disconnectedCallback();
+		// super.disconnectedCallback();
 	}
 	// Called when an attribute is changed, appended, removed, or replaced on the element
 	connectedCallback() {
@@ -97,8 +98,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', window.portfolio.getApiServerAddress+'/comments/create');
-		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
+		client.open('POST', window.portfolio.apiServerAddress+'/comments/create');
+		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var jsonData = {}
 		for(var i = 0; i < event.target.length - 1; i++) {
@@ -121,8 +122,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', window.portfolio.getApiServerAddress+'/comments/remove');
-		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
+		client.open('POST', window.portfolio.apiServerAddress+'/comments/remove');
+		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.comment._id || null;
@@ -143,8 +144,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', window.portfolio.getApiServerAddress+'/comments/flag');
-		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
+		client.open('POST', window.portfolio.apiServerAddress+'/comments/flag');
+		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.comment._id || null;
@@ -166,8 +167,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', window.portfolio.getApiServerAddress+'/comments/up-vote');
-		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
+		client.open('POST', window.portfolio.apiServerAddress+'/comments/up-vote');
+		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.comment._id || null;
@@ -189,8 +190,8 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', window.portfolio.getApiServerAddress+'/comments/down-vote');
-		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
+		client.open('POST', window.portfolio.apiServerAddress+'/comments/down-vote');
+		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.comment._id || null;
@@ -227,7 +228,7 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('GET', window.portfolio.getApiServerAddress+'/comments/read?data='+encodedQuery);
+		client.open('GET', window.portfolio.apiServerAddress+'/comments/read?data='+encodedQuery);
 		client.send();
 	}
 	_loadMoreReplies(callback) {
@@ -265,7 +266,7 @@ class MyCommentComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('GET', window.portfolio.getApiServerAddress+'/comments/read?data='+encodedQuery);
+		client.open('GET', window.portfolio.apiServerAddress+'/comments/read?data='+encodedQuery);
 		client.send();
 	}
 	_redrawShadowRootDOM() {

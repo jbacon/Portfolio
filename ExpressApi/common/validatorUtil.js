@@ -12,7 +12,12 @@ exports.isValidNull = function(val) {
 	}
 }
 exports.normalizeNull = function(val) {
-	if(val === undefined || val === null || val === '' || val === "" || val === 'null' || val === 'undefined')
+	if(val === undefined 
+		|| val === null
+		|| val === ''
+		|| val === ""
+		|| val === 'null' 
+		|| val === 'undefined')
 		return null
 	throw new CustomError('Value ('+val+') can not be converted to null')
 }
@@ -67,9 +72,5 @@ exports.isValidDate = function(val, { allowNullable=false }={}) {
 exports.normalizeDate = function(val, { allowNullable=false }={}) {
 	if(allowNullable === true && exports.isValidNull(val))
 		return exports.normalizeNull(val)
-	else if(val instanceof Date)
-		return val
-	else if(Date.parse(val))
-		return Date.parse(val);
-	throw new CustomError('Value ('+val+') can not be converted to Date')
+	return new Date(val)
 }

@@ -36,8 +36,12 @@ else
 cat <<-EOF | tee ${DIR}/nginx.conf
 server {
     listen 8080;
-    server_name 127.0.0.1;
+    server_name localhost;
     location / {
+	    add_header 'Access-Control-Allow-Origin' "$http_origin";
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Mx-ReqToken,X-Requested-With';
         proxy_pass http://${NODE_CONTAINER_IP}:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
@@ -80,6 +84,7 @@ if [ "${ENVIRONMENT}" != "production" ]; then
 	    server_name localhost;
 	    location / {
 		    alias /StaticSite/;
+		    try_files \$uri /index.html;
 		    gzip_static on;
 		    expires max;
 		    add_header Cache-Control public;

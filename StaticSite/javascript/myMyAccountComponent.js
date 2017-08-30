@@ -24,8 +24,8 @@ class MyMyAccountComponent extends HTMLElement {
 	}
 	/* DATA */
 	get account() {
-		if(window.portfolio && window.portfolio.session)
-			return window.portfolio.session.user;
+		if(window.localStorage.token)
+			return window.portfolio.token.payload.data.user;
 		else 
 			return null
 	}
@@ -50,8 +50,8 @@ class MyMyAccountComponent extends HTMLElement {
 					}
 				}
 			}
-			client.open('POST', window.portfolio.getApiServerAddress+'/account/create-password');
-			client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
+			client.open('POST', window.portfolio.apiServerAddress+'/account/create-password');
+			client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 			client.setRequestHeader("Content-Type", "application/json");
 			client.send(JSON.stringify(data));
 		}
@@ -77,8 +77,8 @@ class MyMyAccountComponent extends HTMLElement {
 					}
 				}
 			}
-			client.open('POST', window.portfolio.getApiServerAddress+'/account/reset-password');
-			client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
+			client.open('POST', window.portfolio.apiServerAddress+'/account/reset-password');
+			client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 			client.setRequestHeader("Content-Type", "application/json");
 			var data = {}
 			data.oldPassword = oldPassword
@@ -103,8 +103,8 @@ class MyMyAccountComponent extends HTMLElement {
 				}
 			}
 		}
-		client.open('POST', API_SERVER_ADDRESS()+'/account/edit-details');
-		client.setRequestHeader("Authorization", "Bearer "+window.portfolio.session.token);
+		client.open('POST', window.portfolio.apiServerAddress+'/account/edit-details');
+		client.setRequestHeader("Authorization", "Bearer "+window.localStorage.token);
 		client.setRequestHeader("Content-Type", "application/json");
 		var data = {}
 		data._id = this.account._id;
@@ -120,7 +120,6 @@ class MyMyAccountComponent extends HTMLElement {
 				<div>
 		        	<button id='edit-details-toggle' name='Edit Account Details'>Edit Account Details</button>
 		        </div>
-		        <div>
 				<form id='edit-details-form' action='' class='hidden'>
 					<table>
 						<tr>
@@ -190,6 +189,12 @@ class MyMyAccountComponent extends HTMLElement {
 					<button id='delete-account-button' name='Delete Account'>Delete Account</button>
 				</div>
 				<style>
+					:host {
+						display: block;
+						text-align: left;
+						vertical-align: top;
+						color: black;
+					}
 					label {
 						font: bold 15px Verdana, sans-serif;
 						color: black;

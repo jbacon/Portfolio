@@ -4,23 +4,23 @@ var Account = require('../model/accounts');
 var bcrypt = require('bcryptjs');
 var CustomError = require('../common/errorUtil');
 var emailUtil = require('../common/emailUtil');
+var configUtil = require('../common/configUtil');
 var router = express.Router();
 
-/* Register w/ Local Credentials */
+/* Registration request - Sends an email to the specified address w/ a registration link containing a temporary verification token. */
 router.post('/register/request', (req, res, next) => {
 	try {
 		req.body.passwordHashAndSalt = bcrypt.hashSync(req.body.password, 10);
 		req.body.password = undefined
 		const newAccount = new Account(req.body)
 	    const token = authUtil.createJwt(newAccount.toJSON())
-		const hashFragmentString = 'token='+token
-		// Send email to 
+	    const queryString = 'token='+encodeURIComponent(token)
 		const email = new emailUtil.Email({
-			to: emailAddress,
+			to: newAccount.email,
 			from: 'aegairsoft1@gmail.com',
 			subject: 'Password Reset',
 			text: undefined,
-			html: '<p>This is an automated Email.</br>Thank you for registering an account with my Portfolio web app! To complete registration please visit the temporary link below (which will verify your email and activate your account!).</br>https://portfolio.joshbacon.name/#registration-callback?'+hashFragmentString+'<p>'
+			html: '<p>This is an automated Email.</br>Thank you for registering an account with my Portfolio web app! To complete registration please visit the temporary link below (which will verify your email and activate your account!).</br>'+configUtil.siteUrl+((configUtil.sitePort) ? ':'+configUtil.sitePort : '')+'/auth/register/callback?'+queryString+'<p>'
 		});
 		emailUtil.sendEmail(email, (error) => {
 			if(error) {
@@ -35,16 +35,15 @@ router.post('/register/request', (req, res, next) => {
 		return next(err)
 	}
 });
+/* Registration Callback - Verify the registration token to complete registration process and create the user account. */
 router.get('/register/callback', (req, res, next) => {
 	try {
 		const decodedToken = authUtil.decodeToken(req.query.token)
 		const newAccount = new Account(decodedToken.data)
 		Account.create({ account: newAccount })
 		.then((account) => {
-			const tokenDetails = authUtil.createJwt(account.toJSON())
-			const token = tokenDetails.token
-			const expiration = tokenDetails.expiration
-		    res.json({ token: token, expiration: expiration, user: account.toJSON() })
+			req.query.token = authUtil.createJwt(account.toJSON())
+			verifyAndSendToken(req, res, next)
 		})
 		.catch((err) => {
 			next(err)
@@ -53,36 +52,27 @@ router.get('/register/callback', (req, res, next) => {
 	catch(err) {
 		next(err)
 	}
-})
-/* Authenticate w/ Local Credentials */
-router.get('/local/token', 
+});
+/* Authenticate w/ Local Credentials - Exchange valid credentials for a local authentication token.  */
+router.get('/local/credentials', 
 	authUtil.getPassport().authenticate('local'),
 	(req, res, next) => {
-		const tokenDetails = authUtil.createJwt(req.user.toJSON())
-		const token = tokenDetails.token
-		const expiration = tokenDetails.expiration
-	    res.json({ token: token, expiration: expiration, user: req.user.toJSON() })
+		req.query.token = authUtil.createJwt(req.user.toJSON())
+		verifyAndSendToken(req, res, next)
 });
-/* Authenticate w/ Facebook Token*/
+/* Verify Local JWT and send back to user if valid. */
+router.get('/local/token', (req, res, next) => {
+	verifyAndSendToken(req, res, next)
+});
+/* Authenticate w/ Facebook Token - Verify Facebook Token and exchange for a Local Authentication Token. */
 router.get('/facebook/token',
 	authUtil.getPassport().authenticate('facebook', { scope: 'email'}),
 	(req, res, next) => {
-		const tokenDetails = authUtil.createJwt(req.user.toJSON())
-		const token = tokenDetails.token
-		const expiration = tokenDetails.expiration
-	    res.json({ token: token, expiration: expiration, user: req.user.toJSON() })
+		req.query.token = authUtil.createJwt(req.user.toJSON())
+		verifyAndSendToken(req, res, next)
 });
-router.get('/email/token', (req, res, next) => {
-	try {
-		const decodedToken = authUtil.decodeToken(req.query.token)
-    	res.json({ token: req.query.token, exp: decodedToken.expiration, user: decodedToken.data })
-	}
-	catch(err) {
-		next(err)
-	}
-});
-/* Forgot Password */
-router.get('/email/request', (req, res, next) => {
+/* Request PasswordReset Email - Send email to specified address including a link w/ a temporary passwordreset token.*/
+router.post('/email/request', (req, res, next) => {
 	// Send Email
 	Account.read(
 	{
@@ -94,14 +84,14 @@ router.get('/email/request', (req, res, next) => {
 		switch(accounts.length) {
 		  case 1: // FOUND
 		    const account = new Account(accounts[0]);
-		    const token = authUtil.createJwt(account.toJSON())
-			var hashFragmentString = 'email_token='+token
+		    const tokenString = JSON.stringify(jwt.token)
+		    const queryString = 'token='+encodeURIComponent(tokenString)+'&expiration='+encodeURIComponent(jwt.expiration)
 			var email = new emailUtil.Email({
 				to: emailAddress,
 				from: 'aegairsoft1@gmail.com',
-				subject: 'Password Reset',
+				subject: 'Forgot Password',
 				text: undefined,
-				html: '<p>This is an automated Email.</br>A password reset was requested for your account on my site (https://portfoio.joshbacon.name).</br>Use the following temporary link to access your account: https://portfolio.joshbacon.name/#forgot-password-callback?'+hashFragmentString+'.</br>To permanently reset your password navigate to the "My Account" page.</p>'
+				html: '<p>This is an automated Email.</br>A forgot password request was sent for your account on my site ('+configUtil.serverUrl+').</br>Use the following temporary link to access your account: '+configUtil.siteUrl+((configUtil.sitePort) ? ':'+configUtil.sitePort : '')+'/auth/email/callback?'+queryString+'.</br>To permanently reset your password navigate to "Account" page.</p>'
 			});
 			emailUtil.sendEmail(email, (error) => {
 				if(error) {
@@ -123,5 +113,34 @@ router.get('/email/request', (req, res, next) => {
 		next(err)
 	});
 });
+/* Password Reset Email Callback - Verify passwordreset token and send email with new password*/
+router.get('/email/callback', (req, res, next) => {
+	try {
+		const decodedToken = authUtil.decodeToken(req.query.token)
+		const newAccount = new Account(decodedToken.data)
+		Account.create({ account: newAccount })
+		.then((account) => {
+			req.query.token = authUtil.createJwt(account.toJSON())
+			verifyAndSendToken(req, res, next)
+		})
+		.catch((err) => {
+			next(err)
+		});
+	}
+	catch(err) {
+		next(err)
+	}
+});
+function verifyAndSendToken(req, res, next) {
+	try {
+		const decodedToken = authUtil.decodeToken(req.query.token)
+    	res.json({
+    		token: req.query.token
+    	});
+	}
+	catch(err) {
+		next(err)
+	}
+}
 
 module.exports = router;

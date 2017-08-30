@@ -1,0 +1,80 @@
+<template>
+	<form id="register-form" action="">
+        <table>
+            <tr>
+                <td>
+                    <label for="email">Email</label>
+                </td>
+                <td>
+                    <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="name-first">First Name</label>
+                </td>
+                <td>
+                    <input class="name-first" type="name" name="nameFirst" placeholder="John" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="name-last">Last Name</label>
+                </td>
+                <td>
+                    <input class="name-last" type="name" name="nameLast" placeholder="Doe" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="password">Password</label>
+                </td>
+                <td>
+                    <input class="password" type="password" name="password" placeholder="Password.." required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="passwordRetype"></label>
+                </td>
+                <td>
+                    <input class="passwordRetype" type="password" name="passwordRetype" placeholder="Retype password.." required>
+                </td>
+            </tr>
+        </table>
+        <input class="submit" type="submit">
+    </form>
+    <style>
+        #register-form {
+            text-align: left;
+            vertical-align: top;
+        }
+    </style>
+    <script>
+    /* REGISTRATION FORM */
+    const formRegister = document.getElementById('register-form')
+    formRegister.addEventListener('submit', function(event) { 
+        event.preventDefault();
+        const httpClient = new XMLHttpRequest();
+        httpClient.open('POST', window.portfolio.apiServerAddress+'/auth/register/request');
+        httpClient.setRequestHeader("Content-Type", "application/json");
+        httpClient.onreadystatechange = function() {
+            if (this.readyState === XMLHttpRequest.DONE) {
+                const response = JSON.parse(this.response);
+                if(this.status === 200) {
+                    alert('Thanks for registering! To activate your account continue registration steps in the verification email that has been sent to your address.')
+                }
+                else {
+                    handleServerErrorResponse(response)
+                }
+            }
+        }
+        const jsonData = {}
+        for(var i = 0; i < event.target.length - 1; i++) {
+            jsonData[formRegister.elements[i].name] = formRegister.elements[i].value;
+        }
+        const dataString = JSON.stringify(jsonData)
+        httpClient.send(dataString);
+    })
+    </script>
+</template>

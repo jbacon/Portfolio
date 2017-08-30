@@ -1,0 +1,42 @@
+<script src="/javascript/myCarouselComponent.js"></script>
+<template>
+	<my-carousel>
+	    <div slot='slide'>
+	    	<div>
+	    		<img src="/images/Background.jpg">
+	    	</div>
+	    	<div>Sking Trip1 - Crystal Mountain</br>asdfasdfsd</br>asdfasdfsd</div>
+	    </div>
+	    <img slot='slide' src="/images/Background.jpg">
+	    <div slot='slide'>
+	    	<div>
+	    		<img src="/images/Background.jpg">
+	    	</div>
+	    	<div>Sking Trip2 - Crystal Mountain</div>
+	    </div>
+	    <div slot='slide'>
+	    	<h1>This is a long string of text to demonstrate a different type of slide content</h1>
+	    </div>
+	    <div slot='slide'>
+	    	<div>
+	    		<img src="/images/Background.jpg">
+	    	</div>
+	    	<div>Sking Trip3 - Crystal Mountain</div>
+	    </div>
+	    <div slot='slide'>
+	    	<div>
+	    		<img src="/images/Background.jpg">
+	    	</div>
+	    	<div>Sking Trip4 - Crystal Mountain</div>
+	    </div>
+	</my-carousel>
+	<style>
+	my-carousel {
+		width: 100%;
+		height: 600px;
+	}
+	img {
+		width: 100%;
+	}
+	</style>
+</template>

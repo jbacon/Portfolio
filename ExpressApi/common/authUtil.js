@@ -41,7 +41,7 @@ exports.createJwt = function(data) {
       data: data
     },
     commonConfig.jwtSecret);
-  return { token: token, expiration: expiration };
+  return token;
 }
 exports.ensureAdmin = function(req, res, next) {
   if(req.user.email === commonConfig.adminEmail) {
@@ -88,7 +88,7 @@ passport.use('jwt', new JwtStrategy(
     jwtFromRequest: exports.extractJwt
   },
   (req, jwt_payload, next) => {
-    // Technically not necessary to verify credentials here.
+    // payload contains entire account data.
     // If this function is reach it is already implied that
     // the user is authenticated via a valid signed token found in the auth header.
     var user = new Account(jwt_payload.data);
@@ -123,7 +123,7 @@ passport.use('local', new LocalStrategy(
               }
             }
             else {
-              next(new CustomError('This account was registered via an external Social Media service, either login using with the appropriate method (then link your social account with a local password).', 401));
+              next(new CustomError('This account was registered via an external Social Media service, login using with the appropriate social account and then create separate/new login credentials for your account.', 401));
               // next(null, false, new CustomError('This account was registered via an external Social Media service, either login using with the appropriate method (then link your social account with a local password).', 401))
             }
             break;
@@ -206,7 +206,7 @@ passport.use('facebook', new FacebookTokenStrategy({
                 }
                 else {
                   // Email mismatch between System and Facebook... Weird error!
-                  next(new CustomError('This facebook profile matches an ID in the backend, but the email on record does not match!', 500))
+                  next(new CustomError('This facebook profile matches an existing profile ID, but the email on record does not match! Contact server admin', 500))
                 }
               }
             }
@@ -228,7 +228,7 @@ passport.use('facebook', new FacebookTokenStrategy({
             });
             break;
           default: // ERROR!!! Too many matches...
-            next(new CustomError('This facebook profile seems to match multiple accounts this system, which should never be the case!', 500))
+            next(new CustomError('This facebook profile seems to match multiple accounts this system, which should never be the case! Contact server admin', 500))
             break;
         }
       }

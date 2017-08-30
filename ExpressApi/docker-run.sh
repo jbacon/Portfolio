@@ -21,11 +21,11 @@ docker run \
 --volume ${DIR}/:/app/ \
 --expose 3000 \
 $(if [ "${ENVIRONMENT}" = "production" ]; then
-	echo '--env CONFIG_FILE=./configs-prod.json '
+	echo '--env PORTFOLIO_CONFIG_FILE=./configs-prod.json '
 else
-	echo '--publish 9229:9229 --env CONFIG_FILE=./configs-dev.json '
+	echo '--publish 9229:9229 --env PORTFOLIO_CONFIG_FILE=./configs-dev.json '
 fi) \
---env MONGODB_URL='mongodb://'${MONGOD_CONTAINER_IP}':27017/portfolio' \
+--env PORTFOLIO_MONGODB_URL='mongodb://'${MONGOD_CONTAINER_IP}':27017/portfolio' \
 --env HTTP_PROXY=${HTTP_PROXY} \
 --env HTTPS_PROXY=${HTTPS_PROXY} \
 --env http_proxy=${http_proxy} \

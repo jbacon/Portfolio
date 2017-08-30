@@ -2,152 +2,61 @@
 <html>
 <head>
     <title>Josh Bacon</title>
-    <script src="javascript/mySessionManager.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="https://connect.facebook.net/en_US/sdk.js" async defer></script>
-    <script src="javascript/myGlobal.js" async defer></script>
-    <script src="javascript/myMyAccountComponent.js"></script>
-    <script src="javascript/myCommentComponent.js"></script>
-    <script src="javascript/myDialogButtonComponent.js"></script>
+    <script src="/javascript/myGlobal.js" async defer></script>
+    <script src="/javascript/myRouter.js" async defer></script>
+    <script src="/javascript/myRoutes.js" async defer></script>
+    <script src="/javascript/libraries/webcomponents-lite.js"></script>
+    <script src="/javascript/myCommentComponent.js"></script>
+    <script src="/javascript/myDialogButtonComponent.js"></script>
     <link rel="stylesheet" href="/stylesheets/layout.css">
-    <link rel="stylesheet" href="/stylesheets/login.css">
-    <link rel="stylesheet" href="/stylesheets/register.css">
-    <link rel="stylesheet" href="/stylesheets/modal-window.css">
+    <link rel="stylesheet" href="/stylesheets/transitions.css">
+    <link rel="stylesheet" href="/stylesheets/styling.css">
 </head>
 <body>
+    <img id='background-img' src='/images/Background.jpg'/>
     <header id="site-header">
-        <h1 id="site-title">Josh Bacon - Software Engineer</h1>
-        <nav id="site-nav-bar">
-            <my-dialog-button id='register-nav-item' class="nav-item clickable">
-                <a slot="open">Register</a>
-                <form slot='content' id="register-form" action="">
-                    <table>
-                        <tr>
-                            <td>
-                                <label for="email">Email</label>
-                            </td>
-                            <td>
-                                <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="name-first">First Name</label>
-                            </td>
-                            <td>
-                                <input class="name-first" type="name" name="nameFirst" placeholder="John" required>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="name-last">Last Name</label>
-                            </td>
-                            <td>
-                                <input class="name-last" type="name" name="nameLast" placeholder="Doe" required>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="password">Password</label>
-                            </td>
-                            <td>
-                                <input class="password" type="password" name="password" placeholder="Password.." required>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="passwordRetype"></label>
-                            </td>
-                            <td>
-                                <input class="passwordRetype" type="password" name="passwordRetype" placeholder="Retype password.." required>
-                            </td>
-                        </tr>
-                    </table>
-                    <input class="submit" type="submit">
-                </form>
+        <p id="site-title" onclick='router.navigate("/")' class="clickable">Josh Bacon</br>Software</br>Developer /</br>Engineer</p>
+        <nav id="user-bar">
+            <a id="greeting" onclick='router.navigate("/greeting")' class="nav-item hidden">Hello</a>
+            <my-dialog-button id='account' class="nav-item hidden">
+                <a slot="open" onclick='router.navigate("/account")' class='clickable' >Account</a>
+                <div slot='content'></div>
             </my-dialog-button>
-            <my-dialog-button id='login-nav-item' class="nav-item clickable">
-                <a slot="open">Login</a>
-                <div slot="content">
-                    <form id="login-form-local" action="">
-                        <table>
-                            <tr>
-                                <td>
-                                    <label for="email">Email</label>
-                                </td>
-                                <td>
-                                    <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label for="password">Password</label>
-                                </td>
-                                <td>
-                                    <input class="password" type="password" name="password" placeholder="Password.." required>
-                                </td>
-                            </tr>
-                        </table>
-                        <input class="submit" type="submit" value="Login">
-                    </form>
-                    <my-dialog-button>
-                        <button slot="open">Forgot Password?</button>
-                        <form slot='content' id="forgot-password-form" action="">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <label for="email">Email</label>
-                                    </td>
-                                    <td>
-                                        <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
-                                    </td>
-                                </tr>
-                            </table>
-                            <input class="submit" type="submit" href="#" value="Submit">
-                        </form>
-                    </my-dialog-button>
-                    <form id="login-form-facebook" class='hidden' action="">
-                        <input class="submit" type="submit" name="Facebook" value="Facebook Login">
-                    </form>
-                    <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" onlogin="fbCheckLoginStatus();"></div>
-                    <fb:login-button scope="public_profile,email" onlogin="fbCheckLoginStatus();" class='hidden'></fb:login-button>
-                    <div id="status"></div>
-                    <form id="login-form-google" action="">
-                        <input class="submit" type="submit" name="Google" value="Google Login">
-                    </form>
-                </div>
+            <a id="logout" onclick='router.navigate("/logout")' class='nav-item clickable hidden'>Logout</a>
+            <my-dialog-button id='login' class="nav-item" >
+                <a slot="open" onclick='router.navigate("/login")' class='clickable'>Login</a>
+                <div slot="content"></div>
             </my-dialog-button>
-            <a id="logout-nav-item" class="logout-link hidden clickable">Logout</a>
-            <my-dialog-button id='account-nav-item' class="nav-item clickable hidden">
-                <a slot="open">Account</a>
-                <my-account slot='content'></my-account>
+            <my-dialog-button id='register' class='nav-item'>
+                <a slot="open" onclick='router.navigate("/register")' class='clickable'>Register</a>
+                <div slot='content'></div>
             </my-dialog-button>
-            <a id="greeting-nav-item" class="hidden clickable">Hello</a>
         </nav>
     </header>
     <main>
         <nav id="main-menu">
-            <div>About Me</div>
-            <div>Articles</div>
-            <div>Photos</div>
-            <div>Contact</div>
+            <span id='about-me' onclick='router.navigate("/about-me")' class='menu-item backdrop clickable'>About Me</span>
+            <span id='articles' onclick='router.navigate("/articles")' class='menu-item backdrop clickable'>Articles</span>
+            <span id='photos' onclick='router.navigate("/photo-gallery")' class='menu-item backdrop clickable'>Photos</span>
+            <span id='contact' onclick='router.navigate("/contact-me")' class='menu-item backdrop clickable'>Contact</span>
         </nav>
-        <section id="main-section">
+        <section id="main-section" class='backdrop'>
             <header id="main-header">
                 <article id="article-header" data-article-id="59344c18e987af001c119f93">Welcome!</article>
             </header>
-            <div id="main-content">
-                <p id="article-content"> Hello! I'm Josh Bacon and you've entered my personal web app portfolio! Please explore my site, I'd love to share my passion for technology with you! You're invite to read through my articles, visit my social profiles, identify yourself via Facebook authentication, and/or provide any feedback you'd like in the below comment sections (no vulgarity please). Creating this app was great fun, and I hope you find it interesting. Behind-the-scenes is M.E..N technology stack.. MongoDB, ExpressJS, and the NodeJS runtime. I chose to ignore front-end frameworks for this project so I could focus on improving my understanding of native DOM manipulation and VanillaJS (Although I also would have enjoyed learning ReactJS for a more robust production application!). Hosting/Infrastructure for my site is backed entirely on my personal AWS account. From domain registration (R53), to DNS resolution (R53), certification management (ACM), and AWS EC2. Other technologies used include: Docker, PugJS templating engine, JSPM, NPM, CSS... Please Email me if you have any questions or interest in further discussions. Thanks for stopping by!</p>
+             <div id="main-content">
             </div>
-            <footer id="main-footer" class="hidden">
-                <section id="actions"><span class="clickable">Share</span><span class="clickable">Print</span><span class="clickable">Contact</span></section>
-            </footer>
         </section>
+        <footer id="main-footer" class="backdrop">
+            <article id="comments">
+                <my-comment id='comment-placeholder' comment="{&quot;_id&quot;:null,&quot;accountID&quot;:null,&quot;articleID&quot;:&quot;59344c18e987af001c119f93&quot;,&quot;parentCommentID&quot;:null,&quot;upVoteAccountIDs&quot;:[],&quot;downVoteAccountIDs&quot;:[],&quot;text&quot;:&quot;Comment Section&quot;,&quot;facebookProfileID&quot;:null,&quot;flags&quot;:[],&quot;childCommentIDs&quot;:[&quot;dummy-placeholder&quot;]}" is-admin="false"></my-comment>
+            </article>
+        </footer>
     </main>
     <footer id="site-footer">
-        <article id="comments">
-            <my-comment id='comment-placeholder' comment="{&quot;_id&quot;:null,&quot;accountID&quot;:null,&quot;articleID&quot;:&quot;59344c18e987af001c119f93&quot;,&quot;parentCommentID&quot;:null,&quot;upVoteAccountIDs&quot;:[],&quot;downVoteAccountIDs&quot;:[],&quot;text&quot;:&quot;Comment Section&quot;,&quot;facebookProfileID&quot;:null,&quot;flags&quot;:[],&quot;childCommentIDs&quot;:[&quot;dummy-placeholder&quot;]}" is-admin="false"></my-comment>
-        </article>
+        <section id="actions"><span class="clickable">Share</span><span class="clickable">Print</span><span class="clickable">Contact</span></section>
     </footer>
 </body>
 </html>

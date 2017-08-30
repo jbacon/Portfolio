@@ -3,15 +3,17 @@ class MyDialogButtonComponent extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: "open" });
+		this._refreshShadowRoot()
 	}
 	static get observedAttributes() { return [ ]; };
 	// Respond to attribute changes...
 	attributeChangedCallback(attr, oldValue, newValue, namespace) {
 		// super.attributeChangedCallback(attr, oldValue, newValue, namespace);
+
 	}
 	// Removed from a document
 	disconnectedCallback() {
-		super.disconnectedCallback();
+		// super.disconnectedCallback();
 	}
 	// Called when an attribute is changed, appended, removed, or replaced on the element
 	connectedCallback() {
@@ -22,6 +24,9 @@ class MyDialogButtonComponent extends HTMLElement {
 	adoptedCallback(oldDocument, newDocument) {
 		super.adoptedCallback(oldDocument, newDocument);
 	}
+	get open() {
+		return this.shadowRoot.getElementById('dialog').open
+	}
 	_refreshShadowRoot() {
 		this.shadowRoot.innerHTML = `
 		<slot id='open' name='open'><button>Open</button></slot>
@@ -29,25 +34,34 @@ class MyDialogButtonComponent extends HTMLElement {
 			<slot id='content' name='content'><p>Placeholder Content</p></slot>
 			<button id='close'>Close</button>
 		</dialog>
+		<style>
+		#open::hover {
+			cursor: pointer;
+		}
+		#close {
+			position: relative;
+			top: 0px;
+			right: 0px;
+		}
+		#dialog {
+			top: 0%;
+		}
+		</style>
 		`
 		const dialog = this.shadowRoot.getElementById('dialog')
 		const content = this.shadowRoot.getElementById('content')
 		const close = this.shadowRoot.getElementById('close')
 		const open = this.shadowRoot.getElementById('open')
 		open.addEventListener('click', function(event) {
-			dialog.showModal()
+			if(!dialog.open) {
+				dialog.showModal()
+			}
 		});
 		close.addEventListener('click', function(event) {
-			dialog.close()
+			if(dialog.open) {
+				dialog.close()
+			}
 		});
-		dialog.addEventListener('click', function(event) {
-			var rect = dialog.getBoundingClientRect();
-		    var isInDialog=(rect.top <= event.clientY && event.clientY <= rect.top + rect.height
-		      && rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
-		    if (!isInDialog && dialog.open) {
-		        dialog.close();
-		    }
-		})
 	}
 }
 window.customElements.define('my-dialog-button', MyDialogButtonComponent)

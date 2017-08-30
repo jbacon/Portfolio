@@ -1,6 +1,6 @@
-# PORTFOLIO WEB APP - [https://portfolio.joshbacon.name](http://portfolio.joshbacon.name)
+# MY PORTFOLIO & ENGINEERING HUB - A web application - [https://portfolio.joshbacon.name](http://portfolio.joshbacon.name)
 
-An interactive website built entirely by me, Josh Bacon, for use as an personal engineering portfolio. This hub employs a both a single-page application architecture and static-site architecture, along with a modern technology stack. Static Assets/Pages are hosted on S3/CloudFront where my API is hosted on EC2.
+Built to be a modern, interactive, lightweight/vanilla, single-page, static-asset, server-decoupled, component-driven web application portal. That's a lot of buzz-words. 
 
 Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 
@@ -8,18 +8,18 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 ## BACK-END API: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/)
 ## FRONT-END U.I.: [Static Assets](), [VanillaJS](http://vanilla-js.com/), [Web-Components](https://www.webcomponents.org/introduction)
 
-## TECHNOLOGIES EXPLORED (including deprecated/abandoned tech)
+## TECHNOLOGIES EXPLORED (including proof-of-concept/deprecated/abandoned technologies)
 - Front-End:
 	-Javascript
 	- Document Object Model (DOM) <- Awesome native browser stuff!
 		- Web Components
 		- Shadow DOM Elements
 		- HTML Imports
-	- JQuery (deprecated)
-	- SystemJS (deprecated)
+	- JQuery (deprecated. Reason: Only benefit was increased backwards browser compatability. I'm not concerned.)
+	- SystemJS (deprecated. Reason: Changed project direction to employ more VanillaJS & "static" site characteristics.)
 	- PassportJS
 	- Json Web Tokens
-	- PugJS (deprecated)
+	- PugJS (deprecated. Reason: Old-school server template rendering, replaced with [vanillaJS string templating](https://developers.google.com/web/updates/2015/01/ES6-Template-Strings))
 - Back-End:
 	- NodeJS
 	- ExpressJS
@@ -29,7 +29,7 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 - Databases:
 	- MongoDB
 - Package Managers:
-	- JSPM (deprecated)
+	- JSPM (deprecated.)
 	- NPM
 - Prod Infrastructure:
 	- AWS

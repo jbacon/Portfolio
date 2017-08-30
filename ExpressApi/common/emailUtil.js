@@ -15,14 +15,13 @@ exports.transporter = nodemailer.createTransport({
         user: 'aegairsoft1@gmail.com',
         clientId: commonConfig.googleAppID,
         clientSecret: commonConfig.googleAppSecret,
-        refreshToken: commonConfig.googleRefreshToken,
-        accessToken: commonConfig.googleAccessToken,
-        expires: commonConfig.googleExpires
+        refreshToken: commonConfig.googleGmailRefreshToken,
+        accessToken: commonConfig.googleGmailAccessToken
     }
 });
 exports.sendEmail = function(email, next) {
 	if(email instanceof exports.Email) {
-		transporter.sendMail(mailOptions, (error, info) => {
+		exports.transporter.sendMail(email.toJSON(), (error, info) => {
 		    if (error) {
 		    	next(error)
 		        return console.log(error);
@@ -50,14 +49,14 @@ exports.Email = class Email {
 	}
 	set to(val) {
 		const emails = val.split(', ')
-		const emailsNormalized = ''
-		for(var email in emails) {
-			const emailNormalized = validator.normalizeEmail(email)
+		var emailsNormalized = ''
+		for(var i=0; i < emails.length; i++) {
+			const emailNormalized = validator.normalizeEmail(emails[i])
 			if(emailsNormalized) {
-				emailsNormalized = emailNormalized
+				emailsNormalized += emailNormalized
 			}
 			else {
-				emailsNormalized = ', '+emailNormalized
+				emailsNormalized += ', '+emailNormalized
 			}
 		}
 		this._to = emailsNormalized
