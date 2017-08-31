@@ -1,21 +1,66 @@
-# MY PORTFOLIO & ENGINEERING HUB - A web application - [https://portfolio.joshbacon.name](http://portfolio.joshbacon.name)
+# MY PORTFOLIO & ENGINEERING HUB - A Web Application
+[https://portfolio.joshbacon.name](http://portfolio.joshbacon.name)
 
-Built to be a modern, interactive, lightweight/vanilla, single-page, static-asset, server-decoupled, component-driven web application portal. That's a lot of buzz-words. 
+My personal blog and portfolio web application.
+Built to be an single-page, event-driven, interactive, componentized, vanilla, light-weight web portal.
 
 Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 
-## HOSTING: [AWS](), [EC2](), [S3/CloudFront](), [Docker](), 
-## BACK-END API: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/)
-## FRONT-END U.I.: [Static Assets](), [VanillaJS](http://vanilla-js.com/), [Web-Components](https://www.webcomponents.org/introduction)
+## CORE TECHNOLGOIES:
+	- HOSTING: [AWS](), [S3/CloudFront](), [Docker](), [EC2]()
+	- BACK-END: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/)
+	- FRONT-END: [Web-Components](https://www.webcomponents.org/introduction), [VanillaJS](http://vanilla-js.com/), [HTML](), [CSS]()
 
-## TECHNOLOGIES EXPLORED (including proof-of-concept/deprecated/abandoned technologies)
+## FEATURES IMPLEMENTED:
+1. Authentication Layer
+	- Facebook, Google, Local Credentials
+2. Social Account Integrations
+	- Facebook, Google
+3. Hierachical Comment System (https://docs.mongodb.com/manual/tutorial/model-tree-structures/)
+4. Blog Postings
+5. Photo Gallery
+6. HTTPS
+
+## FUTURE PLANS & CONSIDERATIONS
+- Notifications:
+	- Email Alert User when..
+		- Comment Reply
+		- Comment Voted
+		- New Article
+	- Email Alert Admin when..
+		- New Account
+		- New Comment
+- QueryParameters or HashURL
+- Event Driven Design:
+	- Increase/Improve Event Design Patterns used for U.I. & Server
+- Hosting API Server
+	- Container Orchastration (Kubernetes)
+	- Lambda + API Gateway? (Single Lambda to handle all routes)
+	- EC2 + Docker, easiest to get started, decoupled from platform/service.
+- DBaaS
+	- AWS vs Google Cloud vs EC2 Hosting
+- Visitor Statistics
+	- Page Views
+	- Unique Visitors
+	- Click-Stream Data
+- Class Decorators & Annotations
+	- Dependency Injection on Models
+	- Possible Uses:
+		- RBAC on Fields/Classes/Methods
+		- Conditional logic
+		- Reusable middleware for building data models.
+- Log Injestion Pipeline (ElasticSearch, Filebeat/Logstash, Kibana?)
+	- Ship -> Store -> Query -> Dashboards -> Alerts
+	- Distributed Tracing?
+
+## ALL TECHNOLOGIES EXPLORED (Including proof-of-concept, deprecated, & abandoned...)
 - Front-End:
 	-Javascript
 	- Document Object Model (DOM) <- Awesome native browser stuff!
 		- Web Components
 		- Shadow DOM Elements
 		- HTML Imports
-	- JQuery (deprecated. Reason: Only benefit was increased backwards browser compatability. I'm not concerned.)
+	- JQuery (deprecated. Reason: Only benefit was increased backwards browser compatability, which is not concern of mine.)
 	- SystemJS (deprecated. Reason: Changed project direction to employ more VanillaJS & "static" site characteristics.)
 	- PassportJS
 	- Json Web Tokens
@@ -25,11 +70,11 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 	- ExpressJS
 	- ESLint
 	- PugJS (deprecated)
-	- Winston 
+	- Winston
 - Databases:
-	- MongoDB
+	- MongoDB (Which I would have chose SQL)
 - Package Managers:
-	- JSPM (deprecated.)
+	- JSPM (deprecated. I don't an all purpose JS package manager, VanillaJS is enough on the front-end.)
 	- NPM
 - Prod Infrastructure:
 	- AWS
@@ -41,7 +86,7 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 			- DNS
 			- Domain Registration
 		- ACM (deprecated) <- Could not get this to work.
-		- S3 
+		- S3
 		- CloudFront
 	- LetsEncrypt
 	- Nginx Reverse Proxy Server
@@ -49,45 +94,3 @@ Feel free to email me with any questions! jbacon@zagmail.gonzaga.edu
 	- Dockerized Everything
 	- Nginx Server for Hosting Static Content
 	- Nginx Server for Reverse Proxy in-front of Node API Server
-	
-## FEATURES IMPLEMENTED:
-1. Models:
-	- Comment
-		- Threaded / nested comment section similar to Reddit
-		- Hybrid Materialized Path & Nested Set
-		- 
-	- Account
-		- Visitors can register via Local, Facebook, and/or Google accounts.
-		- Impliments:
-			- Login 
-			- Forgot Password
-			- Link Accounts (local+facebook)
-			- Edit Account Details
-2. Pages:
-	- About Me
-	- Photo Gallery via S3
-	- Blog Posts
-	- Contact
-3. Extras:
-4. Email Integration
-	- Send forgot password emails
-	- Administrative Notification Emails to myself
-5. Ads
-6. HTTPS
-	- LetsEncrypt
-
-## FUTURE PLANS / CONSIDERATIONS
-- Class Decorators & Annotations
-	- I'd like to use decorators to accomplish dependency injection on my data models.
-	Things that could be injected include RBAC on Fields/Classes/Methods, conditional logic,
-	or any other reusable middleware for building data models.
-- Hosting API Server
-	- Adapt a Container Orchastration Platform
-		- Kubernetes
-		- ECS (sucks?)
-	- EC2 w/ Docker? Lambda+API Gateway?
-	- Modularizing my NodeJS code into separate Lambda functions might become difficult to manage/version. Alternative would be to use a single lambda to route all traffic for all API calls.
-	- EC2 + Docker, easiest to get started, decoupled from platform/service.
-- Host NoSQL/MongoDB?
-	- Separate EC2? Shared?
-	- DBaaS?

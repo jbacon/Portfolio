@@ -1,0 +1,175 @@
+<template>
+	<div id='account-section'>
+		<div>
+			<button id='edit-details-toggle' name='Edit Account Details'>Edit Account Details</button>
+		</div>
+		<form id='edit-details-form' action='' class='hidden'>
+			<table>
+				<tr>
+					<td><label for="email">Email</label></td>
+					<td><input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" value="${this.account.email}" required></td>
+				</tr>
+				<tr>
+					<td><label for="name-first">First Name</label></td>
+					<td><input class="name-first" type="name" name="nameFirst" placeholder="John" value="${this.account.nameFirst}" required></td>
+				</tr>
+				<tr>
+					<td><label for="name-last">Last Name</label></td>
+					<td><input class="name-last" type="name" name="nameLast" placeholder="Doe" value="${this.account.nameLast}" required></td>
+				</tr>
+			</table>
+	    <div>
+	      <input class="submit" type="submit">
+	    </div>
+		</form>
+		<div>
+			<button id='password-reset-toggle' name='Change Password'>Reset Password</button>
+		</div>
+		<form id='password-reset-form' action='' class='hidden'>
+			<table>
+				<tr>
+					<td><label for="oldPassword">Old Password</label></td>
+					<td><input class="old-password" type="password" name="oldPassword" placeholder="Old password.." required></td>
+				</tr>
+				<tr>
+					<td><label for="newPassword">New Password</label></td>
+					<td><input class="new-password" type="password" name="newPassword" placeholder="New password.." ></td>
+				</tr>
+				<tr>
+					<td><label for="newPasswordRetyped">New Password Retyped</label></td>
+					<td><input class="new-password-retyped" type="password" name="newPasswordRetyped" placeholder="New password.." required></td>
+				</tr>
+			</table>
+	    <div>
+	      <input class="submit" type="submit">
+	    </div>
+		</form>
+	</div>
+	<style>
+		#account-section {
+			display: block;
+			text-align: left;
+			vertical-align: top;
+			color: black;
+		}
+		#account-section label {
+			font: bold 15px Verdana, sans-serif;
+			color: black;
+		}
+		#account-section .hidden {
+			display: none;
+		}
+		#account-section .disabled {
+			color: grey;
+			pointer-events: none;
+		}
+		#account-section .active {
+			color: green;
+		}
+	</style>
+	<script type="text/javascript">
+  window.portfolio.apis.Account = class {
+		constructor() {
+			const editDetailsToggle = document.getElementById('edit-details-toggle')
+			const editDetailsForm = document.getElementById('edit-details-form')
+			const editDetailsFormInputEmail = editDetailsForm.querySelector('.email')
+			const editDetailsFormInputNameFirst = editDetailsForm.querySelector('.name-first')
+			const editDetailsFormInputNameLast = editDetailsForm.querySelector('.name-last')
+			const editDetailsFormInputSubmit = editDetailsForm.querySelector('.submit')
+			const passwordResetToggle = document.getElementById('password-reset-toggle')
+			const passwordResetForm = document.getElementById('password-reset-form')
+			const passwordResetFormInputOldPassword = passwordResetForm.querySelector('.old-password')
+			const passwordResetFormInputNewPassword = passwordResetForm.querySelector('.new-password')
+			const passwordResetFormInputNewPasswordRetyped = passwordResetForm.querySelector('.new-password-retyped')
+			const passwordResetFormInputSubmit = passwordResetForm.querySelector('.submit')
+			var accountChangeAction = function() {
+				editDetailsFormInputEmail.value = window.portfolio.apis.authManager.user.email
+				editDetailsFormInputNameFirst.value = window.portfolio.apis.authManager.user.nameFirst
+				editDetailsFormInputNameLast.value = window.portfolio.apis.authManager.user.nameLast
+				if(window.portfolio.apis.authManager.user) {
+					if(window.portfolio.apis.authManager.authType === 'local')
+						passwordResetToggle.classList.remove('hidden')
+					else
+						passwordResetToggle.classList.add('hidden')
+				}
+			}
+			accountChangeAction();
+			window.addEventListener('login-event', function() {
+				accountChangeAction()
+			})
+			window.addEventListener('logout-event', function() {
+				editDetailsFormInputEmail.value = ''
+				editDetailsFormInputNameFirst.value = ''
+				editDetailsFormInputNameLast.value = ''
+			})
+			editDetailsToggle.addEventListener("click", function(event) {
+				if(!editDetailsToggle.classList.contains("disabled")) {
+					editDetailsToggle.classList.toggle("active")
+					editDetailsForm.classList.toggle("hidden")
+				}
+			})
+			passwordResetToggle.addEventListener("click", function(event) {
+				if(!passwordResetToggle.classList.contains("disabled")) {
+					passwordResetToggle.classList.toggle("active")
+					passwordResetForm.classList.toggle("hidden")
+				}
+			})
+			passwordResetForm.addEventListener("submit", function(event) {
+				event.preventDefault()
+				const oldPassword = document.getElementById('password-reset-form').querySelector('.old-password').value
+				const newPassword = document.getElementById('password-reset-form').querySelector('.new-password').value
+				const newPasswordRetyped =  document.getElementById('password-reset-form').querySelector('.new-password-typed').value
+				if(newPassword == newPasswordRetyped) {
+					const client = new XMLHttpRequest()
+					client.onreadystatechange = function() {
+						if (this.readyState === XMLHttpRequest.DONE) {
+							if(this.status === 200) {
+								const response = JSON.parse(this.response)
+								alert("Password reset! Logout to apply changes")
+							}
+							else {
+								window.portfolio.utils.handleServerError(this)
+							}
+						}
+					}
+					client.open("POST", window.portfolio.configs.apiserveraddress+"/account/reset-password")
+					client.setRequestHeader("Authorization", "Bearer "+window.portfolio.apis.authManager.token)
+					client.setRequestHeader("Content-Type", "application/json")
+					var data = {}
+					data.oldPassword = oldPassword
+					data.newPassword = newPassword
+					client.send(JSON.stringify(data))
+				}
+				else {
+					alert("Passwords mismatched. Try retyping password fields.")
+				}
+			})
+			editDetailsForm.addEventListener("submit", function(event) {
+				event.preventDefault()
+				const client = new XMLHttpRequest()
+				client.onreadystatechange = function() {
+					if (this.readyState === XMLHttpRequest.DONE) {
+						if(this.status === 200) {
+							const response = JSON.parse(this.response)
+							alert("Edits succeeded! Logout to apply changes.")
+						}
+						else {
+							window.portfolio.utils.handleServerError(this)
+						}
+					}
+				}
+				client.open("POST", window.portfolio.configs.apiserveraddress+"/account/edit-details")
+				client.setRequestHeader("Authorization", "Bearer "+window.portfolio.apis.authManager.token)
+				client.setRequestHeader("Content-Type", "application/json")
+				var data = {}
+				data.email = document.getElementById('edit-details-form').querySelector('.email').value
+				data.nameFirst = document.getElementById('edit-details-form').querySelector('.name-first').value
+				data.nameLast = document.getElementById('edit-details-form').querySelector('.name-last').value
+				client.send(JSON.stringify(data))
+			})
+		}
+	}
+  window.portfolio.apis.account = new window.portfolio.apis.Account()
+	//# sourceURL=/scripts/account.js
+	</script>
+</template>

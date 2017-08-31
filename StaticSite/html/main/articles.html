@@ -1,0 +1,112 @@
+<!-- <script src="/scripts/components/myCommentComponent.js" type="text/javascript"></script> -->
+<template><!--
+    --><div id='articles-nav'>
+    	<ul class='list-years'>
+    		<li>
+			    <input class='dropdown-toggler' type="checkbox" id="li-2017">
+			    <label for="li-2017" class='clickable'>2017</label>
+	    		<ul class='dropdown-content list-months'>
+	    			<li>
+					    <input class='dropdown-toggler' type="checkbox" id="li-november">
+					    <label for="li-november" class='clickable'>November</label>
+	    				<ul class='dropdown-content list-articles'>
+		    				<li>
+		    					<div class='clickable' onclick='window.portfolio.apis.router.navigate("/articles/2017/november/19/building-a-tech-hub.html")'>Building A Tech Hub</div>
+		    				</li>
+	    				</ul>
+    				</li>
+	    		</ul>
+    		</li>
+    	</ul>
+    </div><!--
+--><div id='article-content'>
+	    <div id="article-header"></div>
+	    <div id='article-date'></div>
+	    <div id='article-section'></div>
+	    <div id="article-footer">
+	    	<div>COMMENT SECTION</div>
+	    	<div id='comment-section'></div>
+	    </div>
+    </div>
+    <style>
+    	#articles-nav {
+    		display: inline-block;
+    		vertical-align: top;
+    		text-align: left;
+    		width: 200px;
+    		margin: 0px 20px 20px 0px;
+    	}
+    	#article-header {
+    		font-size: 30px;
+    		font-weight: bold;
+    	}
+    	#article-date {
+    		font-size: 12px;
+    	}
+    	#article-content {
+    		display: inline-block;
+    		vertical-align: top;
+    		text-align: left;
+    		min-width: 400px;
+    		max-width: calc(100% - 230px);
+    	}
+		#articles-nav ul{
+		  list-style: none;
+		  margin: 0px;
+		  padding: 0px;
+		}
+		#articles-nav label{
+		  display: block;
+		  cursor: pointer;
+		  /*padding: 10px;*/
+		  border: 1px solid #fff;
+		  border-bottom: none;
+		  padding-left: 10px;
+		}
+		#articles-nav ul ul li{
+		  padding: 0px 0px 0px 10px;
+		}
+    </style>
+    <script type="text/javascript" defer>
+    window.portfolio.apis.Articles = class {
+        constructor() {
+        }
+        loadArticle(year, month, day, articleName, next) {
+        	const context = this
+	    		window.portfolio.utils.importHtml('/html/main/articles/'+year+'/'+month+'/'+day+'/'+articleName+'.html', (err, linkImport) => {
+					if(err) return next(err);
+					const articleHeaderOld = document.getElementById('article-header');
+					const articleDateOld = document.getElementById('article-date');
+					const articleSectionOld = document.getElementById('article-section');
+					// const articleFooterOld = document.getElementById('article-footer');
+					const articleHeaderNew = articleHeaderOld.cloneNode(false);
+					articleHeaderNew.textContent= articleName.replace(/[^a-zA-Z0-9]/g, ' ').toUpperCase();
+					articleHeaderOld.replaceWith(articleHeaderNew)
+					const articleDateNew = articleDateOld.cloneNode(false);
+					articleDateNew.textContent = month+' '+day+', '+year
+					articleDateOld.replaceWith(articleDateNew)
+					const newArticleSection = articleSectionOld.cloneNode(false) // Clone but without the children...
+					newArticleSection.appendChild(document.importNode(linkImport.querySelector('template').content, true));
+					articleSectionOld.replaceWith(newArticleSection)
+					window.portfolio.utils.importHtml('/html/general/comment.html', function(err, newDoc) {
+						// DO STUFF
+						var test = new window.portfolio.apis.CommentSection(linkImport.querySelector('template').dataset.articleId)
+						// (new window.portfolio.apis.CommentSection(articleID))
+						// document.getElementsByTagName('body')[0].appendChild(linkImport.querySelector('script'), true)
+						next()
+					});
+				});
+	    }
+	    loadArticleAsync(year, month, day, articleName, articleID) {
+	    	return new Promise(function (resolve, reject) {
+					loadArticle(year, month, day, articleName, articleID, function(err) {
+						if(err) reject(err)
+						else resolve()
+					});
+				});
+	    }
+    }
+    window.portfolio.apis.articles = new window.portfolio.apis.Articles();
+    //# sourceURL=/scripts/articles.js
+    </script>
+</template>

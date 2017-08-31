@@ -1,6 +1,6 @@
-var validator = require('validator');
-var mongodb = require('mongodb');
-var CustomError = require('../common/errorUtil');
+var validator = require('validator')
+var mongodb = require('mongodb')
+var CustomError = require('../common/errorUtil')
 
 exports.isValidNull = function(val) {
 	try {
@@ -12,19 +12,27 @@ exports.isValidNull = function(val) {
 	}
 }
 exports.normalizeNull = function(val) {
-	if(val === undefined 
+	if(val === undefined
 		|| val === null
 		|| val === ''
-		|| val === ""
-		|| val === 'null' 
+		|| val === ''
+		|| val === 'null'
 		|| val === 'undefined')
 		return null
 	throw new CustomError('Value ('+val+') can not be converted to null')
 }
+exports.normalizeBool = function(val) {
+	if(typeof(val) === 'string') {
+		if(val.toLowerCase() === 'true') return true
+		if(val.toLowerCase() === 'false') return false
+	}
+	if(typeof(val) === 'boolean') return val
+	throw new CustomError('Value ('+val+') can not be converted to boolean')
+}
 /* return bool (assumes normalized already) */
 exports.isValidID = function(val, { allowNullable=false }={}) {
 	try {
-		exports.normalizeID(val, { allowNullable: allowNullable });
+		exports.normalizeID(val, { allowNullable: allowNullable })
 		return true
 	}
 	catch(err) {

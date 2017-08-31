@@ -1,0 +1,42 @@
+<script type="text/javascript"></script>
+<template>
+	<div id='articles-nav'>
+  	<input class='dropdown-toggler' type="checkbox" id="li-accounts">
+    <label for="li-accounts" class='clickable'>Accounts</label>
+		<ul class='dropdown-content list-accounts'>
+			<li>
+				<a  class='clickable' onclick='window.portfolio.apis.router.navigate("/admin/accounts/list.html")'>Accounts</a>
+			</li>
+		</ul>
+  </div>
+  <div id='admin-content'>
+    <div id="admin-header"></div>
+    <div id='admin-section'></div>
+    <div id="admin-footer"></div>
+  </div>
+  <style>
+	</style>
+	<script>
+    window.portfolio.apis.Admin = class {
+      constructor() {
+      }
+      loadAccounts(next) {
+
+      }
+
+      loadAccount(next) {
+
+      }
+	    loadArticleAsync(year, month, day, articleName, articleID) {
+	    	return new Promise(function (resolve, reject) {
+					loadArticle(year, month, day, articleName, articleID, function(err) {
+						if(err) reject(err)
+						else resolve()
+					});
+				});
+	    }
+    }
+    window.portfolio.apis.admin = new window.portfolio.apis.Admin();
+    //# sourceURL=/scripts/articles.js
+	</script>
+</template>

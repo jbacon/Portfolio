@@ -1,0 +1,286 @@
+<template>
+  <div id='login-section'>
+    <my-dialog-button>
+      <button id='email-login-button' class="login-button" slot='open'>Continue with Email</button>
+      <div id='email-login-button-popup' slot='content'>
+        <input class='dropdown-toggler' type="checkbox" id="login-register-button">
+        <label class='title clickable' for="login-register-button">Register</label>
+        <form id="register-form" class='dropdown-content' action="">
+          <table>
+            <tr>
+              <td>
+                <label for="name-first">First Name</label>
+              </td>
+              <td>
+                <input class="name-first" type="name" name="nameFirst" placeholder="John" required>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="name-last">Last Name</label>
+              </td>
+              <td>
+                <input class="name-last" type="name" name="nameLast" placeholder="Doe" required>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="email">Email</label>
+              </td>
+              <td>
+                <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="password">Password</label>
+              </td>
+              <td>
+                <input class="password" type="password" name="password" placeholder="Password.." required>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="passwordRetype"></label>
+              </td>
+              <td>
+                <input class="passwordRetype" type="password" name="passwordRetype" placeholder="Retype password.." required>
+              </td>
+            </tr>
+            <tr>
+              <td>
+              </td>
+              <td>
+                <input class="submit" type="submit" value='Register'>
+              </td>
+            </tr>
+          </table>
+        </form>
+        <input class='dropdown-toggler' type="checkbox" id="login-local-button">
+        <label class='title clickable' for="login-local-button">Login</label>
+        <div class='dropdown-content'>
+            <form id="login-form-local" class='dropdown-content' action="">
+              <table>
+                <tr>
+                  <td>
+                    <label for="email">Email</label>
+                  </td>
+                  <td>
+                    <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for="password">Password</label>
+                  </td>
+                  <td>
+                    <input class="password" type="password" name="password" placeholder="Password.." required>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <input class="submit" type="submit" value="Signin">
+                  </td>
+                </tr>
+              </table>
+            </form>
+            <input class='dropdown-toggler' type="checkbox" id="forgot-password-button">
+            <label class='title clickable' for="forgot-password-button">Forgot Password?</label>
+            <form class='dropdown-content' id="forgot-password-form" action="">
+              <table>
+                <tr>
+                  <td>
+                    <label for="email">Email</label>
+                  </td>
+                  <td>
+                    <input class="email" type="email" name="email" placeholder="local-part@sldomain.tld" required>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <input class="submit" type="submit" name="ForgotPassword" value="Send Email">
+                  </td>
+                </tr>
+              </table>
+            </form>
+          </div>
+        </div>
+      </my-dialog-button>
+      <div id="facebook-login-button" class="fb-login-button" data-width="240" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="true" data-scope="public_profile,email"></div>
+      <div id="google-login-button"></div>
+     <!--  <div id="linkedin-login-button" class='login-button hidden'></div>
+      <div style='display: none; background-image: url(/assets/images/signin_with_linkedin-buttons/Retina/Sign-In-Large---Hover.png);'></div>
+      <div style='display: none; background-image: url(/assets/images/signin_with_linkedin-buttons/Retina/Sign-In-Large---Active.png);'></div>
+       --><!-- <div class="g-signin2" data-onsuccess="googleOnSuccess"></div> -->
+      <!-- <fb:login-button scope="public_profile,email" ></fb:login-button> -->
+      <!-- <form id="login-form-facebook" action="">
+          <input class="submit" type="submit" name="Facebook" value="Facebook Login">
+      </form> -->
+      <!-- <form id="login-form-google" action="">
+          <input class="submit" type="submit" name="Google" value="Google Login">
+      </form> -->
+  </div>
+  <style>
+    .title {
+        font-weight: bold;
+    }
+    label {
+        padding: 0px;
+        display: block;
+        font-size: 18px;
+    }
+    #login-section {
+        font-size: 18px;
+        text-align: left;
+        vertical-align: top;
+        color: black;
+    }
+    #email-login-button {
+        display: block;
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    #facebook-login-button {
+        margin-bottom: 20px;
+    }
+    /*#google-login-button {
+        margin-bottom: 10px;
+    }*/
+    #register-form {
+        text-align: left;
+        vertical-align: top;
+        color: black;
+    }
+    .login-button {
+    	width: 240px;
+    	height:40px;
+      display: block;
+    }
+    /*#linkedin-login-button {
+    	height: 44px;
+    	background: url(/assets/images/signin_with_linkedin-buttons/Retina/Sign-In-Large---Default.png) top/100% no-repeat;
+    }
+    #linkedin-login-button:hover {
+    	cursor: pointer;
+    	background-image: url(/assets/images/signin_with_linkedin-buttons/Retina/Sign-In-Large---Hover.png);
+    }
+    #linkedin-login-button:active {
+    	background-image: url(/assets/images/signin_with_linkedin-buttons/Retina/Sign-In-Large---Active.png);
+    }*/
+   </style>
+  <script type="text/javascript">
+ 	if(!window.portfolio.apis.login) {
+	  window.portfolio.apis.Login = class {
+			constructor() {
+				var renderFacebookLogin = function() {
+				  FB.XFBML.parse();
+				}
+				if(typeof FB !== 'undefined') { // FB loaded already
+				  renderFacebookLogin();
+				}
+				else { // FB not loaded, add load listener
+				  window.addEventListener('facebook-api-init', renderFacebookLogin);
+				}
+				var renderGoogleLogin = function() {
+				  gapi.load('signin2', function() {
+			      gapi.signin2.render("google-login-button", {
+		          "scope": "profile email",
+		          "width": 240,
+		          "height": 40,
+		          "longtitle": true,
+		          "theme": "dark",
+		          "onsuccess": window.portfolio.utils.googleLoginSuccess,
+		          "onfailure": window.portfolio.utils.googleLoginFailed
+			      });
+				  });
+				}
+				if(typeof gapi !== 'undefined') { // GoogleAPI loaded
+				  renderGoogleLogin();
+				}
+				else { // Register gapi load event listener
+				  window.addEventListener('google-api-init', renderGoogleLogin);
+				}
+				// const linkedInLoginButton = document.getElementById('linkedin-login-button')
+				// linkedInLoginButton.addEventListener('click', function(event) {
+				// 	event.preventDefault()
+				// 	IN.User.authorize(function() {
+
+				// 	}, this)
+				// })
+				const formLoginLocal = document.getElementById('login-form-local')
+				// const formLoginFacebook     = document.getElementById('login-form-facebook')
+				formLoginLocal.addEventListener('submit', function(event) {
+				  event.preventDefault()
+				  window.portfolio.apis.authManager.loginViaCredentials({
+			      email: formLoginLocal.elements.namedItem('email').value,
+			      password: formLoginLocal.elements.namedItem('password').value
+				  });
+				});
+				// formLoginFacebook.addEventListener('submit', function(event) {
+				//     event.preventDefault();
+				//     var clientId = '144772189413167'
+				//     var redirectUrl = location.origin+'/auth/facebook/callback'
+				//     var facebookUrl = 'https://www.facebook.com/v2.9/dialog/oauth'
+				//         +'?client_id='+clientId
+				//         +'&redirect_uri='+redirectUrl
+				//         +'&response_type=token'
+				//         +'&scope=public_profile,email,user_friends'
+				//     window.location.href = facebookUrl
+				// });
+				const formForgotPassword = document.getElementById('forgot-password-form')
+				formForgotPassword.addEventListener('submit', function(event) {
+				  event.preventDefault();
+				  const httpClient = new XMLHttpRequest();
+				  httpClient.open('POST', window.portfolio.configs.apiserveraddress+'/auth/email/forgotpassword/request');
+				  httpClient.setRequestHeader("Content-Type", "application/json");
+				  httpClient.onreadystatechange = function() {
+			      if (this.readyState === XMLHttpRequest.DONE) {
+		          if(this.status === 200) {
+	              const responseJSON = JSON.parse(this.response);
+	              alert(responseJSON)
+		          }
+		          else {
+	              window.portfolio.utils.handleServerError(this)
+		          }
+			      }
+				  }
+				  const jsonData = {}
+				  for(var i = 0; i < event.target.length - 1; i++) {
+			      jsonData[formForgotPassword.elements[i].name] = formForgotPassword.elements[i].value;
+				  }
+				  const dataString = JSON.stringify(jsonData)
+				  httpClient.send(dataString);
+				})
+				const formRegister = document.getElementById('register-form')
+				formRegister.addEventListener('submit', function(event) {
+				  event.preventDefault();
+				  const httpClient = new XMLHttpRequest();
+				  httpClient.open('POST', window.portfolio.configs.apiserveraddress+'/auth/email/register/request');
+				  httpClient.setRequestHeader("Content-Type", "application/json");
+				  httpClient.onreadystatechange = function() {
+			      if (this.readyState === XMLHttpRequest.DONE) {
+		          if(this.status === 200) {
+	              const response = JSON.parse(this.response);
+	              alert('Thanks for registering! To activate your account continue registration steps in the verification email that has been sent to your address.')
+		          }
+		          else {
+	              window.portfolio.utils.handleServerError(this)
+		          }
+			      }
+				  }
+				  const jsonData = {}
+				  for(var i = 0; i < event.target.length - 1; i++) {
+			      jsonData[formRegister.elements[i].name] = formRegister.elements[i].value;
+				  }
+				  const dataString = JSON.stringify(jsonData)
+				  httpClient.send(dataString);
+				})
+			}
+	  }
+	  window.portfolio.apis.login = new window.portfolio.apis.Login()
+  }
+  //# sourceURL=/scripts/login.js
+  </script>
+</template>

@@ -24,12 +24,16 @@
     "passport-local": "latest",
     "passport-jwt": "latest",
     "passport-facebook-token": "latest",
+    "passport-google-token": "latest",
+    "passport-github-token": "latest",
+    "passport-linkedin-oauth2": "latest",
     "validator": "latest",
     "bcryptjs": "latest",
-    "nodemailer": "latest"
+    "nodemailer": "latest",
+    "apidoc": "latest",
+    "googleapis": "latest"
   },
   "devDependencies": {
-    "jspm": "latest",
     "eslint": "latest"
   }
 }

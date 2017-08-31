@@ -1,0 +1,83 @@
+.backdrop {
+	background-color: rgba(0,0,0,0.7);
+}
+ {
+	text-decoration: none;
+	font-style: normal;
+	color: #62B9F3;
+}
+a {
+	color: #62B9F3;
+}
+a,
+.clickable {
+	text-decoration: none;
+	font-style: normal;
+}
+a:visited,
+.clickable:visited {
+	text-decoration: none;
+	font-style: normal;
+}
+a:hover,
+.clickable:not(.active):hover {
+	text-decoration: underline;
+	cursor: pointer;
+	font-style: oblique;
+}
+.clickable.active:hover {
+	text-decoration: none;
+	cursor: pointer;
+	font-style: oblique;
+}
+.white-text {
+	color: white;
+}
+.black-text {
+	color: black;
+}
+header {
+}
+/*h1 {
+	margin: 0px;
+	font-weight: bold;
+}
+h2 {
+	margin: 0px;
+	font-weight: bold;
+}
+h3 {
+	margin: 0px;
+	font-weight: bold;s
+}*/
+
+body {
+	font-family: Verdana;
+	font-style: sans-serif;
+	font-weight: normal;
+	font-size: 13px;
+	color: white;
+}
+input[type="checkbox"].dropdown-toggler {
+  position: absolute;
+  left: -9999px;
+}
+input[type="checkbox"].dropdown-toggler + label + .dropdown-content {
+  height: 0;
+  transform: scaleY(0);
+}
+input[type="checkbox"].dropdown-toggler:checked + label + .dropdown-content{
+  height: 100%;
+  transform-origin: top;
+  transition: transform .2s ease-out;
+  transform: scaleY(1);
+}
+input[type="checkbox"].dropdown-toggler:checked + label{
+  /*background: #26C281;*/
+  border-bottom: 1px solid #fff;
+}
+/*Not sure why this was added*/
+/*div {
+	position: relative;
+	overflow: hidden;
+}*/

@@ -1,5 +1,5 @@
 #!/bin/bash -ex
-set -x 
+set -x
 # Find path relative to this script file
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -63,7 +63,7 @@ docker run \
 --tty \
 --detach \
 --volume ${DIR}/nginx.conf:/etc/nginx/conf.d/default.conf \
-$(if [ "${ENVIRONMENT}" = "production" ]; then 
+$(if [ "${ENVIRONMENT}" = "production" ]; then
 	echo ' --publish 443:443 --publish 80:80 --volume /etc/letsencrypt/archive/portfolioapi.joshbacon.name/:/etc/letsencrypt/archive/portfolioapi.joshbacon.name/ '
 else
 	echo ' --publish 8080:8080 '

@@ -1,3 +1,3 @@
-# Portfolio Static Site Content/Assests: 
+# Portfolio Static Site
 
-To be hosted on S3 or behind Nginx Server (dev only)
+Includes all static assests, content, javascript, html files to be hosted on S3/CloudFront website.

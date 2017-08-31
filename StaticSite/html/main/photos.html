@@ -1,0 +1,99 @@
+<script src="/scripts/components/myCarouselComponent.js"></script>
+<template>
+	<my-carousel>
+		<div slot='slide'>
+    	<my-dialog-button>
+    		<img class='preview' slot='open' src="/assets/images/skiing.jpg">
+    		<img class='fullscreen' slot='content' src="/assets/images/skiing.jpg">
+    	</my-dialog-button>
+			<div class='description'>Me! @CrystalMountainResort</div>
+		</div>
+		<div slot='slide'>
+    	<my-dialog-button>
+  			<img class='preview' slot='open' src="/assets/images/crystalmtn.jpg">
+  			<img class='fullscreen' slot='content' src="/assets/images/crystalmtn.jpg">
+    	</my-dialog-button>
+			<div class='description'>Beautiful View @CrystalMountainResort</div>
+		</div>
+		<div slot='slide'>
+    	<my-dialog-button>
+				<img class='preview' slot='open' src="/assets/images/skiselfie.jpg">
+				<img class='fullscreen' slot='content' src="/assets/images/skiselfie.jpg">
+    	</my-dialog-button>
+			<div class='description'>Selfie @CrystalMountainResort</div>
+		</div>
+		<div slot='slide'>
+    	<my-dialog-button>
+				<img class='preview' slot='open' src="/assets/images/waterfall.jpg">
+				<img class='fullscreen' slot='content' src="/assets/images/waterfall.jpg">
+    	</my-dialog-button>
+			<div class='description'>Waterfall @ColchuckLake</div>
+		</div>
+		<div slot='slide'>
+    	<my-dialog-button>
+				<img class='preview' slot='open' src="/assets/images/bridge.jpg">
+				<img class='fullscreen' slot='content' src="/assets/images/bridge.jpg">
+    	</my-dialog-button>
+			<div class='description'>Bridge @ColchuckLake</div>
+		</div>
+		<div slot='slide'>
+    	<my-dialog-button>
+				<img class='preview' slot='open' src="/assets/images/tree.jpg">
+				<img class='fullscreen' slot='content' src="/assets/images/tree.jpg">
+    	</my-dialog-button>
+			<div class='description'>Tree @SanJaunIslands</div>
+		</div>
+		<div slot='slide'>
+    	<my-dialog-button>
+				<img class='preview' slot='open' src="/assets/images/hummingbird.jpg">
+				<img class='fullscreen' slot='content' src="/assets/images/hummingbird.jpg">
+    	</my-dialog-button>
+			<div class='description'>Hummingbird @InMyBackyard</div>
+		</div>
+		<div slot='slide'>
+    	<my-dialog-button>
+				<img class='preview' slot='open' src="/assets/images/skigroup.jpg">
+				<img class='fullscreen' slot='content' src="/assets/images/skigroup.jpg">
+    	</my-dialog-button>
+			<div class='description'>Ski Trip @CrystalMountainResort</div>
+		</div>
+	</my-carousel>
+	<style>
+	my-carousel {
+		position: absolute;
+		height: calc(100% - 40px);
+    width: calc(100% - 40px);
+	}
+	</style>
+	<script type="text/javascript">
+    window.portfolio.Photos = class {
+        constructor() {
+			const previewImages = document.querySelectorAll('img.preview');
+			const previewViewport = document.querySelector('my-carousel');
+			for(let i=0; i < previewImages.length; i++) {
+				previewImages[i].onload = function() {
+					const heightFactor = previewViewport.clientHeight / previewImages[i].naturalHeight;
+					const widthFactor = previewViewport.clientWidth / previewImages[i].naturalWidth;
+					const scaleFactor = (heightFactor > widthFactor) ? widthFactor : heightFactor;
+					const newWidth = (previewImages[i].naturalWidth * scaleFactor) * .9; // scale back 10% more...
+					previewImages[i].style.width = newWidth+'px';
+				}
+			}
+			const fullscreenImages = document.querySelectorAll('img.fullscreen');
+			const fullscreenViewport = document.querySelector('body')
+			for(let i=0; i < fullscreenImages.length; i++) {
+				fullscreenImages[i].onload = function() {
+					const heightFactor = fullscreenViewport.clientHeight / fullscreenImages[i].naturalHeight;
+					const widthFactor = fullscreenViewport.clientWidth / fullscreenImages[i].naturalWidth;
+					const scaleFactor = (heightFactor > widthFactor) ? widthFactor : heightFactor;
+					const newWidth = (fullscreenImages[i].naturalWidth * scaleFactor) * .9; // scale back 10% more...
+					fullscreenImages[i].style.width = newWidth+'px';
+				}
+			}
+            return window.portfolio.photos;
+        }
+    }
+    window.portfolio.photos = new window.portfolio.Photos();
+	//# sourceURL=/scripts/myPhotos.js	
+	</script>
+</template>

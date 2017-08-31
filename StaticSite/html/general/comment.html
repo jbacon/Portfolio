@@ -1,0 +1,759 @@
+<template>
+	<div class='comment'>
+		<div class='header'>
+			<div class='name'>Anonymous</div>
+			<div class='date'>Nov 5th, 2017</div>
+		</div>
+		<div class='main'>
+			<div class='profile'>
+				<img class='pic' alt='' src='/assets/images/profile-pic-default.jpg'>
+			</div><!--
+			--><div class='text'>Hello World!</div>
+		</div>
+		<footer class='footer'>
+			<div class='actions'>
+				<span class='reply-toggle clickable left' name='Reply'>Reply</span>
+				<span class='replies-toggle clickable left' name='Replies'>Comments</span>
+				<span class='flag-button clickable right' title='Please flag if inappropriate comment..' name='Flag'>Flag</span>
+				<span class='down-vote-count right'></span>
+				<span class='down-vote-button clickable right' name='Down'>Down</span>
+				<span class='up-vote-count right'></span>
+				<span class='up-vote-button clickable right' name='Up'>Up</span>
+				<span class='remove-button clickable invisible right' name='Remove'>Remove</span>
+			</div>
+			<form class='reply-form hidden' action=''>
+				<table>
+          <tr class='email-section'>
+            <td class='col1'>
+              <label for="email">Email</label>
+            </td>
+            <td  class='col2'>
+              <input class="email" type="email" name="email" placeholder="john-doe@domain.tld" required>
+            	<a slot="open" onclick='window.portfolio.apis.index.loadLogin()' style='font-size: 13px;' class='clickable'>...or signin <b><u>here</u></b></a>
+           </td>
+          </tr>
+          <tr class='name-first-section'>
+            <td class='col1'>
+              <label for="nameFirst">First Name</label>
+            </td>
+            <td class='col2'>
+              <input class="name-first" name="nameFirst" placeholder="..." required>
+            </td>
+          </tr>
+          <tr class='name-last-section'>
+            <td class='col1'>
+              <label for="nameLast">Last Name</label>
+            </td>
+            <td class='col2'>
+              <input class="name-last" name="nameLast" placeholder="..." required>
+            </td>
+          </tr>
+          <tr>
+            <td class='col1'>
+              <label for="nameLast">Comment</label>
+            </td>
+            <td class='col2'>
+	            <textarea name='text' class='text' placeholder='Comment...' required></textarea>
+					</td>
+          </tr>
+          <tr>
+            <td class='col1'>
+            </td>
+            <td class='col2'>
+              <input class="reply-form-submit" type="submit" value='Submit'>
+						</td>
+          </tr>
+        </table>
+			</form>
+			<div class='replies-section hidden' data-start='newest'>
+				<div class='load-new-button clickable hidden' name='Load Newest..'>Load latest..</div>
+				<div class='replies' data-child-count='0'>
+					<slot id='reply-slot' name='reply-slot'>Placeholder</slot>
+				</div>
+				<div class='load-old-button clickable hidden'>Load older..</div>
+			</div>
+		</footer>
+	<div>
+	<style>
+		.comment {
+			width: 100%;
+			margin-bottom: 15px;
+			margin-top: 15px;
+			position: relative;
+			animation-duration: 5s;
+			animation-fill-mode: forwards;
+			animation-name: fadein;
+		}
+			.header {
+				background-color: rgba(255,255,255,0.2);
+				padding: 3px 3px 3px 3px;
+				height: 22px;
+			}
+				.header .name {
+					float: left;
+				}
+				.header .date {
+					float: right;
+				}
+			.main {
+				position: relative;
+				background-color: rgba(255,255,255,0.2);
+			}
+				.main .profile {
+					display: inline-block;
+					height: 53px;
+					width: 53px;
+					text-align: left;
+					vertical-align: top;
+				}
+					.main .profile img{
+						height: 50px;
+						width: 50px;
+						padding: 0px 0px 3px 3px;
+					}
+				.main .text {
+					display: inline-block;
+					text-align: left;
+					vertical-align: top;
+					padding: 0px 8px 8px 8px;
+					width: calc(100% - 70px);
+				}
+			.replies-section .replies {
+				padding-left: 58px;
+			}
+				.replies-section .load-new-button {
+					font-size: 13px;
+				}
+				.replies-section .load-old-button {
+					font-size: 13px;
+				}
+			.actions {
+				font-size: 13px;
+				padding-left: 58px;
+				height: 20px;
+				}
+				.actions > span {
+					padding-right: 7px;
+				}
+				.actions .left {
+					float: left;
+				}
+				.actions .right {
+					float: right;
+				}
+				.replies-toggle:not(.active)::before {
+					content: '';
+				}
+				.replies-toggle.active::before {
+					content: 'Hide ';
+				}
+				.reply-toggle:not(.active)::before {
+					content: '';
+				}
+				.reply-toggle.active::before {
+					content: 'Discard ';
+				}
+			.reply-form {
+				padding-left: 58px;
+				width: calc(100% - 58px);
+			}
+				.reply-form table {
+					width: 100%;
+				}
+				.reply-form .col1 {
+					width: 100px;
+				}
+				.reply-form .col2 {
+					width: calc(100% - 100px);
+				}
+				.reply-form input {
+					font-size: 15px;
+					padding: 0px 4px 0px 4px;
+					background-color: rgba(255, 255, 255, 0.2);
+					border: none;
+					color: white;
+					line-height: 20px;
+				}
+				.reply-form textarea {
+					width: 100%;
+					font-size: 13px;
+					padding: 0px 4px 0px 4px;
+					height: 40px;
+					background-color: rgba(255, 255, 255, 0.2);
+					border: none;
+					color: white;
+				}
+		.hidden {
+			display: none;
+		}
+		.comment .invisible {
+			visibility: hidden;
+		}
+		.comment .disabled {
+			color: grey;
+			pointer-events: none;
+		}
+		.clickable.active {
+			font-style: oblique;
+			text-decoration: underline;
+		}
+		.clickable:not(.active) {
+			font-style: none;
+			text-decoration: none;
+		}
+		.clickable:not(.active):hover {
+			text-decoration: underline;
+			cursor: pointer;
+			font-style: oblique;
+		}
+		.clickable.active:hover {
+			text-decoration: none;
+			cursor: pointer;
+		}
+	</style>
+</template>
+<script>
+window.portfolio.apis.Comment = class extends HTMLElement {
+	constructor({ commentJSON=undefined }) {
+		super()
+		if(!commentJSON) throw new Error('Invalid contsructor parameters')
+		this.attachShadow({ mode: 'open' })
+		const comment = this
+		comment._comment = encodeURIComponent(JSON.stringify(commentJSON))
+		comment.shadowRoot.appendChild(document.importNode(document.getElementById('/html/general/comment.html'.replace(/[^A-Za-z0-9]/g, '')).import.querySelector('template').content, true).querySelector('.comment'))
+		comment.elementDate.textContent = (new Date(commentJSON.dateCreated)).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+		comment.elementText.textContent = commentJSON.text
+		comment.elementUpVoteCount.textContent = commentJSON.upVoteAccountIDs.length
+		comment.elementDownVoteCount.textContent = commentJSON.downVoteAccountIDs.length
+		if(parseInt(commentJSON.children.length) === 0) {
+			comment.elementRepliesToggle.classList.add('invisible')
+		}
+		if(commentJSON.removed) {
+			// COMMENT REMOVED
+			comment._drawRemoved()
+		}
+		else if(commentJSON.account) {
+			// COMMENT FROM USER
+			comment.elementName.textContent = (commentJSON.account.nameFirst+' '+commentJSON.account.nameLast).toUpperCase()
+			if(commentJSON.account.facebookProfileID) {
+				// COMMENT FROM USER VIA FACEBOOK
+				comment.elementProfilePic.src = 'http://graph.facebook.com/'+commentJSON.account.facebookProfileID+'/picture?type=large'
+			}
+			else if(commentJSON.account.googleProfileID) {
+				// COMMENT FROM USER VIA GOOGLE
+				const client = new XMLHttpRequest()
+				client.onload = function() {
+					if(this.status === 200) {
+						const response = JSON.parse(this.response)
+						comment.elementProfilePic.src = response.entry.gphoto$thumbnail.$t
+					}
+				}
+				client.onerror = function() {
+				}
+				client.open('GET', 'http://picasaweb.google.com/data/entry/api/user/'+commentJSON.account.googleProfileID+'?alt=json')
+				client.send()
+			}
+			else {
+				// COMMENT FROM USER VIA LOCAL
+				comment.elementProfilePic.src = '/assets/images/profile-pic-default.jpg'
+			}
+		}
+		else {
+			// COMMENT FROM VISITOR
+			comment.elementProfilePic.src = '/assets/images/profile-pic-default.jpg'
+			comment.elementName.textContent = (commentJSON.nameFirst+' '+commentJSON.nameLast).toUpperCase()
+		}
+		var drawUiAuthenticated = function() {
+			// Is Logged In
+			comment.elementReplyFormSectionEmail.classList.add('hidden')
+			comment.elementReplyFormSectionNameFirst.classList.add('hidden')
+			comment.elementReplyFormSectionNameLast.classList.add('hidden')
+			comment.elementReplyFormSectionEmail.value = ''
+			comment.elementReplyFormSectionNameFirst.value = ''
+			comment.elementReplyFormSectionNameLast.value = ''
+			comment.elementReplyFormInputEmail.removeAttribute('required')
+			comment.elementReplyFormInputNameFirst.removeAttribute('required')
+			comment.elementReplyFormInputNameLast.removeAttribute('required')
+			if(window.portfolio.apis.authManager.user.isAdmin === true) {
+				comment.elementRemoveButton.classList.remove('invisible')
+				comment.elementDownVoteButton.classList.remove('disabled')
+				comment.elementUpVoteButton.classList.remove('disabled')
+				comment.elementFlagButton.classList.remove('disabled')
+			}
+			else if(window.portfolio.apis.authManager.user._id == commentJSON.accountID) {
+				// Comment Owner
+				comment.elementRemoveButton.classList.remove('invisible')
+				comment.elementDownVoteButton.classList.add('disabled')
+				comment.elementUpVoteButton.classList.add('disabled')
+				comment.elementFlagButton.classList.add('disabled')
+			}
+			else {
+				// Not Comment Owner
+				comment.elementRemoveButton.classList.add('invisible')
+				if(commentJSON.upVoteAccountIDs.includes(window.portfolio.apis.authManager.user._id))
+					comment.elementUpVoteButton.classList.add('disabled')
+				else
+					comment.elementUpVoteButton.classList.remove('disabled')
+				if(commentJSON.downVoteAccountIDs.includes(window.portfolio.apis.authManager.user._id))
+					comment.elementDownVoteButton.classList.add('disabled')
+				else
+					comment.elementDownVoteButton.classList.remove('disabled')
+				if(commentJSON.flags.includes(window.portfolio.apis.authManager.user._id))
+					comment.elementFlagButton.classList.add('disabled')
+				else
+					comment.elementFlagButton.classList.remove('disabled')
+			}
+		}
+		var drawUiAnonymous = function() {
+			// Is NOT Logged In
+			comment.elementReplyFormSectionEmail.classList.remove('hidden')
+			comment.elementReplyFormSectionNameFirst.classList.remove('hidden')
+			comment.elementReplyFormSectionNameLast.classList.remove('hidden')
+			comment.elementReplyFormInputEmail.setAttribute('required', '')
+			comment.elementReplyFormInputNameFirst.setAttribute('required', '')
+			comment.elementReplyFormInputNameLast.setAttribute('required', '')
+			comment.elementRemoveButton.classList.add('invisible')
+			comment.elementDownVoteButton.classList.remove('disabled')
+			comment.elementUpVoteButton.classList.remove('disabled')
+			comment.elementFlagButton.classList.remove('disabled')
+		}
+		var drawUi = function() {
+			if(window.portfolio.apis.authManager.token)
+				drawUiAuthenticated()
+			else
+				drawUiAnonymous()
+		}
+		drawUi()
+		window.addEventListener('login-event', function(e) {
+			drawUi()
+		})
+		window.addEventListener('logout-event', function(e) {
+			drawUi()
+		})
+		// Attach Listeners....
+		comment.elementRepliesToggle.addEventListener('click', function(e) {
+			if(!comment.elementRepliesToggle.classList.contains('disabled')) {
+				comment.elementRepliesToggle.classList.toggle('active')
+				comment.elementRepliesSection.classList.toggle('hidden')
+				// comment.elementLoadNewButton.classList.toggle('hidden') // Makes comments look ugly... should be put on a timer or streamed
+				comment.elementLoadOldButton.classList.toggle('hidden')
+				// If replies are empty... AND replies are active
+				if(comment.elementRepliesToggle.classList.contains('active') && comment.childElementCount === 0) {
+					// Query for 1st batch of child comments
+					comment._loadOldReplies(function(err) {
+						if(err)
+							window.portfolio.utils.handleServerError(err)
+						else {
+							// Revert toggle
+							// if(component.childElementCount <= 0) {
+							// 	elementRepliesToggle.classList.toggle('active')
+							// 	elementRepliesSection.classList.toggle('hidden')
+							// 	elementLoadNewButton.classList.toggle('hidden')
+							// 	elementLoadOldButton.classList.toggle('hidden')
+							// }
+						}
+					})
+				}
+			}
+		})
+		comment.elementReplyToggle.addEventListener('click', function(e) {
+			if(!comment.elementReplyToggle.classList.contains('disabled')) {
+				comment.elementReplyToggle.classList.toggle('active')
+				comment.elementReplyForm.classList.toggle('hidden')
+				if(comment.elementReplyFormInputText.isEqualNode(document.activeElement)) {
+					comment.elementReplyFormInputText.blur()
+				}
+				else {
+          // This is causing some weird issues... when focused the page is either refreshing or css is being redrawn/applied (including all animations).
+					// comment.elementReplyFormInputText.focus()
+				}
+			}
+		})
+		comment.elementRemoveButton.addEventListener('click', function(e) {
+			if(!comment.elementRemoveButton.classList.contains('disabled')) {
+				comment._checkAuthStatus(function() {
+					comment._remove(function(err) {
+						if(err) window.portfolio.utils.handleServerError(err)
+					})
+				})
+			}
+		})
+		comment.elementFlagButton.addEventListener('click', function(e) {
+			if(!comment.elementFlagButton.classList.contains('disabled')) {
+				comment._checkAuthStatus(function() {
+					comment._flag(function(err) {
+						if(err) window.portfolio.utils.handleServerError(err)
+					})
+				})
+			}
+		})
+		comment.elementUpVoteButton.addEventListener('click', function(e) {
+			if(!comment.elementUpVoteButton.classList.contains('disabled')) {
+				comment._checkAuthStatus(function() {
+					comment._upVote(function(err) {
+						if(err) window.portfolio.utils.handleServerError(err)
+					})
+				})
+			}
+		})
+		comment.elementDownVoteButton.addEventListener('click', function(e) {
+			if(!comment.elementDownVoteButton.classList.contains('disabled')) {
+				comment._checkAuthStatus(function() {
+					comment._downVote(function(err) {
+						if(err) window.portfolio.utils.handleServerError(err)
+					})
+				})
+			}
+		})
+		comment.elementLoadNewButton.addEventListener('click', function(e) {
+			comment._loadNewReplies(function(err) {
+				if(err) window.portfolio.utils.handleServerError(err)
+			})
+		})
+		comment.elementLoadOldButton.addEventListener('click', function(e) {
+			comment._loadOldReplies(function(err) {
+				if(err) window.portfolio.utils.handleServerError(err)
+			})
+		})
+		comment.elementReplyForm.addEventListener('submit', function(e) {
+			e.preventDefault()
+			comment._create(function(err, comment) {
+				if(err) {
+					window.portfolio.utils.handleServerError(err)
+				}
+			})
+		})
+	}
+	static get observedAttributes() { return [ ] }
+	// Respond to attribute changes...
+	attributeChangedCallback(attr, oldValue, newValue, namespace) {
+	}
+	disconnectedCallback() {
+		// super.disconnectedCallback()
+	}
+	// Called when an attribute is changed, appended, removed, or replaced on the element
+	connectedCallback() {
+		// super.connectedCallback()
+	}
+	// Called when the element is adopted into a new document
+	adoptedCallback(oldDocument, newDocument) {
+		super.adoptedCallback(oldDocument, newDocument)
+	}
+	get commentJSON() {
+		return JSON.parse(decodeURIComponent(this._comment))
+	}
+	get elementProfilePic() { return this.shadowRoot.querySelector('.main .profile .pic') }
+	get elementName() { return this.shadowRoot.querySelector('.header .name') }
+	get elementDate() { return this.shadowRoot.querySelector('.header .date') }
+	get elementText() { return this.shadowRoot.querySelector('.main .text') }
+	get elementReplyToggle() { return this.shadowRoot.querySelector('.footer .actions .reply-toggle') }
+	get elementRepliesToggle() { return this.shadowRoot.querySelector('.footer .actions .replies-toggle') }
+	get elementUpVoteCount() { return this.shadowRoot.querySelector('.footer .actions .up-vote-count') }
+	get elementUpVoteButton() { return this.shadowRoot.querySelector('.footer .actions .up-vote-button') }
+	get elementDownVoteCount() { return this.shadowRoot.querySelector('.footer .actions .down-vote-count') }
+	get elementDownVoteButton() { return this.shadowRoot.querySelector('.footer .actions .down-vote-button') }
+	get elementRemoveButton() { return this.shadowRoot.querySelector('.footer .actions .remove-button') }
+	get elementFlagButton() { return this.shadowRoot.querySelector('.footer .actions .flag-button') }
+	get elementRepliesSection() { return this.shadowRoot.querySelector('.footer .replies-section') }
+	get elementLoadNewButton() { return this.shadowRoot.querySelector('.footer .replies-section .load-new-button') }
+	get elementReplies() { return this.shadowRoot.querySelector('.footer .replies-section .replies')  }
+	get elementReplyForm() {return this.shadowRoot.querySelector('.footer .reply-form') }
+	get elementReplyFormInputText() { return this.shadowRoot.querySelector('.footer .reply-form .text') }
+	get elementReplyFormInputEmail() { return this.shadowRoot.querySelector('.footer .reply-form .email') }
+	get elementReplyFormInputNameFirst() { return this.shadowRoot.querySelector('.footer .reply-form .name-first') }
+	get elementReplyFormInputNameLast() { return this.shadowRoot.querySelector('.footer .reply-form .name-last') }
+	get elementReplyFormSectionEmail() { return this.shadowRoot.querySelector('.footer .reply-form .email-section') }
+	get elementReplyFormSectionNameFirst() { return this.shadowRoot.querySelector('.footer .reply-form .name-first-section') }
+	get elementReplyFormSectionNameLast() { return this.shadowRoot.querySelector('.footer .reply-form .name-last-section') }
+	get elementLoadOldButton() {
+		var selections = this.shadowRoot.querySelectorAll('.footer .replies-section .load-old-button')
+		return selections[selections.length-1]
+	}
+	_loadNewReplies(callback) {
+		const comment = this
+		const commentJSON = comment.commentJSON
+		var queryString = ''
+		queryString += 'articleID='+encodeURIComponent(commentJSON.articleID)
+		queryString += '&parent='+encodeURIComponent(commentJSON._id || null)
+		queryString += '&start='+encodeURIComponent((comment.firstElementChild) ? comment.firstElementChild.commentJSON._id : 'newest')
+		queryString += '&pageSize='+encodeURIComponent('5')
+		queryString += '&sortOrder='+encodeURIComponent('1')
+		queryString += '&pageNum='+encodeURIComponent('1')
+		const client = new XMLHttpRequest()
+		client.onload = function() {
+			if(this.status === 200) {
+				const response = JSON.parse(this.response)
+				const comments = response.data
+				for(var i = 0; i < comments.length; i++) {
+					const newComment = new window.portfolio.apis.Comment({ commentJSON: comments[i] })
+					newComment.slot = 'reply-slot'
+					comment.prepend(newComment)
+				}
+				if(callback) callback(null, comments)
+			}
+			else {
+				if(callback) callback(this)
+			}
+		}
+		client.onerror = function() {
+			if(callback) callback(this)
+		}
+		client.open('GET', window.portfolio.configs.apiserveraddress+'/comments/read?'+queryString)
+		client.send()
+	}
+	_loadOldReplies(callback) {
+		const comment = this
+		const commentJSON = comment.commentJSON
+		var queryString = ''
+		queryString += 'articleID='+encodeURIComponent(commentJSON.articleID)
+		queryString += '&parent='+encodeURIComponent(commentJSON._id || null)
+		queryString += '&start='+encodeURIComponent(comment.elementRepliesSection.dataset.start)
+		queryString += '&pageSize='+encodeURIComponent('5')
+		queryString += '&sortOrder='+encodeURIComponent('-1')
+		queryString += '&pageNum='+encodeURIComponent(parseInt(comment.elementRepliesSection.dataset.pageNum) || 1)
+		queryString += '&skipOnPage='+encodeURIComponent(parseInt(comment.elementRepliesSection.dataset.skipOnPage) || 0)
+		const client = new XMLHttpRequest()
+		client.onload = function() {
+			if(this.status === 200) {
+				var response = JSON.parse(this.response)
+				var comments = response.data
+				if(comment.elementRepliesSection.dataset.start === 'newest' && comments.length > 0) {
+					comment.elementRepliesSection.dataset.start = comments[0]._id
+				}
+				var lastSkipOnPage = 0
+				if(comment.elementRepliesSection.dataset.skipOnPage)
+					lastSkipOnPage = parseInt(comment.elementRepliesSection.dataset.skipOnPage)
+				comment.elementRepliesSection.dataset.skipOnPage = ((comments.length + lastSkipOnPage) < 5) ? lastSkipOnPage + comments.length : 0
+				var lastPageNum =  1
+				if(comment.elementRepliesSection.dataset.pageNum)
+					lastPageNum = parseInt(comment.elementRepliesSection.dataset.pageNum)
+				comment.elementRepliesSection.dataset.pageNum = ((comments.length + lastSkipOnPage) < 5) ? lastPageNum : lastPageNum+1
+				// If returned partially fully page or child elements greaterthan or equal to expected childCount on the element
+				if(comments.length < 5) {
+					comment.elementLoadOldButton.classList.add('hidden')
+				}
+				for(var i = 0; i < comments.length; i++) {
+					const newComment = new window.portfolio.apis.Comment({ commentJSON: comments[i] })
+					newComment.slot = 'reply-slot'
+					comment.appendChild(newComment)
+				}
+				if(callback) callback()
+			}
+			else {
+				if(callback) callback(this)
+			}
+		}
+		client.open('GET', window.portfolio.configs.apiserveraddress+'/comments/read?'+queryString)
+		client.send()
+	}
+	_create(callback) {
+		const comment = this
+		const commentJSON = comment.commentJSON
+		const client = new XMLHttpRequest()
+		client.onload = function() {
+			if(this.status === 200) {
+				var response = JSON.parse(this.response)
+				if(comment.elementRepliesToggle.classList.contains('invisible')) {
+					comment.elementRepliesToggle.classList.remove('invisible')
+				}
+				if(comment.childElementCount === 0) {
+					if(!comment.elementRepliesToggle.classList.contains('active')) {
+						comment.elementRepliesToggle.click()
+					}
+					else {
+						comment.elementLoadOldButton.click()
+					}
+				}
+				else {
+					comment.elementLoadNewButton.click()
+				}
+				comment.elementReplyForm.reset()
+				comment.elementReplyToggle.click()
+				if(callback) callback()
+			}
+			else {
+				if(callback) callback(this)
+			}
+		}
+		client.onerror = function() {
+			if(callback) callback(this)
+		}
+		client.open('POST', window.portfolio.configs.apiserveraddress+'/comments/create')
+		client.setRequestHeader('Authorization', 'Bearer '+window.portfolio.apis.authManager.token)
+		client.setRequestHeader('Content-Type', 'application/json')
+		client.send(JSON.stringify({
+			articleID: commentJSON.articleID,
+			parent: commentJSON._id,
+			text: comment.elementReplyFormInputText.value,
+			email: comment.elementReplyFormInputEmail.value,
+			nameFirst: comment.elementReplyFormInputNameFirst.value,
+			nameLast: comment.elementReplyFormInputNameLast.value
+		}))
+	}
+	_remove(callback) {
+		const comment = this
+		const commentJSON = comment.commentJSON
+		const client = new XMLHttpRequest()
+		client.onload = function() {
+			if(this.status === 200) {
+				var response = JSON.parse(this.response)
+				comment._drawRemoved()
+				if(callback) callback()
+			}
+			else {
+				if(callback) callback(this)
+			}
+		}
+		client.open('POST', window.portfolio.configs.apiserveraddress+'/comments/remove')
+		client.setRequestHeader('Authorization', 'Bearer '+window.portfolio.apis.authManager.token)
+		client.setRequestHeader('Content-Type', 'application/json')
+		client.send(JSON.stringify({
+			_id: commentJSON._id || null
+		}))
+	}
+	_flag(callback) {
+		const comment = this
+		const commentJSON = comment.commentJSON
+		const client = new XMLHttpRequest()
+		client.onload = function() {
+			if(this.status === 200) {
+				var response = JSON.parse(this.response)
+				comment._drawRemoved()
+				comment.elementFlagButton.classList.add('disabled')
+				if(callback) callback()
+			}
+			else {
+				if(callback) callback(this)
+			}
+		}
+		client.open('POST', window.portfolio.configs.apiserveraddress+'/comments/flag')
+		client.setRequestHeader('Authorization', 'Bearer '+window.portfolio.apis.authManager.token)
+		client.setRequestHeader('Content-Type', 'application/json')
+		client.send(JSON.stringify({
+			_id: commentJSON._id || null
+		}))
+	}
+	_upVote(callback) {
+		const comment = this
+		const commentJSON = comment.commentJSON
+		const client = new XMLHttpRequest()
+		client.onload = function() {
+			if(this.status === 200) {
+				var response = JSON.parse(this.response)
+				comment.elementUpVoteCount.textContent = (parseInt(comment.elementUpVoteCount.textContent)+1)
+				comment.elementUpVoteButton.classList.add('disabled')
+				if(callback) callback()
+			}
+			else {
+				if(callback) callback(this)
+			}
+		}
+		client.open('POST', window.portfolio.configs.apiserveraddress+'/comments/up-vote')
+		client.setRequestHeader('Authorization', 'Bearer '+window.portfolio.apis.authManager.token)
+		client.setRequestHeader('Content-Type', 'application/json')
+		var data = {}
+		data._id = commentJSON._id || null
+		client.send(JSON.stringify(data))
+	}
+	_downVote(callback) {
+		const comment = this
+		const commentJSON = comment.commentJSON
+		const client = new XMLHttpRequest()
+		client.onload = function() {
+			if(this.status === 200) {
+				var response = JSON.parse(this.response)
+				comment.elementDownVoteCount.textContent = (parseInt(comment.elementDownVoteCount.textContent)+1)
+				comment.elementDownVoteButton.classList.add('disabled')
+				if(callback) callback()
+			}
+			else {
+				if(callback) callback(this)
+			}
+		}
+		client.open('POST', window.portfolio.configs.apiserveraddress+'/comments/down-vote')
+		client.setRequestHeader('Authorization', 'Bearer '+window.portfolio.apis.authManager.token)
+		client.setRequestHeader('Content-Type', 'application/json')
+		var data = {}
+		data._id = commentJSON._id || null
+		client.send(JSON.stringify(data))
+	}
+	_drawRemoved() {
+		const comment = this
+		const commentJSON = comment.commentJSON
+		this.elementText.textContent = '~ Comment Removed ~'
+		this.elementName.textContent = 'HIDDEN'
+		this.elementProfilePic.src = '/assets/images/profile-pic-default.jpg'
+		this.elementUpVoteButton.classList.add('invisible')
+		this.elementDownVoteButton.classList.add('invisible')
+		this.elementFlagButton.classList.add('invisible')
+		this.elementRemoveButton.classList.add('invisible')
+		this.elementUpVoteCount.classList.add('invisible')
+		this.elementDownVoteCount.classList.add('invisible')
+		this.elementReplyToggle.classList.add('invisible')
+	}
+	_checkAuthStatus(next) {
+		if(!window.portfolio.apis.authManager.token) {
+			window.portfolio.apis.index.loadLogin()
+		}
+		else {
+			next()
+		}
+	}
+}
+if(!window.customElements.get('my-comment')) {
+	window.customElements.define('my-comment', window.portfolio.apis.Comment)
+}
+window.portfolio.apis.CommentSection = class {
+	constructor(entityID) {
+		entityID = (entityID) ? entityID : '59344c18e987af001c119f93'
+		const comment = this
+		const commentSection = document.getElementById('comment-section') // Find Comment Section Container
+		var rootCommentClass = new window.portfolio.apis.Comment({
+			commentJSON: {
+				_id: null,
+				accountID: null,
+				articleID: entityID,
+				parent: null,
+				upVoteAccountIDs: [],
+				downVoteAccountIDs: [],
+				removed: false,
+				text: 'Comments',
+				facebookProfileID: null,
+				flags: [],
+				children: [],
+				account: {
+					nameFirst: '~First Name~',
+					nameLast: '~Last Name~',
+					facebookProfileID: undefined
+				},
+				dateCreated: '~Date Created~'
+			}
+		})
+		rootCommentClass.shadowRoot.querySelector('.header').classList.add('hidden')
+		rootCommentClass.shadowRoot.querySelector('.main').classList.add('hidden')
+		rootCommentClass.elementReplyToggle.classList.remove('invisible')
+		rootCommentClass.elementRepliesToggle.classList.remove('invisible')
+		rootCommentClass.elementUpVoteButton.classList.add('invisible')
+		rootCommentClass.elementDownVoteButton.classList.add('invisible')
+		rootCommentClass.elementFlagButton.classList.add('invisible')
+		rootCommentClass.elementRemoveButton.classList.add('invisible')
+		rootCommentClass.elementUpVoteCount.classList.add('invisible')
+		rootCommentClass.elementDownVoteCount.classList.add('invisible')
+		rootCommentClass.shadowRoot.querySelector('.actions').style.paddingLeft = '0px'
+		rootCommentClass.shadowRoot.querySelector('.replies-section').style.paddingLeft = '0px'
+		rootCommentClass.shadowRoot.querySelector('.reply-form').style.paddingLeft = '0px'
+		rootCommentClass.shadowRoot.querySelector('.replies').style.paddingLeft = '0px'
+		// Any click event inside the comment section
+		if(commentSection.firstElementChild) {
+			commentSection.firstElementChild.replaceWith(rootCommentClass)
+		}
+		else {
+			commentSection.appendChild(rootCommentClass)
+		}
+		rootCommentClass.elementReplyToggle.click()
+		rootCommentClass.elementRepliesToggle.click()
+
+	}
+}
+//# sourceURL=/scripts/comment.js
+</script>

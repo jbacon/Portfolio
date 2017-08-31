@@ -1,4 +1,3 @@
-# Portfolio API Server: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/)
+# Portfolio REST API Server: [NodeJs](https://nodejs.org/en/), [ExpressJS](https://expressjs.com/)
 
-An API server used by my static website hosted on AWS S3+CloudFront.
-Separation of Responsibilities: 100% isolated away from static assest content delivery.
+My REST API server used by my static site (via CORS) to interact with my Database layer.

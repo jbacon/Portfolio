@@ -10,26 +10,33 @@ module.exports = class Comment extends Document {
 	static get COLLECTION_NAME() {
 		return 'comments'
 	}
-	constructor(comment) {
-		// Use Set methods to perform validation
-		// Set Default/Initial values
-		super(comment);
-		this.accountID = comment.accountID;
-		this._account = (comment._account) ? new Account(comment._account) : undefined;
-		this.text = comment.text || null
-		this.articleID = comment.articleID;
-		this.parentCommentID = comment.parentCommentID || null
-		this.upVoteAccountIDs = comment.upVoteAccountIDs || []
-		this.downVoteAccountIDs = comment.downVoteAccountIDs || []
-		this.flags = comment.flags || []
-		this.removed = comment.removed || null
-		this.childCommentIDs = comment.childCommentIDs || []
+	constructor(json) {
+		// Set Default & Initials
+		super(json)
+		this.articleID = json.articleID
+		this.children = json.children || []
+		this.ancestors = json.ancestors || []
+		this.parent = json.parent || null
+		this._parentComment = (json.parentComment) ? Comment.fromJSON(json.parentComment) : null
+		this.text = json.text
+		this.accountID = json.accountID || null
+		this._account = (json.account) ? Account.fromJSON(json.account) : null
+		this.email = json.email || null
+		this.nameFirst = json.nameFirst || null
+		this.nameLast = json.nameLast || null
+		this.notifyOnReply = json.notifyOnReply || true
+		this.upVoteAccountIDs = json.upVoteAccountIDs || []
+		this.downVoteAccountIDs = json.downVoteAccountIDs || []
+		this.flags = json.flags || []
+		this.removed = json.removed || null
 	}
 	get accountID() {
 		return this._accountID;
 	}
 	set accountID(val) {
-		this._accountID = validatorUtil.normalizeID(val)
+		if(val && (this.email || this.nameFirst || this.nameLast))
+			throw new CustomError('Invalid accountID. You cannot set accountID when any one of: email, nameFirst, or nameLast... have already been set to values.' )
+		this._accountID = validatorUtil.normalizeID(val, { allowNullable: true })
 	}
 	// Virtual Account
 	get account() {
@@ -40,22 +47,18 @@ module.exports = class Comment extends Document {
 				}
 				else {
 					// Refresh/Search account (mismatch ID)
-					const accounts = await Account.read({
-						query: {
+					const result = await mongoUtil.getDB()
+						.collection(Account.COLLECTION_NAME)
+						.findOne({
 							_id: this.accountID
-						},
-						pageSize: 1,
-						pageNum: 1
-					})
-					this._account = accounts[0]
-					return accounts[0];
+						});
+					return Account.fromJSON(result);
 				}
 			}
 			else {
 				return null;
 			}
-            // return await someAsyncOperation();
-        })();
+    })();
 	}
 	get text() {
 		return this._text;
@@ -63,17 +66,75 @@ module.exports = class Comment extends Document {
 	set text(val) {
 		this._text = val
 	}
+	get email() {
+		return this._email;
+	}
+	set email(val) {
+		if(val && this.accountID)
+			throw new CustomError('Invalid email. You cannot set email when accountID has already been set to a value.')
+		if(!val)
+			this._email = null
+		else
+			this._email = validator.normalizeEmail(val)
+	}
+	get nameFirst() {
+		return this._nameFirst;
+	}
+	set nameFirst(val) {
+		if(val && this.accountID)
+			throw new CustomError('Invalid nameFirst. You cannot set nameFirst when accountID has already been set to a value.')
+		this._nameFirst = val
+	}
+	get nameLast() {
+		return this._nameLast;
+	}
+	set nameLast(val) {
+		if(val && this.accountID)
+			throw new CustomError('Invalid nameLast. You cannot set nameLast when accountID has already been set to a value.')
+		this._nameLast = val
+	}
+	get notifyOnReply() {
+		return this._notifyOnReply
+	}
+	set notifyOnReply(val) {
+		this._notifyOnReply = validatorUtil.normalizeBool(val)
+	}
 	get articleID() {
 		return this._articleID;
 	}
 	set articleID(val) {
 		this._articleID = validatorUtil.normalizeID(val)
 	}
-	get parentCommentID() {
-		return this._parentCommentID;
+	get parent() {
+		return this._parent;
 	}
-	set parentCommentID(val) {
-		this._parentCommentID = validatorUtil.normalizeID(val, { allowNullable: true })
+	set parent(val) {
+		const temp = validatorUtil.normalizeID(val, { allowNullable: true })
+		if(temp && this.ancestors.length > 0 && !temp.equals(this.ancestors[this.ancestors.length - 1]))
+			throw new CustomError('Invalid parent value. Parent was not present on the end of the ancestor list.')
+		this._parent = temp
+	}
+	// Virtual Parent Comment
+	get parentComment() {
+		return (async () => {
+			if(this.parent) {
+				if(this._parentComment && this._parentComment._id === this.parent) {
+					return this._parentComment
+				}
+				else {
+					// Refresh/Search account (mismatch ID)
+					const result = await mongoUtil.getDB()
+						.collection(Comment.COLLECTION_NAME)
+						.findOne({
+							_id: this.parent
+						});
+					return Comment.fromJSON(result);
+				}
+			}
+			else {
+				return null;
+			}
+    })();
 	}
 	get upVoteAccountIDs() {
 		return this._upVoteAccountIDs;
@@ -99,189 +160,65 @@ module.exports = class Comment extends Document {
 	set removed(val) {
 		this._removed = validatorUtil.normalizeID(val, { allowNullable: true })
 	}
-	get childCommentIDs() {
-		return this._childCommentIDs;
+	get children() {
+		return this._children;
 	}
-	set childCommentIDs(val) {
-		this._childCommentIDs = validatorUtil.normalizeArrayIDs(val)
+	set children(val) {
+		this._children = validatorUtil.normalizeArrayIDs(val)
 	}
-	async toObjectWithVirtuals() {
-		var obj = super.toJSON()
-		obj.accountID = this.accountID.toHexString();
+	get ancestors() {
+		return this._ancestors;
+	}
+	set ancestors(val) {
+		const temp = validatorUtil.normalizeArrayIDs(val)
+		if(this.parent && temp.length < 1)
+			throw new CustomError('Invalid ancestors list. Ancestors is empty but parent is not.')
+		if(this.parent && !this.parent.equals(temp[temp.length - 1]))
+			throw new CustomError('Invalid ancestors list. Ancestors last item is not equivalent to the parent.')
+		this._ancestors = temp
+	}
+	async toJSONIncludingVirtuals({ includeSensitiveFields=[] } = {}) {
+		var obj = await super.toJSONIncludingVirtuals({ includeSensitiveFields: includeSensitiveFields })
+		obj.accountID = (this.accountID) ? this.accountID.toHexString() : this.accountID
 		const account = await this.account;
-		obj.account = (account) ? account.toJSON() : null;
-		obj.text = this.text;
+		if(account)
+			obj.account = await account.toJSONIncludingVirtuals({ includeSensitiveFields: includeSensitiveFields.filter((field) => field.startsWith('account.')).map((field) => { return field.substr(8) }) })
+		obj.text = this.text
+		if(includeSensitiveFields.includes('email'))
+			obj.email = this.email
+		obj.nameFirst = this.nameFirst
+		obj.nameLast = this.nameLast
+		obj.notifyOnReply = this.notifyOnReply
 		obj.articleID = this.articleID.toHexString();
-		obj.parentCommentID = (this.parentCommentID) ? this.parentCommentID.toHexString() : null;
+		obj.parent = (this.parent) ? this.parent.toHexString() : this.parent;
+		const parentComment = await this.parentComment;
+		if(parentComment)
+			obj.parentComment = await parentComment.toJSONIncludingVirtuals({ includeSensitiveFields: includeSensitiveFields.filter((field) => field.startsWith('parentComment.')).map((field) => { return field.substr(8) }) })
 		obj.upVoteAccountIDs = this.upVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
 		obj.downVoteAccountIDs = this.downVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
 		obj.flags = this.flags.map((objectID) => { return objectID.toHexString() });
-		obj.removed = (this.removed) ? this.removed.toHexString() : null;
-		obj.childCommentIDs = this.childCommentIDs.map((objectID) => { return objectID.toHexString() });
+		obj.removed = (this.removed) ? this.removed.toHexString() : this.removed;
+		obj.children = this.children.map((objectID) => { return objectID.toHexString() });
+		obj.ancestors = this.ancestors.map((objectID) => { return objectID.toHexString() });
 		return obj;
 	}
-	toJSON() {
-		var obj = super.toJSON()
-		obj.accountID = this.accountID.toHexString();
+	toJSON({ includeSensitiveFields=[] } = {}) {
+		var obj = super.toJSON({ includeSensitiveFields: includeSensitiveFields })
+		obj.accountID = (this.accountID) ? this.accountID.toHexString() : this.accountID
 		obj.text = this.text;
+		if(includeSensitiveFields.includes('email'))
+			obj.email = this.email
+		obj.nameFirst = this.nameFirst
+		obj.nameLast = this.nameLast
+		obj.notifyOnReply = this.notifyOnReply
 		obj.articleID = this.articleID.toHexString();
-		obj.parentCommentID = (this.parentCommentID) ? this.parentCommentID.toHexString() : null;
+		obj.parent = (this.parent) ? this.parent.toHexString() : this.parent;
 		obj.upVoteAccountIDs = this.upVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
 		obj.downVoteAccountIDs = this.downVoteAccountIDs.map((objectID) => { return objectID.toHexString() });
 		obj.flags = this.flags.map((objectID) => { return objectID.toHexString() });
-		obj.removed = (this.removed) ? this.removed.toHexString() : null
-		obj.childCommentIDs = this.childCommentIDs.map((objectID) => { return objectID.toHexString() });
+		obj.removed = (this.removed) ? this.removed.toHexString() : this.removed
+		obj.children = this.children.map((objectID) => { return objectID.toHexString() });
+		obj.ancestors = this.ancestors.map((objectID) => { return objectID.toHexString() });
 		return obj;
-	}
-	static async create({ comment } = {}) {
-		if(!(comment instanceof Comment))
-			throw new CustomError('Parameter not instance of Comment', 500, comment)
-		// Try CREATE!
-		const result = await super.create({
-			doc: comment
-		})
-		// If new comment has a PARENT, then add new ID to the PARENTS childCommentList (for purpose as secondary search criteria)
-		if(result.ops[0].parentCommentID) {
-			Comment.addChildCommentID({
-				_id: result.ops[0].parentCommentID.toString(),
-				childCommentID: result.ops[0]._id
-			})
-		}
-		const newComment = new Comment(result.ops[0])
-		return newComment
-	}
-	static async read({ id=undefined, articleID=undefined, parentCommentID=undefined, start=undefined, pageSize=10, sortOrder=-1/*Ascending*/, pageNum=1, skipOnPage=0 } = {}) {
-		//Build match query (based on paramaters)
-		const match = {}
-		if(id !== undefined) {
-			match._id = validatorUtil.normalizeID(id, { allowNullable: true })
-		}
-		else { // IF ID PROVIDED, then START IS IRRELEVANT TO QUERY!
-			var startObject;
-			if(start === 'newest')
-				startObject = mongodb.ObjectID()
-			else 
-				startObject = validatorUtil.normalizeID(start)
-			if(sortOrder === -1) //New -> Old
-				match._id = { $lte: startObject }
-			else if(sortOrder === 1) //Old -> New
-				match._id = { $gt: startObject };
-		}
-		if(articleID !== undefined) {
-			match.articleID = validatorUtil.normalizeID(articleID).toHexString()
-		}
-		if(parentCommentID !== undefined) {
-			match.parentCommentID = validatorUtil.normalizeID(parentCommentID, { allowNullable: true })
-			match.parentCommentID = (match.parentCommentID) ? match.parentCommentID.toHexString() : match.parentCommentID
-		}
-		const results = await mongoUtil.getDB()
-			.collection(Comment.COLLECTION_NAME)
-			.aggregate([])
-			.match(match)
-			.sort({
-				_id: sortOrder
-			})
-			.skip(parseInt(pageSize) * (parseInt(pageNum) - 1))
-			.limit(parseInt(pageSize))
-			.lookup({
-				from: 'accounts',
-				localField: 'accountID',
-				foreignField: '_id',
-				as: '_account'
-			})
-			.unwind({
-				path: '$_account',
-				includeArrayIndex: '_accountIndex',
-				preserveNullAndEmptyArrays: true
-			})
-			.toArray()
-		const sliced = results.slice(skipOnPage);
-		const comments = sliced.map((result) => { return new Comment(result) })
-		return comments //Skip On Page
-	}
-	static async update({ comment } = {}) {
-		if(!(comment instanceof Comment))
-			throw new CustomError('Failed to create document. Parameter not instance of Comment', 500, comment)
-		const result = await super.update({
-			doc: comment
-		})
-		return result;
-	}
-	static async delete({ _id } = {}) {
-		const result = await super.delete( {
-			_id: _id,
-			collection: Comment.COLLECTION_NAME
-		});
-		return result
-	}
-	static async addChildCommentID({ _id, childCommentID } = {}) {
-		const result = await mongoUtil.getDB()
-			.collection(Comment.COLLECTION_NAME).updateOne(
-				{
-					_id: validatorUtil.normalizeID(_id)
-				},
-				{
-					$addToSet: {
-						childCommentIDs: validatorUtil.normalizeID(childCommentID) 
-					}
-				}
-			);
-		return result
-	}
-	static async userDownVote({ _id, accountID } = {}) {
-		const result = await mongoUtil.getDB()
-			.collection(Comment.COLLECTION_NAME).updateOne(
-				{
-					_id: validatorUtil.normalizeID(_id)  
-				},
-				{
-					$addToSet: {
-						downVoteAccountIDs: validatorUtil.normalizeID(accountID) 
-					}
-				}
-			);
-		return result;
-	}
-	static async userUpVote({ _id, accountID } = {}) {
-		const result = await mongoUtil.getDB()
-			.collection(Comment.COLLECTION_NAME).updateOne(
-				{
-					_id: validatorUtil.normalizeID(_id)  
-				},
-				{
-					$addToSet: {
-						upVoteAccountIDs: validatorUtil.normalizeID(accountID) 
-					}
-				}
-			);
-		return result
-	}
-	static async flag({ _id, accountID } = {}) {
-		const result = await mongoUtil.getDB()
-			.collection(Comment.COLLECTION_NAME).updateOne(
-				{
-					_id: validatorUtil.normalizeID(_id) 
-				},
-				{
-					$addToSet: {
-						flags: validatorUtil.normalizeID(accountID)
-					}
-				}
-			);
-		return result;
-	}
-	static async remove({ _id, accountID } = {}) {
-		const result = await mongoUtil.getDB()
-			.collection(Comment.COLLECTION_NAME).updateOne(
-				{
-					_id: validatorUtil.normalizeID(_id) 
-				},
-				{
-					$set: { 
-						removed: validatorUtil.normalizeID(accountID)
-					}
-				}
-			);
-		return result
 	}
 }
